@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_28_093954) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_28_185854) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -84,6 +84,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_28_093954) do
     t.index ["vendor_id"], name: "index_promotions_on_vendor_id"
   end
 
+  create_table "purchasers", force: :cascade do |t|
+    t.string "username"
+    t.string "password_hash"
+    t.string "email"
+    t.string "phone_number"
+    t.string "location"
+    t.string "role"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_purchasers_on_email"
+    t.index ["username"], name: "index_purchasers_on_username"
+  end
+
   create_table "reviews", force: :cascade do |t|
     t.bigint "product_id", null: false
     t.bigint "user_id", null: false
@@ -105,27 +118,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_28_093954) do
     t.index ["order_id"], name: "index_shipments_on_order_id"
   end
 
-  create_table "users", force: :cascade do |t|
-    t.string "username"
-    t.string "password_hash"
-    t.string "email"
-    t.string "phone_number"
-    t.date "birth_date"
-    t.string "location"
-    t.string "role"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_users_on_email"
-    t.index ["username"], name: "index_users_on_username"
-  end
-
   create_table "vendors", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "name"
     t.text "description"
     t.text "contact_info"
     t.string "phone_number"
-    t.date "birth_date"
     t.string "location"
     t.bigint "category_id", null: false
     t.decimal "total_revenue"
@@ -135,18 +133,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_28_093954) do
     t.jsonb "analytics"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "business_number_registration"
     t.index ["category_id"], name: "index_vendors_on_category_id"
     t.index ["user_id"], name: "index_vendors_on_user_id"
   end
 
   add_foreign_key "invoices", "orders"
-  add_foreign_key "orders", "users"
+  add_foreign_key "orders", "purchasers", column: "user_id"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "vendors"
   add_foreign_key "promotions", "vendors"
   add_foreign_key "reviews", "products"
-  add_foreign_key "reviews", "users"
+  add_foreign_key "reviews", "purchasers", column: "user_id"
   add_foreign_key "shipments", "orders"
   add_foreign_key "vendors", "categories"
-  add_foreign_key "vendors", "users"
+  add_foreign_key "vendors", "purchasers", column: "user_id"
 end
