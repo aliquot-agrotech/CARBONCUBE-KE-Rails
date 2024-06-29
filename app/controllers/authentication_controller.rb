@@ -1,5 +1,5 @@
 class AuthenticationController < ApplicationController
-    before_action :authorize_request, except: :login
+    skip_before_action :verify_authenticity_token, only: [:login]
 
     def login
         @purchaser = Purchaser.find_by(username: params[:username])

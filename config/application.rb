@@ -32,5 +32,7 @@ module Carbonecomrails
           expose: ['Authorization']
       end
     end
+
+    config.api_only = true
   end
 end
