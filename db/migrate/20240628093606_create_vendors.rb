@@ -12,7 +12,6 @@ class CreateVendors < ActiveRecord::Migration[7.1]
       t.decimal :total_revenue
       t.integer :total_orders
       t.jsonb :customer_demographics
-      t.jsonb :product_inventory
       t.jsonb :analytics
 
       t.timestamps
