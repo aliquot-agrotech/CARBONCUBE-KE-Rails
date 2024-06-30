@@ -1,6 +1,6 @@
 class AuthenticationController < ApplicationController
     skip_before_action :verify_authenticity_token, only: [:login]
-  
+
     def login
         @user = Purchaser.find_by(email: params[:email]) || Vendor.find_by(email: params[:email]) || Admin.find_by(email: params[:email])
         
@@ -11,9 +11,9 @@ class AuthenticationController < ApplicationController
             render json: { errors: ['Invalid email or password'] }, status: :unauthorized
         end
     end
-  
+
     private
-  
+
     def determine_role(user)
         if user.is_a?(Purchaser)
             'purchaser'
@@ -25,5 +25,4 @@ class AuthenticationController < ApplicationController
             'unknown'
         end
     end
-  end
-  
+end

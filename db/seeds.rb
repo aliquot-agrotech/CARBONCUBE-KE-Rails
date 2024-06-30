@@ -16,3 +16,13 @@ Category.create([
     { name: 'Automotive Spares', description: 'Spare parts for automobiles' },
     { name: 'Computer Parts and Accessories', description: 'Components and accessories for computers' }
 ])
+
+# Seed admin data
+Admin.create!(
+  fullame: 'Admin Name',
+  password: 'adminpassword',
+  email: 'admin@example.com',
+  role: 'admin'
+)
+
+puts 'Admin seed data created successfully!'
