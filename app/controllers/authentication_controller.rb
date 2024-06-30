@@ -2,23 +2,25 @@ class AuthenticationController < ApplicationController
     skip_before_action :verify_authenticity_token, only: [:login]
 
     def login
-        @purchaser = Purchaser.find_by(username: params[:username])
-        if @purchaser&.authenticate(params[:password])
-            token = JsonWebToken.encode(purchaser_id: @purchaser.id, role: @purchaser.role)
-            render json: { token: token, role: @purchaser.role }, status: :ok
+        @user = Purchaser.find_by(email: params[:email]) || Vendor.find_by(email: params[:email])
+        
+        if @user&.authenticate(params[:password])
+            token = JsonWebToken.encode(user_id: @user.id, role: determine_role(@user))
+            render json: { token: token, user: @user }, status: :ok
         else
-            render json: { error: 'Invalid username or password' }, status: :unauthorized
+            render json: { errors: ['Invalid email or password'] }, status: :unauthorized
         end
     end
 
     private
 
-    def authorize_request
-        header = request.headers['Authorization']
-        header = header.split(' ').last if header
-        decoded = JsonWebToken.decode(header)
-        @current_purchaser = Purchaser.find(decoded[:purchaser_id]) if decoded
-    rescue ActiveRecord::RecordNotFound, JWT::DecodeError
-        render json: { error: 'Unauthorized request' }, status: :unauthorized
+    def determine_role(user)
+        if user.is_a?(Purchaser)
+            'purchaser'
+        elsif user.is_a?(Vendor)
+            'vendor'
+        else
+            'unknown'
+        end
     end
 end
