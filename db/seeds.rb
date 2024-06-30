@@ -7,3 +7,12 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+# db/seeds.rb
+
+Category.create([
+    { name: 'Filtration Solutions', description: 'Products related to filtration solutions' },
+    { name: 'Hardware Tools', description: 'Various hardware tools' },
+    { name: 'Automotive Spares', description: 'Spare parts for automobiles' },
+    { name: 'Computer Parts and Accessories', description: 'Components and accessories for computers' }
+])

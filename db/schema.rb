@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_29_183330) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_29_194851) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -26,6 +26,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_29_183330) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "categories_vendors", id: false, force: :cascade do |t|
+    t.bigint "category_id", null: false
+    t.bigint "vendor_id", null: false
+    t.index ["category_id", "vendor_id"], name: "index_categories_vendors_on_category_id_and_vendor_id"
+    t.index ["vendor_id", "category_id"], name: "index_categories_vendors_on_vendor_id_and_category_id"
   end
 
   create_table "cms_pages", force: :cascade do |t|
@@ -120,12 +127,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_29_183330) do
   end
 
   create_table "vendors", force: :cascade do |t|
-    t.string "name"
+    t.string "fullname"
     t.text "description"
     t.text "contact_info"
     t.string "phone_number"
     t.string "location"
-    t.bigint "category_id", null: false
     t.decimal "total_revenue"
     t.integer "total_orders"
     t.jsonb "customer_demographics"
@@ -135,7 +141,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_29_183330) do
     t.string "business_number_registration"
     t.string "enterprise_name"
     t.string "email"
-    t.index ["category_id"], name: "index_vendors_on_category_id"
+    t.string "password_digest"
+    t.string "business_registration_number"
   end
 
   add_foreign_key "invoices", "orders"
@@ -146,5 +153,4 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_29_183330) do
   add_foreign_key "reviews", "products"
   add_foreign_key "reviews", "purchasers"
   add_foreign_key "shipments", "orders"
-  add_foreign_key "vendors", "categories"
 end

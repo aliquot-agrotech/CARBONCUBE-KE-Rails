@@ -3,7 +3,6 @@ class Purchaser < ApplicationRecord
   
     has_many :orders
     has_many :reviews
-    has_one :vendor
   
     validates :username, presence: false, uniqueness: true
     validates :fullname, presence: true

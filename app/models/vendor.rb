@@ -1,13 +1,12 @@
 class Vendor < ApplicationRecord
   has_secure_password
 
-  belongs_to :purchaser
   has_and_belongs_to_many :categories
   has_many :products
   has_many :orders
   has_many :reviews, through: :products
 
-  validates :full_name, presence: true
+  validates :fullname, presence: true
   validates :phone_number, presence: true
   validates :email, presence: true, uniqueness: true
   validates :enterprise_name, presence: true
