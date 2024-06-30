@@ -19,10 +19,10 @@ Category.create([
 
 # Seed admin data
 Admin.create!(
-  fullame: 'Admin Name',
-  password: 'adminpassword',
-  email: 'admin@example.com',
-  role: 'admin'
+    fullame: 'Admin Name',
+    password: 'adminpassword',
+    email: 'admin@example.com',
+    role: 'admin'
 )
 
 puts 'Admin seed data created successfully!'
