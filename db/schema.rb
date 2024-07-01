@@ -135,7 +135,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_30_105331) do
   end
 
   create_table "vendors", force: :cascade do |t|
-    t.bigint "user_id", null: false
     t.string "fullname"
     t.text "description"
     t.text "contact_info"
@@ -152,7 +151,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_30_105331) do
     t.string "email"
     t.string "password_digest"
     t.string "business_registration_number"
-    t.index ["user_id"], name: "index_vendors_on_user_id"
   end
 
   add_foreign_key "invoices", "orders"
@@ -163,5 +161,4 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_30_105331) do
   add_foreign_key "reviews", "products"
   add_foreign_key "reviews", "purchasers", column: "user_id"
   add_foreign_key "shipments", "orders"
-  add_foreign_key "vendors", "purchasers", column: "user_id"
 end
