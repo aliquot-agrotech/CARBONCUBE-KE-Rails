@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_01_120832) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_01_122022) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -83,8 +83,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_01_120832) do
     t.integer "quantity"
     t.string "brand"
     t.string "manufacturer"
-    t.string "package_dimensions"
     t.decimal "package_weight"
+    t.decimal "package_length"
+    t.decimal "package_width"
+    t.decimal "package_height"
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["vendor_id"], name: "index_products_on_vendor_id"
   end
