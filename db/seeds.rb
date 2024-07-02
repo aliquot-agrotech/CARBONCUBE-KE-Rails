@@ -15,9 +15,9 @@
 # Create categories
 categories = [
     { name: 'Filtration Solutions', description: 'Products related to filtration solutions' },
-    { name: 'Hardware Tools', description: 'Various hardware tools' },
+    { name: 'Hardware Tools', description: 'Various Hardware Tools' },
     { name: 'Automotive Spares', description: 'Spare parts for automobiles' },
-    { name: 'Computer Parts and Accessories and Accessories', description: 'Components and accessories for computers' }
+    { name: 'Computer Parts and Accessories', description: 'Components and accessories for computers' }
 ]
 
 categories.each do |category_data|
@@ -77,12 +77,12 @@ products = [
     { title: 'Shower Water Filter', description: 'Filters chlorine and impurities from shower water, promoting healthier skin and hair.', media: ['shower_filter.jpg'], category_id: Category.find_by(name: 'Filtration Solutions').id, vendor_id: Vendor.first.id, price: 49.99, quantity: 80, brand: 'PureShower', manufacturer: 'ShowerTech', package_length: 8, package_width: 4, package_height: 12, package_weight: 1.5 },
     { title: 'Under Sink Water Filter', description: 'Compact under sink water filtration system for clean drinking water.', media: ['under_sink_filter.jpg'], category_id: Category.find_by(name: 'Filtration Solutions').id, vendor_id: Vendor.second.id, price: 149.99, quantity: 20, brand: 'PureSink', manufacturer: 'HomeTech', package_length: 16, package_width: 10, package_height: 14, package_weight: 3.0 },
 
-    # hardware Tools
-    { title: 'Cordless Drill', description: 'Powerful cordless drill with multiple torque settings and LED light.', media: ['cordless_drill.jpg'], category_id: Category.find_by(name: 'hardware Tools').id, vendor_id: Vendor.third.id, price: 129.99, quantity: 40, brand: 'MaxDrill', manufacturer: 'ToolTech', package_length: 14, package_width: 6, package_height: 10, package_weight: 2.5 },
-    { title: 'Tool Chest', description: 'Large tool chest with drawers and wheels for easy mobility.', media: ['tool_chest.jpg'], category_id: Category.find_by(name: 'hardware Tools').id, vendor_id: Vendor.first.id, price: 299.99, quantity: 10, brand: 'ToolMaster', manufacturer: 'ToolCraft', package_length: 20, package_width: 12, package_height: 18, package_weight: 8.0 },
-    { title: 'Hammer Set', description: 'Assorted hammer set with fiberglass handles for durability.', media: ['hammer_set.jpg'], category_id: Category.find_by(name: 'hardware Tools').id, vendor_id: Vendor.second.id, price: 49.99, quantity: 50, brand: 'ProHammer', manufacturer: 'HammerTech', package_length: 8, package_width: 4, package_height: 12, package_weight: 1.8 },
-    { title: 'Electric Screwdriver', description: 'Electric screwdriver with rechargeable battery and multiple bit attachments.', media: ['electric_screwdriver.jpg'], category_id: Category.find_by(name: 'hardware Tools').id, vendor_id: Vendor.third.id, price: 79.99, quantity: 30, brand: 'PowerDriver', manufacturer: 'DriverTech', package_length: 10, package_width: 5, package_height: 14, package_weight: 2.0 },
-    { title: 'Heavy Duty Saw', description: 'Professional heavy-duty saw for woodworking and construction projects.', media: ['heavy_duty_saw.jpg'], category_id: Category.find_by(name: 'hardware Tools').id, vendor_id: Vendor.first.id, price: 199.99, quantity: 20, brand: 'ProSaw', manufacturer: 'SawTech', package_length: 18, package_width: 8, package_height: 16, package_weight: 4.5 },
+    # Hardware Tools
+    { title: 'Cordless Drill', description: 'Powerful cordless drill with multiple torque settings and LED light.', media: ['cordless_drill.jpg'], category_id: Category.find_by(name: 'Hardware Tools').id, vendor_id: Vendor.third.id, price: 129.99, quantity: 40, brand: 'MaxDrill', manufacturer: 'ToolTech', package_length: 14, package_width: 6, package_height: 10, package_weight: 2.5 },
+    { title: 'Tool Chest', description: 'Large tool chest with drawers and wheels for easy mobility.', media: ['tool_chest.jpg'], category_id: Category.find_by(name: 'Hardware Tools').id, vendor_id: Vendor.first.id, price: 299.99, quantity: 10, brand: 'ToolMaster', manufacturer: 'ToolCraft', package_length: 20, package_width: 12, package_height: 18, package_weight: 8.0 },
+    { title: 'Hammer Set', description: 'Assorted hammer set with fiberglass handles for durability.', media: ['hammer_set.jpg'], category_id: Category.find_by(name: 'Hardware Tools').id, vendor_id: Vendor.second.id, price: 49.99, quantity: 50, brand: 'ProHammer', manufacturer: 'HammerTech', package_length: 8, package_width: 4, package_height: 12, package_weight: 1.8 },
+    { title: 'Electric Screwdriver', description: 'Electric screwdriver with rechargeable battery and multiple bit attachments.', media: ['electric_screwdriver.jpg'], category_id: Category.find_by(name: 'Hardware Tools').id, vendor_id: Vendor.third.id, price: 79.99, quantity: 30, brand: 'PowerDriver', manufacturer: 'DriverTech', package_length: 10, package_width: 5, package_height: 14, package_weight: 2.0 },
+    { title: 'Heavy Duty Saw', description: 'Professional heavy-duty saw for woodworking and construction projects.', media: ['heavy_duty_saw.jpg'], category_id: Category.find_by(name: 'Hardware Tools').id, vendor_id: Vendor.first.id, price: 199.99, quantity: 20, brand: 'ProSaw', manufacturer: 'SawTech', package_length: 18, package_width: 8, package_height: 16, package_weight: 4.5 },
 
     # Automotive Spares
     { title: 'Brake Pad Kit', description: 'Complete brake pad replacement kit for cars and trucks.', media: ['brake_pad_kit.jpg'], category_id: Category.find_by(name: 'Automotive Spares').id, vendor_id: Vendor.second.id, price: 79.99, quantity: 60, brand: 'BrakeTech', manufacturer: 'AutoParts Inc', package_length: 12, package_width: 6, package_height: 8, package_weight: 3.2 },

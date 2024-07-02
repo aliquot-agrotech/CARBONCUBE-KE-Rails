@@ -60,7 +60,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_01_122022) do
   end
 
   create_table "orders", force: :cascade do |t|
-    t.bigint "user_id", null: false
+    t.bigint "purchaser_id", null: false
     t.string "status"
     t.decimal "total_amount"
     t.boolean "is_sent_out"
@@ -68,7 +68,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_01_122022) do
     t.boolean "is_delivered"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_orders_on_user_id"
+    t.index ["purchaser_id"], name: "index_orders_on_purchaser_id"
   end
 
   create_table "products", force: :cascade do |t|
@@ -119,13 +119,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_01_122022) do
 
   create_table "reviews", force: :cascade do |t|
     t.bigint "product_id", null: false
-    t.bigint "user_id", null: false
+    t.bigint "purchaser_id", null: false
     t.integer "rating"
     t.text "review"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_reviews_on_product_id"
-    t.index ["user_id"], name: "index_reviews_on_user_id"
+    t.index ["purchaser_id"], name: "index_reviews_on_purchaser_id"
   end
 
   create_table "shipments", force: :cascade do |t|
@@ -158,11 +158,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_01_122022) do
   end
 
   add_foreign_key "invoices", "orders"
-  add_foreign_key "orders", "purchasers", column: "user_id"
+  add_foreign_key "orders", "purchasers"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "vendors"
   add_foreign_key "promotions", "vendors"
   add_foreign_key "reviews", "products"
-  add_foreign_key "reviews", "purchasers", column: "user_id"
+  add_foreign_key "reviews", "purchasers"
   add_foreign_key "shipments", "orders"
 end
