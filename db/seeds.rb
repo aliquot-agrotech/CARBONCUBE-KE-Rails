@@ -116,6 +116,62 @@ products.each do |product_data|
     end
 end
 
+# Seed orders data
+orders = [
+  { purchaser_id: Purchaser.first.id, status: 'processing', total_amount: 129.98, is_sent_out: false, is_processing: true, is_delivered: false },
+  { purchaser_id: Purchaser.second.id, status: 'processing', total_amount: 219.98, is_sent_out: false, is_processing: true, is_delivered: false },
+  { purchaser_id: Purchaser.third.id, status: 'processing', total_amount: 89.99, is_sent_out: false, is_processing: true, is_delivered: false },
+  { purchaser_id: Purchaser.first.id, status: 'processing', total_amount: 189.98, is_sent_out: false, is_processing: true, is_delivered: false },
+  { purchaser_id: Purchaser.second.id, status: 'processing', total_amount: 299.99, is_sent_out: false, is_processing: true, is_delivered: false },
+  { purchaser_id: Purchaser.third.id, status: 'processing', total_amount: 59.99, is_sent_out: false, is_processing: true, is_delivered: false },
+  { purchaser_id: Purchaser.first.id, status: 'processing', total_amount: 159.98, is_sent_out: false, is_processing: true, is_delivered: false },
+  { purchaser_id: Purchaser.second.id, status: 'processing', total_amount: 209.97, is_sent_out: false, is_processing: true, is_delivered: false },
+  { purchaser_id: Purchaser.third.id, status: 'processing', total_amount: 119.98, is_sent_out: false, is_processing: true, is_delivered: false },
+  { purchaser_id: Purchaser.first.id, status: 'processing', total_amount: 179.97, is_sent_out: false, is_processing: true, is_delivered: false }
+]
+
+orders.each do |order_data|
+  Order.create!(order_data)
+end
+
+# Seed order items data
+order_items = [
+  { order_id: Order.first.id, product_id: Product.first.id, quantity: 2 },
+  { order_id: Order.second.id, product_id: Product.second.id, quantity: 1 },
+  { order_id: Order.third.id, product_id: Product.third.id, quantity: 3 },
+  { order_id: Order.fourth.id, product_id: Product.fourth.id, quantity: 2 },
+  { order_id: Order.fifth.id, product_id: Product.fifth.id, quantity: 1 },
+  { order_id: Order.sixth.id, product_id: Product.first.id, quantity: 2 },
+  { order_id: Order.seventh.id, product_id: Product.second.id, quantity: 1 },
+  { order_id: Order.eighth.id, product_id: Product.third.id, quantity: 3 },
+  { order_id: Order.ninth.id, product_id: Product.fourth.id, quantity: 2 },
+  { order_id: Order.tenth.id, product_id: Product.fifth.id, quantity: 1 }
+]
+
+order_items.each do |order_item_data|
+  OrderItem.create!(order_item_data)
+end
+
+# Seed order vendors data
+order_vendors = [
+  { order_id: Order.first.id, vendor_id: Vendor.first.id },
+  { order_id: Order.second.id, vendor_id: Vendor.second.id },
+  { order_id: Order.third.id, vendor_id: Vendor.third.id },
+  { order_id: Order.fourth.id, vendor_id: Vendor.second.id },
+  { order_id: Order.fifth.id, vendor_id: Vendor.third.id },
+  { order_id: Order.sixth.id, vendor_id: Vendor.first.id },
+  { order_id: Order.seventh.id, vendor_id: Vendor.third.id },
+  { order_id: Order.eighth.id, vendor_id: Vendor.first.id },
+  { order_id: Order.ninth.id, vendor_id: Vendor.second.id },
+  { order_id: Order.tenth.id, vendor_id: Vendor.second.id }
+]
+
+order_vendors.each do |order_vendor_data|
+  OrderVendor.create!(order_vendor_data)
+end
+
+
+
 
 puts 'Seed data created successfully!'
 
