@@ -134,18 +134,35 @@ orders.each do |order_data|
   Order.create!(order_data)
 end
 
+# Ensure orders and products are created before running this
+
+# Fetch all orders and products
+orders = Order.all
+products = Product.all
+vendors = Vendor.all
+
 # Seed order items data
 order_items = [
-  { order_id: Order.first.id, product_id: Product.first.id, quantity: 2 },
-  { order_id: Order.second.id, product_id: Product.second.id, quantity: 1 },
-  { order_id: Order.third.id, product_id: Product.third.id, quantity: 3 },
-  { order_id: Order.fourth.id, product_id: Product.fourth.id, quantity: 2 },
-  { order_id: Order.fifth.id, product_id: Product.fifth.id, quantity: 1 },
-  { order_id: Order.sixth.id, product_id: Product.first.id, quantity: 2 },
-  { order_id: Order.seventh.id, product_id: Product.second.id, quantity: 1 },
-  { order_id: Order.eighth.id, product_id: Product.third.id, quantity: 3 },
-  { order_id: Order.ninth.id, product_id: Product.fourth.id, quantity: 2 },
-  { order_id: Order.tenth.id, product_id: Product.fifth.id, quantity: 1 }
+  { order_id: orders[0].id, product_id: products[0].id, quantity: 2 },
+  { order_id: orders[0].id, product_id: products[1].id, quantity: 1 },
+  { order_id: orders[1].id, product_id: products[2].id, quantity: 3 },
+  { order_id: orders[1].id, product_id: products[13].id, quantity: 2 },
+  { order_id: orders[2].id, product_id: products[4].id, quantity: 1 },
+  { order_id: orders[2].id, product_id: products[0].id, quantity: 2 },
+  { order_id: orders[3].id, product_id: products[12].id, quantity: 1 },
+  { order_id: orders[3].id, product_id: products[2].id, quantity: 2 },
+  { order_id: orders[4].id, product_id: products[4].id, quantity: 1 },
+  { order_id: orders[4].id, product_id: products[15].id, quantity: 3 },
+  { order_id: orders[5].id, product_id: products[3].id, quantity: 2 },
+  { order_id: orders[5].id, product_id: products[0].id, quantity: 1 },
+  { order_id: orders[6].id, product_id: products[2].id, quantity: 4 },
+  { order_id: orders[6].id, product_id: products[1].id, quantity: 2 },
+  { order_id: orders[7].id, product_id: products[3].id, quantity: 1 },
+  { order_id: orders[7].id, product_id: products[4].id, quantity: 3 },
+  { order_id: orders[8].id, product_id: products[17].id, quantity: 2 },
+  { order_id: orders[8].id, product_id: products[2].id, quantity: 1 },
+  { order_id: orders[9].id, product_id: products[3].id, quantity: 3 },
+  { order_id: orders[9].id, product_id: products[1].id, quantity: 2 }
 ]
 
 order_items.each do |order_item_data|
@@ -154,16 +171,16 @@ end
 
 # Seed order vendors data
 order_vendors = [
-  { order_id: Order.first.id, vendor_id: Vendor.first.id },
-  { order_id: Order.second.id, vendor_id: Vendor.second.id },
-  { order_id: Order.third.id, vendor_id: Vendor.third.id },
-  { order_id: Order.fourth.id, vendor_id: Vendor.second.id },
-  { order_id: Order.fifth.id, vendor_id: Vendor.third.id },
-  { order_id: Order.sixth.id, vendor_id: Vendor.first.id },
-  { order_id: Order.seventh.id, vendor_id: Vendor.third.id },
-  { order_id: Order.eighth.id, vendor_id: Vendor.first.id },
-  { order_id: Order.ninth.id, vendor_id: Vendor.second.id },
-  { order_id: Order.tenth.id, vendor_id: Vendor.second.id }
+  { order_id: orders[0].id, vendor_id: vendors[0].id },
+  { order_id: orders[1].id, vendor_id: vendors[1].id },
+  { order_id: orders[2].id, vendor_id: vendors[2].id },
+  { order_id: orders[3].id, vendor_id: vendors[1].id },
+  { order_id: orders[4].id, vendor_id: vendors[2].id },
+  { order_id: orders[5].id, vendor_id: vendors[0].id },
+  { order_id: orders[6].id, vendor_id: vendors[2].id },
+  { order_id: orders[7].id, vendor_id: vendors[0].id },
+  { order_id: orders[8].id, vendor_id: vendors[1].id },
+  { order_id: orders[9].id, vendor_id: vendors[1].id }
 ]
 
 order_vendors.each do |order_vendor_data|

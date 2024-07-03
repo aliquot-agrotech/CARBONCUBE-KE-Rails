@@ -93,19 +93,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_02_144639) do
   create_table "products", force: :cascade do |t|
     t.bigint "vendor_id", null: false
     t.bigint "category_id", null: false
-    t.text "description"
-    t.decimal "price"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.string "title"
-    t.jsonb "media", default: []
+    t.text "description"
+    t.string "media"
+    t.decimal "price"
     t.integer "quantity"
     t.string "brand"
     t.string "manufacturer"
-    t.decimal "package_weight"
+    t.string "package_weight"
     t.decimal "package_length"
     t.decimal "package_width"
     t.decimal "package_height"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["vendor_id"], name: "index_products_on_vendor_id"
   end
@@ -123,15 +123,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_02_144639) do
   end
 
   create_table "purchasers", force: :cascade do |t|
+    t.string "fullname"
     t.string "username"
+    t.string "password_digest"
     t.string "email"
     t.string "phone_number"
     t.string "location"
     t.string "role"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "password_digest"
-    t.string "fullname"
     t.index ["email"], name: "index_purchasers_on_email"
     t.index ["username"], name: "index_purchasers_on_username"
   end
@@ -167,13 +167,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_02_144639) do
     t.integer "total_orders"
     t.jsonb "customer_demographics"
     t.jsonb "analytics"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "business_number_registration"
+    t.string "business_registration_number"
     t.string "enterprise_name"
     t.string "email"
     t.string "password_digest"
-    t.string "business_registration_number"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_foreign_key "invoices", "orders"
