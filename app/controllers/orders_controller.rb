@@ -1,12 +1,11 @@
 # app/controllers/orders_controller.rb
+
 class OrdersController < ApplicationController
   before_action :set_order, only: [:show, :update, :destroy]
 
   # GET /orders
   def index
-    puts "Fetching orders..."
     orders = Order.includes(:order_items, :purchaser).all
-    puts "Orders fetched: #{orders.inspect}"
     render json: orders, status: :ok
   end
 
@@ -48,7 +47,9 @@ class OrdersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def order_params
-      params.require(:order).permit(:purchaser_id, :status, :total_amount, :is_sent_out, :is_processing, :is_delivered, product_ids: [])
+      params.require(:order).permit(:purchaser_id, :status, :total_amount, :is_sent_out, :is_processing, :is_delivered, 
+                                    order_items_attributes: [:id, :product_id, :quantity, :_destroy], 
+                                    order_vendors_attributes: [:id, :vendor_id, :_destroy])
     end
 end
 
