@@ -15,4 +15,5 @@ Rails.application.routes.draw do
   resources :products
   resources :purchasers
   resources :vendors, only: [:index, :show, :create, :update, :destroy]
+  resources :reviews, only: [:index, :show, :create, :update, :destroy]
 end

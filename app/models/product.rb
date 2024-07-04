@@ -1,6 +1,7 @@
 class Product < ApplicationRecord
   belongs_to :vendor
   belongs_to :category
+  has_many :reviews
 
   validates :title, presence: true
   validates :description, presence: true

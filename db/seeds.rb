@@ -34,9 +34,16 @@ end
 
 # Seed purchaser data
 purchasers = [
-    { fullname: 'Purchaser One', username: 'purchaser1', phone_number: '1234567890', email: 'purchaser1@example.com', location: '123 Street, City', password: 'password' },
-    { fullname: 'Purchaser Two', username: 'purchaser2', phone_number: '1234567891', email: 'purchaser2@example.com', location: '456 Street, City', password: 'password' },
-    { fullname: 'Purchaser Three', username: 'purchaser3', phone_number: '1234567892', email: 'purchaser3@example.com', location: '789 Street, City', password: 'password' }
+  { fullname: 'John Doe', username: 'johndoe', phone_number: '1234567890', email: 'johndoe@example.com', location: '123 Main St, Anytown', password: 'password' },
+  { fullname: 'Jane Smith', username: 'janesmith', phone_number: '1234567891', email: 'janesmith@example.com', location: '456 Oak St, Anytown', password: 'password' },
+  { fullname: 'Alice Johnson', username: 'alicejohnson', phone_number: '1234567892', email: 'alicejohnson@example.com', location: '789 Maple St, Anytown', password: 'password' },
+  { fullname: 'Bob Brown', username: 'bobbrown', phone_number: '1234567893', email: 'bobbrown@example.com', location: '101 Pine St, Anytown', password: 'password' },
+  { fullname: 'Carol Davis', username: 'caroldavis', phone_number: '1234567894', email: 'caroldavis@example.com', location: '202 Cedar St, Anytown', password: 'password' },
+  { fullname: 'David Evans', username: 'davidevans', phone_number: '1234567895', email: 'davidevans@example.com', location: '303 Birch St, Anytown', password: 'password' },
+  { fullname: 'Eve Foster', username: 'evefoster', phone_number: '1234567896', email: 'evefoster@example.com', location: '404 Elm St, Anytown', password: 'password' },
+  { fullname: 'Frank Green', username: 'frankgreen', phone_number: '1234567897', email: 'frankgreen@example.com', location: '505 Walnut St, Anytown', password: 'password' },
+  { fullname: 'Grace Hill', username: 'gracehill', phone_number: '1234567898', email: 'gracehill@example.com', location: '606 Spruce St, Anytown', password: 'password' },
+  { fullname: 'Hank Lee', username: 'hanklee', phone_number: '1234567899', email: 'hanklee@example.com', location: '707 Cherry St, Anytown', password: 'password' }
 ]
 
 purchasers.each do |purchaser_data|
@@ -51,11 +58,17 @@ end
 
 # Seed vendor data
 vendors = [
-    { fullname: 'Vendor One', phone_number: '0987654321', email: 'vendor1@example.com', enterprise_name: 'Vendor One Enterprise', location: '321 Street, City', password: 'password', business_registration_number: 'BN/2024/123456', category_ids: [Category.first.id] },
-    { fullname: 'Vendor Two', phone_number: '0987654322', email: 'vendor2@example.com', enterprise_name: 'Vendor Two Enterprise', location: '654 Street, City', password: 'password', business_registration_number: 'BN/2024/123457', category_ids: [Category.second.id] },
-    { fullname: 'Vendor Three', phone_number: '0987654323', email: 'vendor3@example.com', enterprise_name: 'Vendor Three Enterprise', location: '987 Street, City', password: 'password', business_registration_number: 'BN/2024/123458', category_ids: [Category.third.id] }
+  { fullname: 'John Brown', phone_number: '0987654321', email: 'johnbrown@example.com', enterprise_name: 'Brown\'s Hardware', location: '123 Main St, Townsville', password: 'password', business_registration_number: 'BN/2021/123456', category_ids: [Category.first.id] },
+  { fullname: 'Alice White', phone_number: '0987654322', email: 'alicewhite@example.com', enterprise_name: 'White\'s Automotive', location: '456 Oak St, Springfield', password: 'password', business_registration_number: 'BN/2024/123457', category_ids: [Category.second.id] },
+  { fullname: 'Michael Johnson', phone_number: '0987654323', email: 'michaeljohnson@example.com', enterprise_name: 'Johnson\'s Electronics', location: '789 Elm St, Rivertown', password: 'password', business_registration_number: 'BN/2023/123458', category_ids: [Category.third.id] },
+  { fullname: 'Emily Davis', phone_number: '0987654324', email: 'emilydavis@example.com', enterprise_name: 'Davis Construction', location: '101 Pine St, Lakeside', password: 'password', business_registration_number: 'BN/2024/123459', category_ids: [Category.fourth.id] },
+  { fullname: 'Daniel Wilson', phone_number: '0987654325', email: 'danielwilson@example.com', enterprise_name: 'Wilson\'s Furniture', location: '202 Cedar St, Mountainview', password: 'password', business_registration_number: 'BN/2022/123460', category_ids: [Category.second.id] },
+  { fullname: 'Sarah Martinez', phone_number: '0987654326', email: 'sarahmartinez@example.com', enterprise_name: 'Martinez Fashion', location: '303 Maple St, Seaside', password: 'password', business_registration_number: 'BN/2024/123461', category_ids: [Category.first.id] },
+  { fullname: 'Kevin Rodriguez', phone_number: '0987654327', email: 'kevinrodriguez@example.com', enterprise_name: 'Rodriguez\'s Appliances', location: '404 Walnut St, Hilltop', password: 'password', business_registration_number: 'BN/2020/123462', category_ids: [Category.second.id] },
+  { fullname: 'Jessica Garcia', phone_number: '0987654328', email: 'jessicagarcia@example.com', enterprise_name: 'Garcia\'s Jewelry', location: '505 Spruce St, Brookside', password: 'password', business_registration_number: 'BN/2024/123463', category_ids: [Category.third.id] },
+  { fullname: 'David Lopez', phone_number: '0987654329', email: 'davidlopez@example.com', enterprise_name: 'Lopez\'s Bakery', location: '606 Pine St, Fairview', password: 'password', business_registration_number: 'BN/2020/123464', category_ids: [Category.fourth.id] },
+  { fullname: 'Amanda Scott', phone_number: '0987654330', email: 'amandascott@example.com', enterprise_name: 'Scott\'s Sporting Goods', location: '707 Oak St, Sunnyside', password: 'password', business_registration_number: 'BN/2019/123465', category_ids: [Category.first.id] }
 ]
-
 vendors.each do |vendor_data|
     Vendor.find_or_create_by(email: vendor_data[:email]) do |vendor|
         vendor.fullname = vendor_data[:fullname]
@@ -187,7 +200,22 @@ order_vendors.each do |order_vendor_data|
   OrderVendor.create!(order_vendor_data)
 end
 
+reviews_data = [
+  { product_id: 1, purchaser_id: 1, rating: 5, review: "Excellent product, highly recommend!" },
+  { product_id: 2, purchaser_id: 2, rating: 4, review: "Good value for money." },
+  { product_id: 3, purchaser_id: 3, rating: 3, review: "Average quality, expected better." },
+  { product_id: 4, purchaser_id: 4, rating: 5, review: "Superb! Exactly what I needed." },
+  { product_id: 5, purchaser_id: 5, rating: 2, review: "Not satisfied with the product." },
+  { product_id: 1, purchaser_id: 2, rating: 4, review: "Pretty good, works as expected." },
+  { product_id: 2, purchaser_id: 3, rating: 5, review: "Fantastic, exceeded my expectations!" },
+  { product_id: 3, purchaser_id: 4, rating: 1, review: "Poor quality, would not buy again." },
+  { product_id: 4, purchaser_id: 5, rating: 3, review: "It's okay, not great." },
+  { product_id: 5, purchaser_id: 1, rating: 4, review: "Good product, worth the price." }
+]
 
+reviews_data.each do |review_data|
+  Review.create!(review_data)
+end
 
 
 puts 'Seed data created successfully!'
