@@ -4,8 +4,10 @@ class OrdersController < ApplicationController
 
   # GET /orders
   def index
-    @orders = Order.all
-    render json: @orders
+    puts "Fetching orders..."
+    orders = Order.includes(:order_items, :purchaser).all
+    puts "Orders fetched: #{orders.inspect}"
+    render json: orders, status: :ok
   end
 
   # GET /orders/1
