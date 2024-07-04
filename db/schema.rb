@@ -37,8 +37,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_02_144639) do
   end
 
   create_table "categories_vendors", id: false, force: :cascade do |t|
-    t.bigint "category_id", null: false
     t.bigint "vendor_id", null: false
+    t.bigint "category_id", null: false
     t.index ["category_id", "vendor_id"], name: "index_categories_vendors_on_category_id_and_vendor_id"
     t.index ["vendor_id", "category_id"], name: "index_categories_vendors_on_vendor_id_and_category_id"
   end
@@ -139,7 +139,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_02_144639) do
   create_table "reviews", force: :cascade do |t|
     t.bigint "product_id", null: false
     t.bigint "purchaser_id", null: false
-    t.integer "rating"
+    t.integer "rating", limit: 2, null: false
     t.text "review"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
