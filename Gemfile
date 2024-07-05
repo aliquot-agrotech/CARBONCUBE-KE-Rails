@@ -57,7 +57,7 @@ gem 'active_model_serializers'
 # gem "image_processing", "~> 1.2"
 
 # Password manager env
-gem 'dotenv-rails', groups: [:development, :test, :production]
+gem 'dotenv-rails'
 
 
 group :development, :test do
