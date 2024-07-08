@@ -1,5 +1,5 @@
 class AuthenticationController < ApplicationController
-    skip_before_action :verify_authenticity_token, only: [:login]
+    skip_before_action :verify_authenticity_token, raise: false
 
     def login
         @user = Purchaser.find_by(email: params[:email]) || Vendor.find_by(email: params[:email]) || Admin.find_by(email: params[:email])

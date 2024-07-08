@@ -27,17 +27,12 @@ Rails.application.routes.draw do
     resources :products
     resources :orders do
       member do
-        patch :update_status
+        patch 'update_status'
       end
     end
     resources :shipments
     resources :categories, only: [:index, :show]
-
     get 'analytics', to: 'analytics#index'
-    get 'profile', to: 'vendors#show'
-    patch 'profile', to: 'vendors#update'
-    post 'signup', to: 'vendors#signup'
-    post 'login', to: 'authentication#login'
   end
 
   # Routes for vendors and purchasers

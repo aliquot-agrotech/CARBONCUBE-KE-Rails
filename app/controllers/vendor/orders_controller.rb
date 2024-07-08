@@ -1,31 +1,19 @@
-# app/controllers/orders_controller.rb
+module Vendor
+  class OrdersController < ApplicationController
+    before_action :set_order, only: [:show, :update, :destroy, :update_status]
 
-class Vendor::OrdersController < ApplicationController
-    before_action :set_order, only: [:show, :update, :destroy]
-  
-    # GET /orders
+    # GET /vendor/orders
     def index
-      orders = Order.includes(:order_items, :purchaser).all
-      render json: orders, status: :ok
+      @orders = current_vendor.orders
+      render json: @orders
     end
-  
-    # GET /orders/1
+
+    # GET /vendor/orders/:id
     def show
       render json: @order
     end
-  
-    # POST /orders
-    def create
-      @order = Order.new(order_params)
-  
-      if @order.save
-        render json: @order, status: :created, location: @order
-      else
-        render json: @order.errors, status: :unprocessable_entity
-      end
-    end
-  
-    # PATCH/PUT /orders/1
+
+    # PATCH/PUT /vendor/orders/:id
     def update
       if @order.update(order_params)
         render json: @order
@@ -33,24 +21,30 @@ class Vendor::OrdersController < ApplicationController
         render json: @order.errors, status: :unprocessable_entity
       end
     end
-  
-    # DELETE /orders/1
-    def destroy
-      @order.destroy
+
+    # PATCH/PUT /vendor/orders/:id/update_status
+    def update_status
+      if @order.update(status: params[:status])
+        render json: @order
+      else
+        render json: @order.errors, status: :unprocessable_entity
+      end
     end
-  
+
+    # GET /vendor/invoices
+    def invoices
+      @invoices = current_vendor.orders.select(:id, :total_amount, :status, :created_at)
+      render json: @invoices
+    end
+
     private
-      # Use callbacks to share common setup or constraints between actions.
-      def set_order
-        @order = Order.find(params[:id])
-      end
-  
-      # Only allow a list of trusted parameters through.
-      def order_params
-        params.require(:order).permit(:purchaser_id, :status, :total_amount, :is_sent_out, :is_processing, :is_delivered, 
-                                      order_items_attributes: [:id, :product_id, :quantity, :_destroy], 
-                                      order_vendors_attributes: [:id, :vendor_id, :_destroy])
-      end
+
+    def set_order
+      @order = current_vendor.orders.find(params[:id])
+    end
+
+    def order_params
+      params.require(:order).permit(:status, :is_sent_out, :is_processing, :is_delivered)
+    end
   end
-  
-  
+end
