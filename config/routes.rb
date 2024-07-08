@@ -24,7 +24,7 @@ Rails.application.routes.draw do
 
   # Vendor namespace for vendor-specific functionality
   namespace :vendor do
-    resources :products
+    resources :products, only: [:index, :show, :create, :update, :destroy]
     resources :orders do
       member do
         patch 'update_status'
