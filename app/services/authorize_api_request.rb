@@ -14,22 +14,14 @@ class AuthorizeApiRequest
     def find_user
       user_id = decoded_token[:user_id] if decoded_token.present?
       if user_id
-        if (user = Purchaser.find_by(id: user_id))
-          return user
-        elsif (user = Vendor.find_by(id: user_id))
-          return user
-        elsif (user = Admin.find_by(id: user_id))
+        if (user = Vendor.find_by(id: user_id))
           return user
         end
       end
   
-      email = @headers['Authorization'].presence
+      email = decoded_token[:email] if decoded_token.present?
       if email
-        if (user = Purchaser.find_by(email: email))
-          return user
-        elsif (user = Vendor.find_by(email: email))
-          return user
-        elsif (user = Admin.find_by(email: email))
+        if (user = Vendor.find_by(email: email))
           return user
         end
       end
