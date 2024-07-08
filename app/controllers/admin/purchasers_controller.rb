@@ -1,55 +1,44 @@
-# app/controllers/purchasers_controller.rb
-
 class Admin::PurchasersController < ApplicationController
-    skip_before_action :verify_authenticity_token, only: [:create]
-  
-    # GET /purchasers
-    def index
-      @purchasers = Purchaser.all
-      render json: @purchasers
-    end
-  
-    # GET /purchasers/:id
-    def show
-      @purchaser = Purchaser.find(params[:id])
-      render json: @purchaser
-    end
-  
-    # POST /purchasers
-    def create
-      @purchaser = Purchaser.new(purchaser_params)
-  
-      if @purchaser.save
-        token = JsonWebToken.encode(purchaser_id: @purchaser.id, role: @purchaser.role)
-        render json: { token: token, purchaser: @purchaser }, status: :created
-      else
-        render json: { errors: @purchaser.errors.full_messages }, status: :unprocessable_entity
-      end
-    end
-  
-    # PATCH/PUT /purchasers/:id
-    def update
-      @purchaser = Purchaser.find(params[:id])
-  
-      if @purchaser.update(purchaser_params)
-        render json: @purchaser
-      else
-        render json: { errors: @purchaser.errors.full_messages }, status: :unprocessable_entity
-      end
-    end
-  
-    # DELETE /purchasers/:id
-    def destroy
-      @purchaser = Purchaser.find(params[:id])
-      @purchaser.destroy
-      head :no_content
-    end
+  before_action :set_purchaser, only: [:show, :update, :destroy]
 
-  
-    private
-  
-    def purchaser_params
-      params.require(:purchaser).permit(:fullname, :username, :phone_number, :email, :location, :password, :password_confirmation)
+  def index
+    @purchasers = Purchaser.all
+    render json: @purchasers
+  end
+
+  def show
+    render json: @purchaser
+  end
+
+  def create
+    @purchaser = Purchaser.new(purchaser_params)
+    if @purchaser.save
+      render json: @purchaser, status: :created
+    else
+      render json: @purchaser.errors, status: :unprocessable_entity
     end
   end
-  
+
+  def update
+    if @purchaser.update(purchaser_params)
+      render json: @purchaser
+    else
+      render json: @purchaser.errors, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    @purchaser.destroy
+    head :no_content
+  end
+
+  private
+
+  def set_purchaser
+    @purchaser = Purchaser.find(params[:id])
+  end
+
+  def purchaser_params
+    params.require(:purchaser).permit(:fullname, :username, :phone_number, :email, :location, :password)
+  end
+end

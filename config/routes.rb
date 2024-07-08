@@ -6,19 +6,20 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   post 'auth/login', to: 'authentication#login'
 
-  # Defines the root path route ("/")
-  # root "posts#index"
-
   # Admin namespace for admin-specific functionality
   namespace :admin do
-    resources :vendors
-    resources :purchasers
-    resources :orders
-    resources :products
-    resources :reviews
+    resources :vendors do
+      resources :products, only: [:index]
+      resources :reviews, only: [:index]
+    end
+    resources :purchasers do
+      resources :orders, only: [:index]
+    end
+    resources :orders, only: [:index, :show, :update, :destroy]
     resources :categories
-    resources :shipments
-    resources :invoices
+    resources :cms_pages
+
+    get 'analytics', to: 'analytics#index'
   end
 
   # Vendor namespace for vendor-specific functionality
@@ -26,9 +27,6 @@ Rails.application.routes.draw do
     resources :products
     resources :orders
     resources :shipments
-    resources :reviews
-    resources :purchasers, only: [:index, :show]
-    resources :invoices
     resources :categories, only: [:index, :show]
   end
 
