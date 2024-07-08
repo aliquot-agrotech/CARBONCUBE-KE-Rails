@@ -24,6 +24,7 @@ Rails.application.routes.draw do
 
   # Vendor namespace for vendor-specific functionality
   namespace :vendor do
+    post 'signup', to: 'vendors#signup'
     resources :products, only: [:index, :show, :create, :update, :destroy]
     resources :orders do
       member do

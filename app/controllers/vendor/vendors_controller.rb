@@ -1,5 +1,5 @@
-module Vendor
-    class VendorsController < ApplicationController
+
+    class Vendor::VendorsController < ApplicationController
       before_action :set_vendor, only: [:show, :update]
   
       # GET /vendor/profile
@@ -44,5 +44,5 @@ module Vendor
         params.require(:vendor).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :business_registration_number, category_ids: [])
       end
     end
-  end
+
   
