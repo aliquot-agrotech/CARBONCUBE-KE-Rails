@@ -46,7 +46,7 @@ class ProductsController < ApplicationController
   
     # Only allow a list of trusted parameters through.
     def product_params
-        params.require(:product).permit(:title, :description, :media, :category_id, :vendor_id, :price, :quantity, :brand, :manufacturer, :package_length, :package_width, :package_height, :package_weight)
+        params.require(:product).permit(:title, :description, :media[], :category_id, :vendor_id, :price, :quantity, :brand, :manufacturer, :package_length, :package_width, :package_height, :package_weight)
     end
 end
   

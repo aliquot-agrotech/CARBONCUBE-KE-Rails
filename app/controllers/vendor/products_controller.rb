@@ -1,21 +1,18 @@
-# app/controllers/vendor/products_controller.rb
-
 class Vendor::ProductsController < ApplicationController
+  before_action :set_product, [:show, :update, :destroy, :index, :create]
   before_action :authenticate_vendor
-  before_action :set_vendor
 
   def index
-    @products = @vendor.products
-    render json: @products, status: :ok
+    @products = current_vendor.products
+    render json: @products
   end
 
   def show
-    @product = @vendor.products.find(params[:id])
     render json: @product
   end
 
   def create
-    @product = @vendor.products.new(product_params)
+    @product = current_vendor.products.build(product_params)
 
     if @product.save
       render json: @product, status: :created
@@ -25,18 +22,16 @@ class Vendor::ProductsController < ApplicationController
   end
 
   def update
-    @product = @vendor.products.find(params[:id])
-
     if @product.update(product_params)
-      render json: @product
+      render json: @product   
     else
       render json: @product.errors, status: :unprocessable_entity
     end
   end
 
   def destroy
-    @product = @vendor.products.find(params[:id])
     @product.destroy
+    head :no_content
   end
 
   private
@@ -46,11 +41,20 @@ class Vendor::ProductsController < ApplicationController
   end
 
   def set_product
-    @product = current_vendor.products.find(params[:id])
+    @vendor = current_vendor
+    if @vendor.nil?
+      render json: { error: 'Vendor not found' }, status: :not_found
+      return
+    end
+
+    @product = @vendor.products.find_by(id: params[:id])
+    unless @product
+      render json: { error: 'Product not found' }, status: :not_found
+    end
   end
 
   def product_params
-    params.require(:product).permit(:title, :description, :media, :category_id, :price, :quantity, :brand, :manufacturer, :package_dimensions, :package_weight)
+    params.require(:product).permit(:title, :description, :media[], :category_id, :price, :quantity, :brand, :manufacturer, :package_length, :package_width, :package_height, :package_weight)
   end
 
   def authenticate_vendor
@@ -61,6 +65,6 @@ class Vendor::ProductsController < ApplicationController
   end
 
   def current_vendor
-    @current_user
+    @current_user ||= AuthorizeApiRequest.new(request.headers).result
   end
 end
