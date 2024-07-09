@@ -1,19 +1,11 @@
 class Product < ApplicationRecord
   belongs_to :vendor
   belongs_to :category
-  has_many :reviews
 
-  validates :title, presence: true
-  validates :description, presence: true
-  validates :media, presence: true
-  validates :category_id, presence: true
-  validates :vendor_id, presence: true
-  validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :quantity, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-  validates :brand, presence: true
-  validates :manufacturer, presence: true
-  validates :package_length, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :package_width, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :package_height, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :package_weight, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :title, :description, :price, :quantity, :brand, :manufacturer, :package_length, :package_width, :package_height, :package_weight, presence: true
+  validates :price, :quantity, :package_length, :package_width, :package_height, numericality: true
+  validates :package_weight, numericality: { greater_than: 0 }
+
+  # Ensure media can accept a string or array of strings
+  serialize :media, Array
 end

@@ -25,7 +25,9 @@ Rails.application.routes.draw do
   # Vendor namespace for vendor-specific functionality
   namespace :vendor do
     post 'signup', to: 'vendors#signup'
-    resources :products, only: [:index, :show, :create, :update, :destroy]
+    post 'login', to: 'authentication#login'
+
+    resources :products
     resources :orders do
       member do
         patch 'update_status'
@@ -34,6 +36,8 @@ Rails.application.routes.draw do
     resources :shipments
     resources :categories, only: [:index, :show]
     get 'analytics', to: 'analytics#index'
+    get 'reviews', to: 'reviews#index'
+    resources :profiles, only: [:update]
   end
 
   # Routes for vendors and purchasers

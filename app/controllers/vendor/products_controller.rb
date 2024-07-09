@@ -45,6 +45,10 @@ class Vendor::ProductsController < ApplicationController
     @vendor = current_vendor
   end
 
+  def set_product
+    @product = current_vendor.products.find(params[:id])
+  end
+
   def product_params
     params.require(:product).permit(:title, :description, :media, :category_id, :price, :quantity, :brand, :manufacturer, :package_dimensions, :package_weight)
   end
