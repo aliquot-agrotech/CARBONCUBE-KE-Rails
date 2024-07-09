@@ -1,6 +1,6 @@
 class Vendor::ProductsController < ApplicationController
-  before_action :set_product, [:show, :update, :destroy, :index, :create]
   before_action :authenticate_vendor
+  before_action :set_product, only: [:show, :update, :destroy]
 
   def index
     @products = current_vendor.products
@@ -23,7 +23,7 @@ class Vendor::ProductsController < ApplicationController
 
   def update
     if @product.update(product_params)
-      render json: @product   
+      render json: @product
     else
       render json: @product.errors, status: :unprocessable_entity
     end
@@ -36,8 +36,15 @@ class Vendor::ProductsController < ApplicationController
 
   private
 
-  def set_vendor
-    @vendor = current_vendor
+  def authenticate_vendor
+    @current_user = AuthorizeApiRequest.new(request.headers).result
+    unless @current_user && @current_user.is_a?(Vendor)
+      render json: { error: 'Not Authorized' }, status: 401
+    end
+  end
+
+  def current_vendor
+    @current_user
   end
 
   def set_product
@@ -54,17 +61,6 @@ class Vendor::ProductsController < ApplicationController
   end
 
   def product_params
-    params.require(:product).permit(:title, :description, :media[], :category_id, :price, :quantity, :brand, :manufacturer, :package_length, :package_width, :package_height, :package_weight)
-  end
-
-  def authenticate_vendor
-    @current_user = AuthorizeApiRequest.new(request.headers).result
-    unless @current_user && @current_user.is_a?(Vendor)
-      render json: { error: 'Not Authorized' }, status: 401
-    end
-  end
-
-  def current_vendor
-    @current_user ||= AuthorizeApiRequest.new(request.headers).result
+    params.require(:product).permit(:title, :description, :media, :category_id, :price, :quantity, :brand, :manufacturer, :package_length, :package_width, :package_height, :package_weight)
   end
 end
