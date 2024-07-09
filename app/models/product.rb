@@ -7,5 +7,5 @@ class Product < ApplicationRecord
   validates :package_weight, numericality: { greater_than: 0 }
 
   # Ensure media can accept a string or array of strings
-  serialize :media, Array
+  serialize :media, JSON
 end

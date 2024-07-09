@@ -95,15 +95,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_02_144639) do
     t.bigint "category_id", null: false
     t.string "title"
     t.text "description"
-    t.string "media"
-    t.decimal "price"
+    t.text "media"
+    t.decimal "price", precision: 10, scale: 2
     t.integer "quantity"
     t.string "brand"
     t.string "manufacturer"
-    t.string "package_weight"
-    t.decimal "package_length"
-    t.decimal "package_width"
-    t.decimal "package_height"
+    t.decimal "package_weight", precision: 10, scale: 2
+    t.decimal "package_length", precision: 10, scale: 2
+    t.decimal "package_width", precision: 10, scale: 2
+    t.decimal "package_height", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_products_on_category_id"
