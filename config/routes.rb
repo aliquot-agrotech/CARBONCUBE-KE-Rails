@@ -35,7 +35,7 @@ Rails.application.routes.draw do
     end
     resources :shipments
     resources :categories, only: [:index, :show]
-    get 'analytics', to: 'analytics#index'
+    resources :analytics, only: [:index]
     get 'reviews', to: 'reviews#index'
     resources :profiles, only: [:update]
   end
