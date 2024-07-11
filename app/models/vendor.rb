@@ -3,7 +3,8 @@ class Vendor < ApplicationRecord
   has_secure_password
   has_and_belongs_to_many :categories
   has_many :products
-  has_many :orders
+  has_many :order_vendors
+  has_many :orders, through: :order_vendors
   has_many :reviews, through: :products
   has_many :invoices, through: :orders
 
