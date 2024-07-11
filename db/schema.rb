@@ -52,7 +52,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_02_144639) do
 
   create_table "invoices", force: :cascade do |t|
     t.bigint "order_id", null: false
-    t.datetime "invoice_date"
+    t.string "mpesa_transaction_code"
     t.decimal "total_amount"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
