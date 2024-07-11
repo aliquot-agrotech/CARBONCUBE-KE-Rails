@@ -12,6 +12,8 @@ class Order < ApplicationRecord
   accepts_nested_attributes_for :order_items, allow_destroy: true
   accepts_nested_attributes_for :order_vendors, allow_destroy: true
 
+  validates :status, inclusion: { in: %w[processing on-transit delivered] }
+
   private
 
   def calculate_total_amount

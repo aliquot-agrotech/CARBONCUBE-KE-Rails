@@ -23,12 +23,12 @@ default: &default
 development:
   <<: *default
   database: carbonecomrails_development
-  password: <%= ENV['DEVELOPMENT_DATABASE_PASSWORD'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
 
 test:
   <<: *default
   database: carbonecomrails_test
-  password: <%= ENV['TEST_DATABASE_PASSWORD'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -53,4 +53,4 @@ test:
 production:
   <<: *default
   database: carbonecomrails_production
-  password: <%= ENV["PRODUCTION_DATABASE_PASSWORD"] %>
+  password: <%= ENV["DB_PASSWORD"] %>

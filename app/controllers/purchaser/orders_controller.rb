@@ -1,51 +1,45 @@
-# app/controllers/orders_controller.rb
+# app/controllers/purchaser/orders_controller.rb
 class Purchaser::OrdersController < ApplicationController
   before_action :authenticate_purchaser
 
-  # GET /orders
   def index
-    @orders = current_purchaser.orders.includes(:order_items, :vendors)
-    render json: @orders, include: ['order_items', 'vendors'], status: :ok
+    @orders = current_purchaser.orders
+    render json: @orders
   end
 
-  # GET /orders/:id
   def show
-    @order = current_purchaser.orders.find_by(id: params[:id])
-    if @order
-      render json: @order, include: ['order_items', 'vendors'], status: :ok
-    else
-      render json: { error: 'Order not found' }, status: :not_found
-    end
+    @order = current_purchaser.orders.find(params[:id])
+    render json: @order
   end
 
-  # POST /orders
   def create
-    @order = current_purchaser.orders.new(order_params)
+    @order = current_purchaser.orders.build(order_params)
 
     if @order.save
       render json: @order, status: :created
+    else
+      render json: @order.errors, status: :unprocessable_entity
+    end
+  end
+
+  def checkout
+    @order = current_purchaser.orders.find(params[:id])
+    mpesa_code = params[:mpesa_code]
+
+    if @order.update(mpesa_transaction_code: mpesa_code)
+      render json: { message: 'Checkout completed and MPESA transaction code saved successfully' }, status: :ok
     else
       render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
-  # POST /orders/:id/checkout
-  def checkout
-    @order = current_purchaser.orders.find_by(id: params[:id])
-    mpesa_code = params[:mpesa_code]
+  def update_status
+    @order = current_purchaser.orders.find(params[:id])
 
-    if @order.nil?
-      render json: { error: 'Order not found' }, status: :not_found
-      return
-    end
-
-    # Create invoice for the order
-    invoice = Invoice.new(order: @order, mpesa_transaction_code: mpesa_code, total_amount: @order.total_amount)
-
-    if invoice.save
-      render json: { message: 'Invoice created successfully' }, status: :created
+    if params[:status] == 'delivered' && @order.update(status: 'delivered')
+      render json: @order
     else
-      render json: { errors: invoice.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: 'Only the status can be set to delivered by the purchaser' }, status: :unprocessable_entity
     end
   end
 

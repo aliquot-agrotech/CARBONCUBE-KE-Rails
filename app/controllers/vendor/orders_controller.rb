@@ -1,3 +1,4 @@
+# app/controllers/vendor/orders_controller.rb
 class Vendor::OrdersController < ApplicationController
   before_action :authenticate_vendor
   before_action :set_order, only: [:show, :update, :destroy, :update_status]
@@ -5,12 +6,12 @@ class Vendor::OrdersController < ApplicationController
   # GET /vendor/orders
   def index
     @orders = current_vendor.orders.includes(:order_items).where(order_items: { product_id: current_vendor.products.ids })
-    render json: @orders, include: ['order_items.product']
+    render json: @orders, include: ['order_items.product'], except: [:mpesa_transaction_code]
   end
 
   # GET /vendor/orders/:id
   def show
-    render json: @order, include: ['order_items.product']
+    render json: @order, include: ['order_items.product'], except: [:mpesa_transaction_code]
   end
 
   # PATCH/PUT /vendor/orders/:id
@@ -24,10 +25,10 @@ class Vendor::OrdersController < ApplicationController
 
   # PATCH/PUT /vendor/orders/:id/update_status
   def update_status
-    if @order.update(status: params[:status])
+    if params[:status] == 'on-transit' && @order.update(status: 'on-transit')
       render json: @order
     else
-      render json: @order.errors, status: :unprocessable_entity
+      render json: { errors: 'Only the status can be set to on-transit by the vendor' }, status: :unprocessable_entity
     end
   end
 
@@ -35,12 +36,6 @@ class Vendor::OrdersController < ApplicationController
   def destroy
     @order.destroy
     head :no_content
-  end
-
-  # GET /vendor/invoices
-  def invoices
-    @invoices = current_vendor.orders.select(:id, :total_amount, :status, :created_at)
-    render json: @invoices
   end
 
   private
@@ -53,7 +48,7 @@ class Vendor::OrdersController < ApplicationController
   end
 
   def order_params
-    params.require(:order).permit(:status, :is_sent_out, :is_processing, :is_delivered)
+    params.require(:order).permit(:status)
   end
 
   def authenticate_vendor

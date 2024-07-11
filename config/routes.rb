@@ -43,6 +43,7 @@ Rails.application.routes.draw do
     post 'signup', to: 'purchasers#create'
     resources :orders, only: [:index, :show, :create] do
       post 'checkout', on: :member
+      patch 'update_status', on: :member
     end
   end
 end
