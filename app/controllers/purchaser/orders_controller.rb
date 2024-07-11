@@ -1,5 +1,5 @@
 # app/controllers/orders_controller.rb
-class OrdersController < ApplicationController
+class Purchaser::OrdersController < ApplicationController
   before_action :authenticate_purchaser
 
   # GET /orders

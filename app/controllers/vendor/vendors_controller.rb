@@ -17,7 +17,7 @@
       end
   
       # POST /vendor/signup
-      def signup
+      def create
         vendor_params = vendor_params_with_categories
         @vendor = Vendor.new(vendor_params.except(:category_ids))
         @vendor.categories = Category.find(vendor_params[:category_ids])

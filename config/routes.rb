@@ -24,9 +24,7 @@ Rails.application.routes.draw do
 
   # Vendor namespace for vendor-specific functionality
   namespace :vendor do
-    post 'signup', to: 'vendors#signup'
-    post 'login', to: 'authentication#login'
-
+    post 'signup', to: 'vendors#create'
     resources :products
     resources :orders do
       member do
@@ -40,10 +38,13 @@ Rails.application.routes.draw do
     resources :profiles, only: [:update]
   end
 
-  # Routes for vendors and purchasers
-  resources :orders, only: [:index, :show, :create, :update, :destroy]
-  resources :products
-  resources :purchasers, only: [:index, :show, :create, :update, :destroy]
-  resources :vendors, only: [:index, :show, :create, :update, :destroy]
-  resources :reviews, only: [:index, :show, :create, :update, :destroy]
+  # Purchaser namespace for purchaser-specific functionality
+  namespace :purchasers do
+    post 'signup', to: 'purchasers#create'
+    resources :orders do
+      member do
+        post 'checkout'
+      end
+    end
+  end
 end

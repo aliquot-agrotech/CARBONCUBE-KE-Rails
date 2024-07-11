@@ -1,6 +1,6 @@
 # app/controllers/purchasers_controller.rb
 
-class PurchasersController < ApplicationController
+class Purchaser::PurchasersController < ApplicationController
     skip_before_action :verify_authenticity_token, only: [:create]
   
     # GET /purchasers
