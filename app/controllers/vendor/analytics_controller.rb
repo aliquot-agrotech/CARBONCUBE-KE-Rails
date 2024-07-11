@@ -2,20 +2,39 @@ class Vendor::AnalyticsController < ApplicationController
   before_action :authenticate_vendor
 
   def index
-    total_orders = current_vendor.orders.count
-    total_revenue = calculate_total_revenue
-    average_rating = calculate_average_rating
-
     analytics_data = {
-      total_orders: total_orders,
-      total_revenue: total_revenue,
-      average_rating: average_rating
+      total_orders: calculate_total_orders,
+      total_revenue: calculate_total_revenue,
+      average_rating: calculate_average_rating,
+      reviews: fetch_reviews
     }
-
     render json: analytics_data
   end
 
   private
+
+  def calculate_total_orders
+    current_vendor.orders.count
+  end
+
+  def calculate_total_revenue
+    current_vendor.orders.joins(order_items: :product).sum('order_items.quantity * products.price')
+  end
+
+  def calculate_average_rating
+    current_vendor.products.joins(:reviews).average(:rating).to_f.round(1)
+  end
+
+  def fetch_reviews
+    current_vendor.reviews.includes(:product).map do |review|
+      {
+        id: review.id,
+        product_name: review.product.title,
+        rating: review.rating,
+        comment: review.review
+      }
+    end
+  end
 
   def authenticate_vendor
     @current_user = AuthorizeApiRequest.new(request.headers).result
@@ -26,19 +45,5 @@ class Vendor::AnalyticsController < ApplicationController
 
   def current_vendor
     @current_user
-  end
-
-  def calculate_total_revenue
-    # Assuming 'OrderItem' model has 'quantity' and 'product' association with 'price'
-    current_vendor.orders.joins(order_items: :product).sum('order_items.quantity * products.price')
-  end
-
-  def calculate_average_rating
-    # Assuming 'Review' model has 'rating' attribute and 'Product' model has 'vendor' association
-    reviews = Review.joins(product: :vendor).where(vendors: { id: current_vendor.id })
-    total_reviews = reviews.count
-    total_ratings_sum = reviews.sum(:rating)
-    average_rating = total_reviews > 0 ? total_ratings_sum.to_f / total_reviews : 0
-    average_rating.round(2)
   end
 end
