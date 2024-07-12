@@ -1,4 +1,5 @@
 class Admin::AnalyticsController < ApplicationController
+  before_action :authenticate_admin
     def index
       @total_vendors = Vendor.count
       @total_purchasers = Purchaser.count
@@ -13,6 +14,19 @@ class Admin::AnalyticsController < ApplicationController
         total_products: @total_products,
         total_reviews: @total_reviews
       }
+    end
+
+    private
+
+    def authenticate_admin
+      @current_user = AdminAuthorizeApiRequest.new(request.headers).result
+      unless @current_user && @current_user.is_a?(Admin)
+        render json: { error: 'Not Authorized' }, status: :unauthorized
+      end
+    end
+  
+    def current_admin
+      @current_user
     end
   end
   

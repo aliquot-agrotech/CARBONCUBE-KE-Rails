@@ -1,6 +1,6 @@
 # app/controllers/vendor/products_controller.rb
-class Admin::ProductsController < ApplicationController
-    before_action :authenticate_vendor!
+class Admin::ProductsController < ApplicationController 
+    before_action :authenticate_admin
   
     def index
       @products = current_vendor.products
@@ -42,8 +42,16 @@ class Admin::ProductsController < ApplicationController
       params.require(:product).permit(:title, :description, :price, :quantity, :category_id, :brand, :manufacturer, :package_dimensions, :package_weight)
     end
   
-    def authenticate_vendor!
-      # Your authentication logic for vendors
+    def authenticate_admin
+      @current_user = AdminAuthorizeApiRequest.new(request.headers).result
+      unless @current_user && @current_user.is_a?(Admin)
+        render json: { error: 'Not Authorized' }, status: :unauthorized
+      end
     end
+  
+    def current_admin
+      @current_user
+    end
+    
   end
   

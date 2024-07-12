@@ -1,4 +1,5 @@
 class Admin::VendorsController < ApplicationController
+  before_action :authenticate_admin
   before_action :set_vendor, only: [:show, :update, :destroy]
 
   def index
@@ -40,5 +41,16 @@ class Admin::VendorsController < ApplicationController
 
   def vendor_params
     params.require(:vendor).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :business_registration_number, category_ids: [])
+  end
+
+  def authenticate_admin
+    @current_user = AdminAuthorizeApiRequest.new(request.headers).result
+    unless @current_user && @current_user.is_a?(Admin)
+      render json: { error: 'Not Authorized' }, status: :unauthorized
+    end
+  end
+
+  def current_admin
+    @current_user
   end
 end

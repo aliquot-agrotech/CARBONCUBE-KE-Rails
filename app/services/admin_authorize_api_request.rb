@@ -1,29 +1,29 @@
-# app/services/vendor_authorize_api_request.rb
+# app/services/admin_authorize_api_request.rb
 
-class VendorAuthorizeApiRequest
+class AdminAuthorizeApiRequest
   def initialize(headers = {})
     @headers = headers
   end
 
   def result
-    @vendor ||= find_vendor
+    @admin ||= find_admin
   end
 
   private
 
-  def find_vendor
-    vendor_id = decoded_token[:user_id] if decoded_token.present?
+  def find_admin
+    admin_id = decoded_token[:user_id] if decoded_token.present?
 
-    if vendor_id
-      vendor = Vendor.find_by(id: vendor_id)
-      return vendor if vendor
+    if admin_id
+      admin = Admin.find_by(id: admin_id)
+      return admin if admin
     end
 
-    vendor_email = decoded_token[:email] if decoded_token.present?
+    admin_email = decoded_token[:email] if decoded_token.present?
 
-    if vendor_email
-      vendor = Vendor.find_by(email: vendor_email)
-      return vendor if vendor
+    if admin_email
+      admin = Admin.find_by(email: admin_email)
+      return admin if admin
     end
 
     raise ExceptionHandler::InvalidToken, 'Invalid token'
@@ -39,6 +39,5 @@ class VendorAuthorizeApiRequest
     else
       raise ExceptionHandler::MissingToken, 'Missing token'
     end
-    nil
   end
 end

@@ -1,4 +1,5 @@
 class Admin::PurchasersController < ApplicationController
+  before_action :authenticate_admin
   before_action :set_purchaser, only: [:show, :update, :destroy]
 
   def index
@@ -40,5 +41,16 @@ class Admin::PurchasersController < ApplicationController
 
   def purchaser_params
     params.require(:purchaser).permit(:fullname, :username, :phone_number, :email, :location, :password)
+  end
+
+  def authenticate_admin
+    @current_user = AdminAuthorizeApiRequest.new(request.headers).result
+    unless @current_user && @current_user.is_a?(Admin)
+      render json: { error: 'Not Authorized' }, status: :unauthorized
+    end
+  end
+
+  def current_admin
+    @current_user
   end
 end

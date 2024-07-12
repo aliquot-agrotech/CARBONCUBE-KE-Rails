@@ -6,24 +6,24 @@ class PurchaserAuthorizeApiRequest
   end
 
   def result
-    @user ||= find_user
+    @purchaser ||= find_purchaser
   end
 
   private
 
-  def find_user
-    user_id = decoded_token[:user_id] if decoded_token.present?
+  def find_purchaser
+    purchaser_id = decoded_token[:user_id] if decoded_token.present?
 
-    if user_id
-      user = Purchaser.find_by(id: user_id)
-      return user if user
+    if purchaser_id
+      purchaser = Purchaser.find_by(id: purchaser_id)
+      return purchaser if purchaser
     end
 
-    email = decoded_token[:email] if decoded_token.present?
+    purchaser_email = decoded_token[:email] if decoded_token.present?
 
-    if email
-      user = Purchaser.find_by(email: email)
-      return user if user
+    if purchaser_email
+      purchaser = Purchaser.find_by(email: purchaser_email)
+      return purchaser if purchaser
     end
 
     raise ExceptionHandler::InvalidToken, 'Invalid token'
