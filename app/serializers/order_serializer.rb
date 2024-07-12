@@ -1,6 +1,6 @@
 # app/serializers/order_serializer.rb
 class OrderSerializer < ActiveModel::Serializer
-  attributes :id, :status, :total_amount, :is_sent_out, :is_processing, :is_delivered, :created_at, :updated_at
+  attributes :id, :status, :total_amount, :mpesa_transaction_code, :created_at, :updated_at
   belongs_to :purchaser
   has_many :order_items
 
