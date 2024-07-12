@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_02_144639) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_12_112628) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -27,6 +27,25 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_02_144639) do
     t.jsonb "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "bookmarks", force: :cascade do |t|
+    t.bigint "purchaser_id", null: false
+    t.bigint "product_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_bookmarks_on_product_id"
+    t.index ["purchaser_id"], name: "index_bookmarks_on_purchaser_id"
+  end
+
+  create_table "cart_items", force: :cascade do |t|
+    t.bigint "purchaser_id", null: false
+    t.bigint "product_id", null: false
+    t.integer "quantity", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_cart_items_on_product_id"
+    t.index ["purchaser_id"], name: "index_cart_items_on_purchaser_id"
   end
 
   create_table "categories", force: :cascade do |t|
@@ -164,6 +183,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_02_144639) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "bookmarks", "products"
+  add_foreign_key "bookmarks", "purchasers"
+  add_foreign_key "cart_items", "products"
+  add_foreign_key "cart_items", "purchasers"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "order_vendors", "orders"
