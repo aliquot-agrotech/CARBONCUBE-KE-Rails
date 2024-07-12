@@ -131,21 +131,22 @@ end
 
 # Seed orders data
 orders = [
-  { purchaser_id: Purchaser.first.id, status: 'processing', total_amount: 129.98, is_sent_out: false, is_processing: true, is_delivered: false },
-  { purchaser_id: Purchaser.second.id, status: 'processing', total_amount: 219.98, is_sent_out: false, is_processing: true, is_delivered: false },
-  { purchaser_id: Purchaser.third.id, status: 'processing', total_amount: 89.99, is_sent_out: false, is_processing: true, is_delivered: false },
-  { purchaser_id: Purchaser.first.id, status: 'processing', total_amount: 189.98, is_sent_out: false, is_processing: true, is_delivered: false },
-  { purchaser_id: Purchaser.second.id, status: 'processing', total_amount: 299.99, is_sent_out: false, is_processing: true, is_delivered: false },
-  { purchaser_id: Purchaser.third.id, status: 'processing', total_amount: 59.99, is_sent_out: false, is_processing: true, is_delivered: false },
-  { purchaser_id: Purchaser.first.id, status: 'processing', total_amount: 159.98, is_sent_out: false, is_processing: true, is_delivered: false },
-  { purchaser_id: Purchaser.second.id, status: 'processing', total_amount: 209.97, is_sent_out: false, is_processing: true, is_delivered: false },
-  { purchaser_id: Purchaser.third.id, status: 'processing', total_amount: 119.98, is_sent_out: false, is_processing: true, is_delivered: false },
-  { purchaser_id: Purchaser.first.id, status: 'processing', total_amount: 179.97, is_sent_out: false, is_processing: true, is_delivered: false }
+  { purchaser_id: Purchaser.first.id, status: 'processing', total_amount: 129.98, mpesa_transaction_code: 'SGA96AZWUR' },
+  { purchaser_id: Purchaser.second.id, status: 'processing', total_amount: 219.98, mpesa_transaction_code: 'TGB78HYUJ9' },
+  { purchaser_id: Purchaser.third.id, status: 'processing', total_amount: 89.99, mpesa_transaction_code: 'HJK89JNHU1' },
+  { purchaser_id: Purchaser.first.id, status: 'processing', total_amount: 189.98, mpesa_transaction_code: 'YUIO90JIKL' },
+  { purchaser_id: Purchaser.second.id, status: 'processing', total_amount: 299.99, mpesa_transaction_code: 'KJH45RTFG7' },
+  { purchaser_id: Purchaser.third.id, status: 'processing', total_amount: 59.99, mpesa_transaction_code: 'LMN12VBNM6' },
+  { purchaser_id: Purchaser.first.id, status: 'processing', total_amount: 159.98, mpesa_transaction_code: 'ZXC34FGHJ8' },
+  { purchaser_id: Purchaser.second.id, status: 'processing', total_amount: 209.97, mpesa_transaction_code: 'QWE56RTYU7' },
+  { purchaser_id: Purchaser.third.id, status: 'processing', total_amount: 119.98, mpesa_transaction_code: 'RTY67YUIO0' },
+  { purchaser_id: Purchaser.first.id, status: 'processing', total_amount: 179.97, mpesa_transaction_code: 'BNM45FGHJ9' }
 ]
 
 orders.each do |order_data|
   Order.create!(order_data)
 end
+
 
 # Ensure orders and products are created before running this
 

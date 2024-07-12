@@ -50,15 +50,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_02_144639) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "invoices", force: :cascade do |t|
-    t.bigint "order_id", null: false
-    t.string "mpesa_transaction_code"
-    t.decimal "total_amount"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["order_id"], name: "index_invoices_on_order_id"
-  end
-
   create_table "order_items", force: :cascade do |t|
     t.bigint "order_id", null: false
     t.bigint "product_id", null: false
@@ -80,11 +71,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_02_144639) do
 
   create_table "orders", force: :cascade do |t|
     t.bigint "purchaser_id", null: false
-    t.string "status"
+    t.string "status", default: "processing"
     t.decimal "total_amount"
-    t.boolean "is_sent_out"
-    t.boolean "is_processing"
-    t.boolean "is_delivered"
+    t.string "mpesa_transaction_code"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["purchaser_id"], name: "index_orders_on_purchaser_id"
@@ -175,7 +164,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_02_144639) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "invoices", "orders"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "order_vendors", "orders"
