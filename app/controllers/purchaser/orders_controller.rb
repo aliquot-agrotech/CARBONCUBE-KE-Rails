@@ -50,7 +50,7 @@ class Purchaser::OrdersController < ApplicationController
   end
 
   def authenticate_purchaser
-    @current_user = AuthorizeApiRequest.new(request.headers).result
+    @current_user = PurchaserAuthorizeApiRequest.new(request.headers).result
     unless @current_user && @current_user.is_a?(Purchaser)
       render json: { error: 'Not Authorized' }, status: :unauthorized
     end
