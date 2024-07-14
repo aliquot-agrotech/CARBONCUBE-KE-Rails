@@ -1,8 +1,7 @@
 # app/controllers/purchasers_controller.rb
 
 class Purchaser::PurchasersController < ApplicationController
-    skip_before_action :verify_authenticity_token, only: [:create]
-  
+    
     # GET /purchasers
     def index
       @purchasers = Purchaser.all
@@ -16,16 +15,16 @@ class Purchaser::PurchasersController < ApplicationController
     end
   
     # POST /purchasers
-    def create
-      @purchaser = Purchaser.new(purchaser_params)
-  
-      if @purchaser.save
-        token = JsonWebToken.encode(purchaser_id: @purchaser.id, role: @purchaser.role)
-        render json: { token: token, purchaser: @purchaser }, status: :created
-      else
-        render json: { errors: @purchaser.errors.full_messages }, status: :unprocessable_entity
-      end
+  def create
+    @purchaser = Purchaser.new(purchaser_params)
+
+    if @purchaser.save
+      token = JsonWebToken.encode(purchaser_id: @purchaser.id, role: @purchaser.role)
+      render json: { token: token, purchaser: @purchaser }, status: :created
+    else
+      render json: { errors: @purchaser.errors.full_messages }, status: :unprocessable_entity
     end
+  end
   
     # PATCH/PUT /purchasers/:id
     def update
