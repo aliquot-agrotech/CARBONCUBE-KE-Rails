@@ -28,14 +28,16 @@ Rails.application.routes.draw do
     resources :products
     resources :orders do
       member do
-        patch 'update_status'
+        put '/on-transit', to: 'orders#update_status_to_on_transit'
       end
     end
     resources :shipments
     resources :categories, only: [:index, :show]
     resources :analytics, only: [:index]
-    get 'reviews', to: 'reviews#index'
-    resource :profile, only: [:show, :update] 
+    resources :reviews, only: [] do
+      post 'reply', on: :member
+    end      
+    resources :profile, only: [:show, :update] 
   end
 
   # Purchaser namespace for purchaser-specific functionality

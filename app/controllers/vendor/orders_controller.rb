@@ -1,7 +1,7 @@
 # app/controllers/vendor/orders_controller.rb
 class Vendor::OrdersController < ApplicationController
   before_action :authenticate_vendor
-  before_action :set_order, only: [:show, :update, :destroy, :update_status]
+  before_action :set_order, only: [:index, :show, :update_status_to_on_transit]
 
   # GET /vendor/orders
   def index
@@ -14,21 +14,12 @@ class Vendor::OrdersController < ApplicationController
     render json: @order, include: ['order_items.product'], except: [:mpesa_transaction_code]
   end
 
-  # PATCH/PUT /vendor/orders/:id
-  def update
-    if @order.update(order_params)
+  # PUT /vendor/orders/:id/on-transit
+  def update_status_to_on_transit
+    if @order.update(status: 'on-transit')
       render json: @order
     else
-      render json: @order.errors, status: :unprocessable_entity
-    end
-  end
-
-  # PATCH/PUT /vendor/orders/:id/update_status
-  def update_status
-    if params[:status] == 'on-transit' && @order.update(status: 'on-transit')
-      render json: @order
-    else
-      render json: { errors: 'Only the status can be set to on-transit by the vendor' }, status: :unprocessable_entity
+      render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -52,7 +43,7 @@ class Vendor::OrdersController < ApplicationController
   end
 
   def authenticate_vendor
-    @current_user = AuthorizeApiRequest.new(request.headers).result
+    @current_user = VendorAuthorizeApiRequest.new(request.headers).result
     unless @current_user && @current_user.is_a?(Vendor)
       render json: { error: 'Not Authorized' }, status: :unauthorized
     end
