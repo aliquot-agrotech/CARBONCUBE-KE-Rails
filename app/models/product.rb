@@ -6,6 +6,7 @@ class Product < ApplicationRecord
   has_many :reviews, dependent: :destroy
   has_many :cart_items, dependent: :destroy
   has_many :bookmarks, dependent: :destroy
+  has_many :purchasers, through: :bookmarks
 
   validates :title, :description, :price, :quantity, :brand, :manufacturer, :package_length, :package_width, :package_height, :package_weight, presence: true
   validates :price, :quantity, :package_length, :package_width, :package_height, numericality: true

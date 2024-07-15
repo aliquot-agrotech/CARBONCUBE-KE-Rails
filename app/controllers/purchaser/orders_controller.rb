@@ -37,14 +37,15 @@ class Purchaser::OrdersController < ApplicationController
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
   end
-
-  def update_status
+  
+  # PUT /purchaser/orders/:id/deliver
+  def update_status_to_delivered
     @order = current_purchaser.orders.find(params[:id])
 
-    if params[:status] == 'delivered' && @order.update(status: 'delivered')
+    if @order.update(status: 'delivered')
       render json: @order
     else
-      render json: { errors: 'Only the status can be set to delivered by the purchaser' }, status: :unprocessable_entity
+      render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
     end
   end
 

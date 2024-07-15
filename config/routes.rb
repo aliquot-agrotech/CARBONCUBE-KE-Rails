@@ -42,7 +42,8 @@ Rails.application.routes.draw do
   namespace :purchaser, path: 'purchaser' do
     post 'signup', to: 'purchasers#create'
     
-    resources :purchasers, only: [:show, :update]   
+    resources :purchasers, only: [:show, :update]
+    resources :bookmarks, only: [:create, :destroy]   
     resources :cart_items, only: [:index, :create, :destroy] do
       collection do
         post :checkout
@@ -50,13 +51,14 @@ Rails.application.routes.draw do
     end
     resources :products, only: [:index, :show] do
       member do
-        post 'bookmark'
         post 'add_to_cart'
       end
     end
     
     resources :orders, only: [:index, :show, :create] do
-      patch 'update_status', on: :member
+      member do
+        put 'deliver', to: 'orders#update_status_to_delivered'
+      end
     end
   end
 end

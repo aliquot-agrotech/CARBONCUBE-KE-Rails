@@ -1,31 +1,29 @@
+# app/controllers/purchaser/bookmarks_controller.rb
 class Purchaser::BookmarksController < ApplicationController
   before_action :authenticate_purchaser
 
-  def index
-    @bookmarks = current_purchaser.bookmarks.includes(:product)
-    render json: @bookmarks, include: ['product']
-  end
-
+  # POST /purchaser/bookmarks
   def create
-    @bookmark = current_purchaser.bookmarks.build(product_id: params[:product_id])
-
-    if @bookmark.save
-      render json: @bookmark, status: :created
-    else
-      render json: @bookmark.errors, status: :unprocessable_entity
-    end
+    product = Product.find(params[:product_id])
+    current_purchaser.bookmark_product(product)
+    render json: { message: 'Product bookmarked successfully' }, status: :created
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Product not found' }, status: :not_found
   end
 
+  # DELETE /purchaser/bookmarks/:id
   def destroy
-    @bookmark = current_purchaser.bookmarks.find_by(product_id: params[:product_id])
-    @bookmark.destroy
+    product = Product.find(params[:id])
+    current_purchaser.unbookmark_product(product)
     head :no_content
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Bookmark not found' }, status: :not_found
   end
 
   private
 
   def authenticate_purchaser
-    @current_user = AuthorizeApiRequest.new(request.headers).result
+    @current_user = PurchaserAuthorizeApiRequest.new(request.headers).result
     unless @current_user && @current_user.is_a?(Purchaser)
       render json: { error: 'Not Authorized' }, status: :unauthorized
     end
