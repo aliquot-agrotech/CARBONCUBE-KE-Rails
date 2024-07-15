@@ -35,7 +35,7 @@ Rails.application.routes.draw do
     resources :categories, only: [:index, :show]
     resources :analytics, only: [:index]
     get 'reviews', to: 'reviews#index'
-    resources :profiles, only: [:update]
+    resource :profile, only: [:show, :update] 
   end
 
   # Purchaser namespace for purchaser-specific functionality
