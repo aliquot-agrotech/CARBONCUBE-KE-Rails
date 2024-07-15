@@ -1,5 +1,3 @@
-# app/controllers/purchaser/orders_controller.rb
-
 class Purchaser::OrdersController < ApplicationController
   before_action :authenticate_purchaser
 
@@ -14,27 +12,30 @@ class Purchaser::OrdersController < ApplicationController
   end
 
   def create
-    @order = current_purchaser.orders.build(order_params)
-
-    if @order.save
-      render json: @order, status: :created
-    else
-      render json: @order.errors, status: :unprocessable_entity
+    if params[:mpesa_transaction_code].blank?
+      render json: { error: "Mpesa transaction code can't be blank" }, status: :unprocessable_entity
+      return
     end
-  end
 
-  def checkout
-    @order = current_purchaser.orders.find(params[:id])
-    mpesa_code = params[:mpesa_code]
+    ActiveRecord::Base.transaction do
+      @order = current_purchaser.orders.create!(
+        status: 'processing',
+        mpesa_transaction_code: params[:mpesa_transaction_code]
+      )
 
-    if @order.update(mpesa_code: mpesa_code, status: 'processing')
-      transfer_cart_items_to_order(@order)
-      current_purchaser.cart_items.destroy_all
-      current_purchaser.update(cart_total_price: 0)
-      render json: { message: 'Checkout completed and MPESA transaction code saved successfully' }, status: :ok
-    else
-      render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
+      current_purchaser.cart_items.each do |cart_item|
+        @order.order_items.create!(
+          product_id: cart_item.product_id,
+          quantity: cart_item.quantity,
+          price: cart_item.total_price
+        )
+        cart_item.destroy
+      end
     end
+
+    render json: @order, status: :created
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
   end
 
   def update_status
@@ -49,10 +50,6 @@ class Purchaser::OrdersController < ApplicationController
 
   private
 
-  def order_params
-    params.require(:order).permit(order_items_attributes: [:product_id, :quantity, :price])
-  end
-
   def authenticate_purchaser
     @current_user = PurchaserAuthorizeApiRequest.new(request.headers).result
     unless @current_user && @current_user.is_a?(Purchaser)
@@ -62,15 +59,5 @@ class Purchaser::OrdersController < ApplicationController
 
   def current_purchaser
     @current_user
-  end
-
-  def transfer_cart_items_to_order(order)
-    current_purchaser.cart_items.each do |cart_item|
-      order.order_items.create(
-        product_id: cart_item.product_id,
-        quantity: cart_item.quantity,
-        price: cart_item.price
-      )
-    end
   end
 end

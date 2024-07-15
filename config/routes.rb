@@ -56,7 +56,6 @@ Rails.application.routes.draw do
     end
     
     resources :orders, only: [:index, :show, :create] do
-      # post 'checkout', on: :member
       patch 'update_status', on: :member
     end
   end
