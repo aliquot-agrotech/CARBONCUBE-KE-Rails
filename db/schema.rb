@@ -42,6 +42,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_12_112628) do
     t.bigint "purchaser_id", null: false
     t.bigint "product_id", null: false
     t.integer "quantity", default: 1, null: false
+    t.decimal "price", precision: 10, scale: 2, default: "0.0", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_cart_items_on_product_id"
@@ -73,6 +74,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_12_112628) do
     t.bigint "order_id", null: false
     t.bigint "product_id", null: false
     t.integer "quantity", default: 1, null: false
+    t.decimal "price", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "total_price", precision: 10, scale: 2, default: "0.0", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["order_id"], name: "index_order_items_on_order_id"

@@ -155,7 +155,7 @@ orders = Order.all
 products = Product.all
 vendors = Vendor.all
 
-# Seed order items data
+# Assuming you have already loaded products and orders
 order_items = [
   { order_id: orders[0].id, product_id: products[0].id, quantity: 2 },
   { order_id: orders[0].id, product_id: products[1].id, quantity: 1 },
@@ -180,8 +180,11 @@ order_items = [
 ]
 
 order_items.each do |order_item_data|
+  order_item_data[:price] = Product.find(order_item_data[:product_id]).price
+  order_item_data[:total_price] = order_item_data[:price] * order_item_data[:quantity]
   OrderItem.create!(order_item_data)
 end
+
 
 # Seed order vendors data
 order_vendors = [
