@@ -37,7 +37,7 @@ Rails.application.routes.draw do
     resources :reviews, only: [:index, :show] do
       post 'reply', on: :member
     end      
-    resources :profile, only: [:show, :update] 
+    resource :profile, only: [:show, :update] 
   end
 
   # Purchaser namespace for purchaser-specific functionality

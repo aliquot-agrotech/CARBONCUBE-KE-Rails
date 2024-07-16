@@ -37,7 +37,7 @@ class Vendor::AnalyticsController < ApplicationController
   end
 
   def authenticate_vendor
-    @current_user = AuthorizeApiRequest.new(request.headers).result
+    @current_user = VendorAuthorizeApiRequest.new(request.headers).result
     unless @current_user && @current_user.is_a?(Vendor)
       render json: { error: 'Not Authorized' }, status: 401
     end
