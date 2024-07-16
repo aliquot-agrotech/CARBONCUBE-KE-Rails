@@ -152,6 +152,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_12_112628) do
     t.bigint "purchaser_id", null: false
     t.integer "rating", limit: 2, null: false
     t.text "review"
+    t.text "reply"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_reviews_on_product_id"

@@ -1,17 +1,16 @@
-# app/controllers/vendor/orders_controller.rb
 class Vendor::OrdersController < ApplicationController
   before_action :authenticate_vendor
-  before_action :set_order, only: [:index, :show, :update_status_to_on_transit]
+  before_action :set_order, only: [:show, :update_status_to_on_transit, :destroy]
 
   # GET /vendor/orders
   def index
-    @orders = current_vendor.orders.includes(:order_items).where(order_items: { product_id: current_vendor.products.ids })
-    render json: @orders, include: ['order_items.product'], except: [:mpesa_transaction_code]
+    @orders = current_vendor.orders.includes(order_items: :product).where(order_items: { product_id: current_vendor.products.ids }).distinct
+    render json: @orders, include: ['order_items.product'], except: [:mpesa_transaction_code], each_serializer: VendorOrderSerializer
   end
 
   # GET /vendor/orders/:id
   def show
-    render json: @order, include: ['order_items.product'], except: [:mpesa_transaction_code]
+    render json: @order, include: ['order_items.product'], except: [:mpesa_transaction_code], serializer: VendorOrderSerializer
   end
 
   # PUT /vendor/orders/:id/on-transit
@@ -32,14 +31,10 @@ class Vendor::OrdersController < ApplicationController
   private
 
   def set_order
-    @order = current_vendor.orders.includes(:order_items).find_by(id: params[:id])
+    @order = current_vendor.orders.includes(order_items: :product).find_by(id: params[:id])
     unless @order
       render json: { error: 'Order not found' }, status: :not_found
     end
-  end
-
-  def order_params
-    params.require(:order).permit(:status)
   end
 
   def authenticate_vendor

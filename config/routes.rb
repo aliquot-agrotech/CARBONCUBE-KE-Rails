@@ -28,13 +28,13 @@ Rails.application.routes.draw do
     resources :products
     resources :orders do
       member do
-        put '/on-transit', to: 'orders#update_status_to_on_transit'
+        put 'on-transit', to: 'orders#update_status_to_on_transit'
       end
     end
     resources :shipments
     resources :categories, only: [:index, :show]
     resources :analytics, only: [:index]
-    resources :reviews, only: [] do
+    resources :reviews, only: [:index, :show] do
       post 'reply', on: :member
     end      
     resources :profile, only: [:show, :update] 
