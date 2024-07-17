@@ -1,6 +1,6 @@
 class Vendor::OrdersController < ApplicationController
   before_action :authenticate_vendor
-  before_action :set_order, only: [:show, :update_status_to_on_transit, :destroy]
+  before_action :set_order, only: [:show, :destroy]
 
   # GET /vendor/orders
   def index
@@ -13,14 +13,7 @@ class Vendor::OrdersController < ApplicationController
     render json: @order, include: ['order_items.product'], except: [:mpesa_transaction_code], serializer: VendorOrderSerializer
   end
 
-  # PUT /vendor/orders/:id/on-transit
-  def update_status_to_on_transit
-    if @order.update(status: 'on-transit')
-      render json: @order
-    else
-      render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
-    end
-  end
+
 
   # DELETE /vendor/orders/:id
   def destroy

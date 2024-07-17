@@ -1,6 +1,6 @@
 class Admin::OrdersController < ApplicationController
   before_action :authenticate_admin
-  before_action :set_order, only: [:show, :update, :destroy]
+  before_action :set_order, only: [:show, :update_status_to_on_transit, :destroy]
 
   def index
     @orders = Order.all
@@ -10,12 +10,12 @@ class Admin::OrdersController < ApplicationController
   def show
     render json: @order
   end
-
-  def update
-    if @order.update(order_params)
+  # PUT /admin/orders/:id/on-transit
+  def update_status_to_on_transit
+    if @order.update(status: 'on-transit')
       render json: @order
     else
-      render json: @order.errors, status: :unprocessable_entity
+      render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
     end
   end
 

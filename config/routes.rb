@@ -15,7 +15,11 @@ Rails.application.routes.draw do
     resources :purchasers do
       resources :orders, only: [:index]
     end
-    resources :orders, only: [:index, :show, :update, :destroy]
+    resources :orders, only: [:index, :show, :destroy] do
+      member do
+        put 'on-transit', to: 'orders#update_status_to_on_transit'
+      end
+    end
     resources :categories
     resources :cms_pages
 
@@ -26,11 +30,7 @@ Rails.application.routes.draw do
   namespace :vendor do
     post 'signup', to: 'vendors#create'
     resources :products
-    resources :orders do
-      member do
-        put 'on-transit', to: 'orders#update_status_to_on_transit'
-      end
-    end
+    resources :orders
     resources :shipments
     resources :categories, only: [:index, :show]
     resources :analytics, only: [:index]
