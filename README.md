@@ -8,7 +8,7 @@ This repository contains a Ruby on Rails application designed for an eCommerce p
 
 Before getting started, ensure you have the following installed on your system:
 
-- Ruby (version 3.3.3)
+- Ruby (version 3.3.4)
 - Ruby on Rails (version 7.1.3.4)
 - PostgreSQL
 
@@ -68,4 +68,4 @@ Specify the license under which the code is distributed, if applicable.
 
 Mention any acknowledgements or credits for third-party libraries, resources, or inspiration used in the project.
 
-## Developed by [LEW KM](https://github.com/LewKM) [Lewis Mwendwa Kathembe](https://www.linkedin.com/in/lewis-mwendwa-3a2581244/)
+## Developed by : [Lewis Mwendwa Kathembe](https://www.linkedin.com/in/lewis-mwendwa-3a2581244/)

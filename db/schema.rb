@@ -172,7 +172,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_12_112628) do
   create_table "vendors", force: :cascade do |t|
     t.string "fullname"
     t.text "description"
-    t.text "contact_info"
     t.string "phone_number"
     t.string "location"
     t.decimal "total_revenue"
