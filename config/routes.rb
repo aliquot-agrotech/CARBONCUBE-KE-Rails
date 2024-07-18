@@ -8,19 +8,22 @@ Rails.application.routes.draw do
 
   # Admin namespace for admin-specific functionality
   namespace :admin do
-    resources :vendors do
+    namespace :vendors do
       get ':vendor_id/profile', to: 'profiles#show'
       resources :products, only: [:index]
       resources :reviews, only: [:index]
     end
-    resources :purchasers do
+
+    namespace :purchasers do
       resources :orders, only: [:index]
     end
+
     resources :orders, only: [:index, :show, :destroy] do
       member do
         put 'on-transit', to: 'orders#update_status_to_on_transit'
       end
     end
+    
     resources :categories
     resources :cms_pages
 
