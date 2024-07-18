@@ -1,11 +1,10 @@
-class Admin::Vendors::ProductsController < ApplicationController
+class Admin::Vendors::ProfilesController < ApplicationController
   before_action :authenticate_admin
   before_action :set_vendor
 
-  # GET /admin/vendors/:vendor_id/products
-  def index
-    @products = @vendor.products
-    render json: @products
+  # GET /admin/vendors/:vendor_id/profile
+  def show
+    render json: @vendor, include: :categories
   end
 
   private

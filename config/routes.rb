@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   # Admin namespace for admin-specific functionality
   namespace :admin do
     resources :vendors do
+      get ':vendor_id/profile', to: 'profiles#show'
       resources :products, only: [:index]
       resources :reviews, only: [:index]
     end
