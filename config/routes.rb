@@ -12,6 +12,7 @@ Rails.application.routes.draw do
       get ':vendor_id/profile', to: 'profiles#show'
       get ':vendor_id/products', to: 'products#index'
       get ':vendor_id/products/:product_id/reviews', to: 'reviews#index'
+       get ':vendor_id/orders', to: 'orders#index_for_vendor'
     end
 
     namespace :purchasers do
