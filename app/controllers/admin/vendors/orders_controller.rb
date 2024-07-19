@@ -5,13 +5,14 @@ class Admin::Vendors::OrdersController < ApplicationController
   # GET /admin/vendors/:vendor_id/orders
   def index_for_vendor
     # Get all orders that have order_items related to the vendor's products
-    orders = @vendor.orders.includes(order_items: :product).where(order_items: { product_id: @vendor.products.pluck(:id) })
+    orders = @vendor.orders.includes(order_items: :product, purchaser: :orders).where(order_items: { product_id: @vendor.products.pluck(:id) })
 
-    # Filter the order_items to include only those related to the specific vendor
+    # Prepare the response with filtered orders, including the purchaser details
     filtered_orders = orders.map do |order|
       {
-        order: order.as_json(except: [:mpesa_transaction_code]),
-        order_items: order.order_items.select { |item| @vendor.products.exists?(item.product_id) }.as_json(include: :product)
+        order: order.as_json(only: [:id, :status, :total_amount, :created_at, :updated_at, :mpesa_transaction_code]),
+        purchaser: order.purchaser.as_json(only: [:id, :fullname, :email, :phone_number]),
+        order_items: order.order_items.select { |item| @vendor.products.exists?(item.product_id) }.as_json(include: { product: { only: [:id, :title, :price] } })
       }
     end
 
