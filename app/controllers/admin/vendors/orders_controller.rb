@@ -10,7 +10,7 @@ class Admin::Vendors::OrdersController < ApplicationController
     # Prepare the response with filtered orders, including the purchaser details
     filtered_orders = orders.map do |order|
       {
-        order: order.as_json(only: [:id, :status, :total_amount, :created_at, :updated_at, :mpesa_transaction_code]),
+        order: order.as_json(only: [:id, :status, :created_at, :updated_at, :mpesa_transaction_code]),
         purchaser: order.purchaser.as_json(only: [:id, :fullname, :email, :phone_number]),
         order_items: order.order_items.select { |item| @vendor.products.exists?(item.product_id) }.as_json(include: { product: { only: [:id, :title, :price] } })
       }
