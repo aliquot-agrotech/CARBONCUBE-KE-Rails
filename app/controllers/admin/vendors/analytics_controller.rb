@@ -24,17 +24,26 @@ class Admin::Vendors::AnalyticsController < ApplicationController
                            .where(products: { id: @vendor.products.pluck(:id) })
                            .average(:rating).to_f
 
-    # Count the number of reviews related to the vendor's products
-    total_reviews = @vendor.reviews.joins(:product)
-                              .where(products: { id: @vendor.products.pluck(:id) })
-                              .count
+    # Count the number of reviews related to the vendor's products and group by rating
+    reviews_by_rating = @vendor.reviews.joins(:product)
+                                  .where(products: { id: @vendor.products.pluck(:id) })
+                                  .group(:rating)
+                                  .count
 
-    # Fetch detailed reviews with purchaser information and product title
+    # Prepare data for pie chart
+    rating_pie_chart = (1..5).map do |rating|
+      {
+        rating: rating,
+        count: reviews_by_rating[rating] || 0
+      }
+    end
+
+    # Fetch detailed reviews with purchaser information
     reviews_details = @vendor.reviews.joins(:product, :purchaser)
                                .where(products: { id: @vendor.products.pluck(:id) })
-                               .select('reviews.id, reviews.rating, reviews.review, reviews.created_at, purchasers.fullname AS purchaser_name, products.title AS product_title')
+                               .select('reviews.*, purchasers.fullname AS purchaser_name')
                                .as_json(only: [:id, :rating, :review, :created_at],
-                                        methods: [:purchaser_name, :product_title])
+                                        include: { purchaser: { only: [:fullname] } })
 
     # Prepare the analytics response
     analytics = {
@@ -42,7 +51,8 @@ class Admin::Vendors::AnalyticsController < ApplicationController
       total_orders: total_orders,
       total_products_sold: total_products_sold,
       mean_rating: mean_rating,
-      total_reviews: total_reviews,
+      total_reviews: reviews_by_rating.values.sum,
+      rating_pie_chart: rating_pie_chart,
       reviews: reviews_details
     }
 
