@@ -17,7 +17,8 @@ Rails.application.routes.draw do
     end
 
     namespace :purchasers do
-      resources :orders, only: [:index]
+      get ':purchaser_id/profile', to: 'profiles#show'
+      get ':purchaser_id/orders', to: 'orders#index_for_purchaser'
     end
 
     resources :orders, only: [:index, :show, :destroy] do
