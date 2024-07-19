@@ -10,8 +10,8 @@ Rails.application.routes.draw do
   namespace :admin do
     namespace :vendors do
       get ':vendor_id/profile', to: 'profiles#show'
-      resources :products, only: [:index]
-      resources :reviews, only: [:index]
+      get ':vendor_id/products', to: 'products#index'
+      get ':vendor_id/products/:product_id/reviews', to: 'reviews#index'
     end
 
     namespace :purchasers do

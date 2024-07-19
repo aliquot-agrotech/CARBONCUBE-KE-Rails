@@ -2,7 +2,6 @@ class Admin::Vendors::ProductsController < ApplicationController
   before_action :authenticate_admin
   before_action :set_vendor
 
-  # GET /admin/vendors/:vendor_id/products
   def index
     @products = @vendor.products
     render json: @products
