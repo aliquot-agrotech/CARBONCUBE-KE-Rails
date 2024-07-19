@@ -6,8 +6,8 @@ class Admin::Vendors::AnalyticsController < ApplicationController
   def show
     # Calculate total revenue from all orders related to the vendor's products
     total_revenue = @vendor.orders.joins(:order_items)
-                               .where(order_items: { product_id: @vendor.products.pluck(:id) })
-                               .sum('order_items.quantity * order_items.price')
+                              .where(order_items: { product_id: @vendor.products.pluck(:id) })
+                              .sum('order_items.quantity * order_items.price')
 
     # Calculate total number of orders related to the vendor's products
     total_orders = @vendor.orders.joins(:order_items)
@@ -16,13 +16,13 @@ class Admin::Vendors::AnalyticsController < ApplicationController
 
     # Calculate total number of products sold (sum of quantities)
     total_products_sold = @vendor.orders.joins(:order_items)
-                                   .where(order_items: { product_id: @vendor.products.pluck(:id) })
-                                   .sum('order_items.quantity')
+                                  .where(order_items: { product_id: @vendor.products.pluck(:id) })
+                                  .sum('order_items.quantity')
 
     # Calculate average rating (mean of ratings) from reviews related to the vendor's products
     mean_rating = @vendor.reviews.joins(:product)
-                           .where(products: { id: @vendor.products.pluck(:id) })
-                           .average(:rating).to_f
+                          .where(products: { id: @vendor.products.pluck(:id) })
+                          .average(:rating).to_f
 
     # Count the number of reviews related to the vendor's products and group by rating
     reviews_by_rating = @vendor.reviews.joins(:product)
@@ -40,9 +40,9 @@ class Admin::Vendors::AnalyticsController < ApplicationController
 
     # Fetch detailed reviews with purchaser information
     reviews_details = @vendor.reviews.joins(:product, :purchaser)
-                               .where(products: { id: @vendor.products.pluck(:id) })
-                               .select('reviews.*, purchasers.fullname AS purchaser_name')
-                               .as_json(only: [:id, :rating, :review, :created_at],
+                              .where(products: { id: @vendor.products.pluck(:id) })
+                              .select('reviews.*, purchasers.fullname AS purchaser_name')
+                              .as_json(only: [:id, :rating, :review, :created_at],
                                         include: { purchaser: { only: [:fullname] } })
 
     # Prepare the analytics response
