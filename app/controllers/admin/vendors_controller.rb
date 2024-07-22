@@ -34,25 +34,34 @@ class Admin::VendorsController < ApplicationController
     head :no_content
   end
 
-  # PUT /admin/vendors/:id/block
-  def block
-    if @vendor
+# PUT /admin/vendors/:id/block
+def block
+  if @vendor
+    mean_rating = @vendor.reviews.average(:rating).to_f
+
+    if mean_rating < 3.0
       @vendor.update(blocked: true)
       head :no_content
     else
-      render json: { error: 'Vendor not found' }, status: :not_found
+      render json: { error: 'Vendor cannot be blocked because their mean rating is above 3.0' }, status: :unprocessable_entity
     end
+  else
+    render json: { error: 'Vendor not found' }, status: :not_found
   end
+end
 
-   # PUT /admin/vendors/:id/unblock
-   def unblock
-    if @vendor
-      @vendor.update(blocked: false)
-      head :no_content
+# PUT /admin/vendors/:id/unblock
+def unblock
+  if @vendor
+    if @vendor.update(blocked: false)
+      render json: { message: 'Vendor was unblocked successfully' }, status: :ok
     else
-      render json: { error: 'Vendor not found' }, status: :not_found
+      render json: @vendor.errors, status: :unprocessable_entity
     end
+  else
+    render json: { error: 'Vendor not found' }, status: :not_found
   end
+end
 
   private
 
