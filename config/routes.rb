@@ -53,8 +53,8 @@ Rails.application.routes.draw do
   # Purchaser namespace for purchaser-specific functionality
   namespace :purchaser, path: 'purchaser' do
     post 'signup', to: 'purchasers#create'
-    
-    resources :purchasers, only: [:show, :update]
+
+    resource :profile, only: [:show, :update]
     resources :bookmarks, only: [:index, :show, :create, :destroy]   
     resources :cart_items, only: [:index, :create, :destroy] do
       collection do
