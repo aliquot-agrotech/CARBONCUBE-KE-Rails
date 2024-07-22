@@ -33,6 +33,7 @@ Rails.application.routes.draw do
     resources :vendors
     resources :purchasers
     resources :analytics
+    resources :reviews
   end
 
   # Vendor namespace for vendor-specific functionality

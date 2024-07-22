@@ -1,4 +1,4 @@
-class Admin::Vendors::AnalyticsController < ApplicationController
+class Admin::Vendor::AnalyticsController < ApplicationController
   before_action :authenticate_admin
   before_action :set_vendor
 

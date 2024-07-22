@@ -1,4 +1,4 @@
-class Admin::Vendors::ReviewsController < ApplicationController
+class Admin::Vendor::ReviewsController < ApplicationController
   before_action :authenticate_admin
   before_action :set_vendor
   before_action :set_product

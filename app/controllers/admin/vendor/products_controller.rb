@@ -1,4 +1,4 @@
-class Admin::Vendors::ProductsController < ApplicationController
+class Admin::Vendor::ProductsController < ApplicationController
   before_action :authenticate_admin
   before_action :set_vendor
 

@@ -1,4 +1,4 @@
-class Admin::Purchasers::OrdersController < ApplicationController
+class Admin::Purchaser::OrdersController < ApplicationController
   before_action :authenticate_admin
   before_action :set_purchaser
 
