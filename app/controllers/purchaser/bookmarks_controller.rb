@@ -2,6 +2,15 @@
 class Purchaser::BookmarksController < ApplicationController
   before_action :authenticate_purchaser
 
+  def index
+    @bookmarks = current_purchaser.bookmarks
+    render json: @bookmarks
+  end
+
+  def show
+    @bookmark = current_purchaser.bookmarks.find(params[:id])
+  end
+
   # POST /purchaser/bookmarks
   def create
     product = Product.find(params[:product_id])

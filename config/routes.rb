@@ -55,7 +55,7 @@ Rails.application.routes.draw do
     post 'signup', to: 'purchasers#create'
     
     resources :purchasers, only: [:show, :update]
-    resources :bookmarks, only: [:create, :destroy]   
+    resources :bookmarks, only: [:index, :show, :create, :destroy]   
     resources :cart_items, only: [:index, :create, :destroy] do
       collection do
         post :checkout
@@ -72,5 +72,7 @@ Rails.application.routes.draw do
         put 'deliver', to: 'orders#update_status_to_delivered'
       end
     end
+
+    resources :reviews
   end
 end
