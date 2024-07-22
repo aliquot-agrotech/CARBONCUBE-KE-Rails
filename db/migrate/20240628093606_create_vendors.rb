@@ -12,6 +12,7 @@ class CreateVendors < ActiveRecord::Migration[7.1]
       t.string :business_registration_number
       t.string :enterprise_name
       t.string :email
+      t.boolean :blocked
       t.string :password_digest
       t.timestamps
     end
