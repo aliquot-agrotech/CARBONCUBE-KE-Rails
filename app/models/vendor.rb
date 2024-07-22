@@ -14,4 +14,16 @@ class Vendor < ApplicationRecord
   validates :enterprise_name, presence: true
   validates :location, presence: true
   validates :business_registration_number, presence: true
+
+  def calculate_mean_rating
+    reviews.average(:rating).to_f
+  end
+
+  def check_and_block
+    if calculate_mean_rating < 3.0
+      update(blocked: true)
+    else
+      update(blocked: false)
+    end
+  end
 end

@@ -30,7 +30,12 @@ Rails.application.routes.draw do
     resources :categories
     resources :products
     resources :cms_pages
-    resources :vendors
+    resources :vendors do
+      member do
+        put 'block'
+        put 'unblock'
+      end
+    end
     resources :purchasers
     resources :analytics
     resources :reviews

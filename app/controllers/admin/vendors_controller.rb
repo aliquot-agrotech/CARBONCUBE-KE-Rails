@@ -1,6 +1,7 @@
 class Admin::VendorsController < ApplicationController
   before_action :authenticate_admin
-  before_action :set_vendor, only: [:show, :update, :destroy]
+  before_action :set_vendor, only: [:block, :unblock, :show, :update, :destroy]
+
 
   def index
     @vendors = Vendor.all
@@ -31,6 +32,26 @@ class Admin::VendorsController < ApplicationController
   def destroy
     @vendor.destroy
     head :no_content
+  end
+
+  # PUT /admin/vendors/:id/block
+  def block
+    if @vendor
+      @vendor.update(blocked: true)
+      head :no_content
+    else
+      render json: { error: 'Vendor not found' }, status: :not_found
+    end
+  end
+
+   # PUT /admin/vendors/:id/unblock
+   def unblock
+    if @vendor
+      @vendor.update(blocked: false)
+      head :no_content
+    else
+      render json: { error: 'Vendor not found' }, status: :not_found
+    end
   end
 
   private

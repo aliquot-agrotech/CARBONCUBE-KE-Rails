@@ -2,8 +2,9 @@ class Purchaser::ProductsController < ApplicationController
     before_action :set_product, only: [:show]
   
     # GET /purchaser/products
+  
     def index
-      @products = Product.all
+      @products = Product.joins(:vendor).where(vendors: { blocked: false })
       render json: @products
     end
   

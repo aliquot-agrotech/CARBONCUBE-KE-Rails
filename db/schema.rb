@@ -181,6 +181,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_12_112628) do
     t.string "business_registration_number"
     t.string "enterprise_name"
     t.string "email"
+    t.boolean "blocked"
     t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
