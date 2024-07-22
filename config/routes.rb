@@ -28,9 +28,10 @@ Rails.application.routes.draw do
     end
     
     resources :categories
+    resources :products
     resources :cms_pages
 
-    get 'analytics', to: 'analytics#index'
+    resources :analytics
   end
 
   # Vendor namespace for vendor-specific functionality
