@@ -1,4 +1,13 @@
 class Product < ApplicationRecord
+  include PgSearch::Model
+
+  pg_search_scope :search_by_title_and_description, 
+  against: [:title, :description],
+  using: {
+    tsearch: { prefix: true },
+    trigram: {}
+  }
+
   belongs_to :vendor
   belongs_to :category
   has_many :order_items
