@@ -12,7 +12,16 @@ class Purchaser::ProductsController < ApplicationController
     def show
       render json: @product
     end
-  
+
+    # GET /purchaser/products/search
+    def search
+      query = params[:query]
+      @products = Product.joins(:vendor)
+                        .where("title ILIKE ? OR description ILIKE ?", "%#{query}%", "%#{query}%")
+                        .where(vendors: { blocked: false })
+      render json: @products
+    end
+    
     private
   
     def set_product
