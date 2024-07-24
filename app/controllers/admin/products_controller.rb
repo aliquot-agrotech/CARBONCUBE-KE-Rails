@@ -1,16 +1,20 @@
 class Admin::ProductsController < ApplicationController 
   before_action :authenticate_admin
 
+  # GET /admin/products
   def index
-    @products = Product.all
+    @products = Product.joins(:vendor)  # Only filter blocked vendors
+                       .where(vendors: { blocked: false })
     render json: @products
   end
 
+  # GET /admin/products/:id
   def show
     @product = Product.find(params[:id])
     render json: @product
   end
 
+  # POST /admin/products
   def create
     @product = Product.new(product_params)
     if @product.save
@@ -20,6 +24,7 @@ class Admin::ProductsController < ApplicationController
     end
   end
 
+  # PATCH/PUT /admin/products/:id
   def update
     @product = Product.find(params[:id])
     if @product.update(product_params)
@@ -29,11 +34,35 @@ class Admin::ProductsController < ApplicationController
     end
   end
 
+  # DELETE /admin/products/:id
   def destroy
     @product = Product.find(params[:id])
     @product.destroy
     head :no_content
   end
+
+  # GET /admin/products/search
+  def search
+    if params[:query].present?
+      title_description_search = Product.joins(:vendor)
+                                        .where(vendors: { blocked: false })
+                                        .search_by_title_and_description(params[:query])
+
+      category_search = Product.joins(:vendor, :category)
+                              .where(vendors: { blocked: false })
+                              .where('categories.name ILIKE ?', "%#{params[:query]}%")
+                              .select('products.*')
+
+      # Combine results manually
+      @products = (title_description_search.to_a + category_search.to_a).uniq
+    else
+      @products = Product.joins(:vendor)
+                        .where(vendors: { blocked: false })
+    end
+
+    render json: @products
+  end
+
 
   private
 

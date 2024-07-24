@@ -29,7 +29,11 @@ Rails.application.routes.draw do
     end
     
     resources :categories
-    resources :products
+    resources :products do
+      collection do
+        get 'search'
+      end
+    end
     resources :cms_pages
     resources :vendors do
       member do
