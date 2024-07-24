@@ -15,14 +15,13 @@ class Purchaser::ProductsController < ApplicationController
 
   # GET /purchaser/products/search
   def search
-    if params[:query].present?
-      @products = Product.joins(:vendor)
-                         .where(vendors: { blocked: false })
-                         .search_by_title_and_description(params[:query])
-    else
-      @products = Product.joins(:vendor)
-                         .where(vendors: { blocked: false })
-    end
+    query = params[:query].present? ? params[:query] : ''
+
+    @products = Product.joins(:vendor, :category)
+                       .where(vendors: { blocked: false })
+                       .where('products.title ILIKE ? OR products.description ILIKE ? OR categories.name ILIKE ?', 
+                              "%#{query}%", "%#{query}%", "%#{query}%")
+                       .distinct
 
     render json: @products
   end
