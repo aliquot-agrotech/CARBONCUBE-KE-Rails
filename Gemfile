@@ -44,7 +44,7 @@ gem "bootsnap", require: false
 # JWT authentication
 gem 'jwt'
 gem 'bcrypt', '~> 3.1.7'  # for password hashing
-gem 'rack-cors'
+gem 'rack-cors', require: 'rack/cors'
 
 # Sinatra
 gem "sinatra"
