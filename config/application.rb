@@ -25,7 +25,7 @@ module Carbonecomrails
     # config.eager_load_paths << Rails.root.join("extras")
     config.middleware.insert_before 0, Rack::Cors do
       allow do
-        origins 'http://localhost:3000' # Adjust the origin as needed
+        origins 'http://localhost:3001' # Adjust the origin as needed
         resource '*',
           headers: :any,
           methods: [:get, :post, :put, :patch, :delete, :options, :head],
