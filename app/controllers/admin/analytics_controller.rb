@@ -8,24 +8,24 @@ class Admin::AnalyticsController < ApplicationController
     @total_products = Product.count
     @total_reviews = Review.count
 
-    # Best Selling Products
+    # Best Selling Product for Each Category
     best_selling_products = Product.joins(:order_items)
-                                   .select('products.*, SUM(order_items.quantity) AS total_sold')
-                                   .group('products.id')
+                                   .select('products.*, categories.name as category_name, SUM(order_items.quantity) AS total_sold')
+                                   .joins(:category)
+                                   .group('products.id, categories.id')
                                    .order('total_sold DESC')
-                                   .limit(10)
+                                   .group_by(&:category_id)
+                                   .map { |category_id, products| products.first }
 
     # Total Products Sold Out
-    total_products_sold_out = Product.joins(:order_items)
-                                     .select('products.id')
-                                     .group('products.id')
-                                     .having('SUM(order_items.quantity) >= MAX(products.quantity)')
-                                     .count
+    total_products_sold_out = OrderItem.distinct.count(:product_id)
 
-    # Purchasers Insights
+    # Top 5 Purchasers Insights
     purchasers_insights = Purchaser.joins(:orders)
-                                   .select('purchasers.*, COUNT(orders.id) AS total_orders, SUM(orders.total_amount) AS total_spent')
+                                   .select('purchasers.fullname, COUNT(orders.id) AS total_orders')
                                    .group('purchasers.id')
+                                   .order('total_orders DESC')
+                                   .limit(5)
 
     # Total Revenue
     total_revenue = Order.joins(:order_items)
@@ -43,7 +43,7 @@ class Admin::AnalyticsController < ApplicationController
       total_products: @total_products,
       total_reviews: @total_reviews,
       best_selling_products: best_selling_products,
-      total_products_sold_out: total_products_sold_out.keys.size,
+      total_products_sold_out: total_products_sold_out,
       purchasers_insights: purchasers_insights,
       total_revenue: total_revenue,
       sales_performance: sales_performance
