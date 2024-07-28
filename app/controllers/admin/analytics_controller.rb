@@ -10,10 +10,10 @@ class Admin::AnalyticsController < ApplicationController
 
     # Best Selling Product for Each Category
     best_selling_products = Category.joins(products: :order_items)
-                                    .select('categories.id AS category_id, categories.name AS category_name, products.id AS product_id, products.title AS product_title, SUM(order_items.quantity) AS total_sold')
+                                    .select('categories.id AS category_id, categories.name AS category_name, products.id AS product_id, products.title AS product_title, products.price AS product_price, SUM(order_items.quantity) AS total_sold')
                                     .group('categories.id, products.id')
                                     .order('categories.id, total_sold DESC')
-                                    .map { |record| { category_name: record.category_name, product_id: record.product_id, product_title: record.product_title, total_sold: record.total_sold } }
+                                    .map { |record| { category_name: record.category_name, product_id: record.product_id, product_title: record.product_title, product_price: record.product_price, total_sold: record.total_sold } }
                                     .group_by { |record| record[:category_name] }
                                     .transform_values(&:first)
 
