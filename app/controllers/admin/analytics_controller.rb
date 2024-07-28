@@ -38,6 +38,14 @@ class Admin::AnalyticsController < ApplicationController
                              .group("DATE_TRUNC('month', orders.created_at)")
                              .sum('order_items.price * order_items.quantity')
 
+    # Best Selling Categories Analytics
+    best_selling_categories = Category.joins(products: :order_items)
+                                      .select('categories.name AS category_name, SUM(order_items.quantity) AS total_sold')
+                                      .group('categories.id')
+                                      .order('total_sold DESC')
+                                      .limit(3)
+                                      .map { |record| { category_name: record.category_name, total_sold: record.total_sold } }
+
     render json: {
       total_vendors: @total_vendors,
       total_purchasers: @total_purchasers,
@@ -48,7 +56,8 @@ class Admin::AnalyticsController < ApplicationController
       total_products_sold_out: total_products_sold_out,
       purchasers_insights: purchasers_insights,
       total_revenue: total_revenue,
-      sales_performance: sales_performance
+      sales_performance: sales_performance,
+      best_selling_categories: best_selling_categories
     }
   end
 
