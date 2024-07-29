@@ -17,6 +17,10 @@ class Order < ApplicationRecord
 
   private
 
+  def order_date
+    created_at.strftime('%Y-%m-%d')
+  end
+
   def calculate_total_amount
     self.total_amount = order_items.sum { |item| item.quantity * item.price }
   end

@@ -8,20 +8,15 @@ class Admin::PurchasersController < ApplicationController
   end
 
   def show
+    # Include orders with nested order items
     purchaser = Purchaser.includes(orders: { order_items: :product }).find(params[:id])
-    render json: purchaser.to_json(
-      include: {
-        orders: {
-          include: {
-            order_items: {
-              include: :product
-            }
-          }
-        }
+    render json: purchaser.to_json(include: {
+      orders: {
+        include: { order_items: { include: :product } },
+        methods: [:order_date, :calculate_total_amount]
       }
-    )
+    })
   end
-  
 
   def create
     @purchaser = Purchaser.new(purchaser_params)
