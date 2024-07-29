@@ -13,7 +13,7 @@ class Admin::PurchasersController < ApplicationController
     render json: purchaser.to_json(include: {
       orders: {
         include: { order_items: { include: :product } },
-        methods: [:order_date, :calculate_total_amount]
+        methods: [:order_date, :total_price]
       }
     })
   end

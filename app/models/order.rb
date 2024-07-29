@@ -15,6 +15,10 @@ class Order < ApplicationRecord
   validates :status, inclusion: { in: %w[processing on-transit delivered] }
   validates :mpesa_transaction_code, presence: true
 
+  def total_price
+    order_items.sum { |item| item.quantity * item.product.price }
+  end
+
   private
 
   def order_date
