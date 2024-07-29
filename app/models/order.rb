@@ -15,16 +15,16 @@ class Order < ApplicationRecord
   validates :status, inclusion: { in: %w[processing on-transit delivered] }
   validates :mpesa_transaction_code, presence: true
 
-  def total_price
-    order_items.sum { |item| item.quantity * item.product.price }
-  end
-
   private
 
   def order_date
     created_at.strftime('%Y-%m-%d')
   end
 
+  def total_price
+    order_items.sum { |item| item.quantity * item.product.price }
+  end
+  
   def calculate_total_amount
     self.total_amount = order_items.sum { |item| item.quantity * item.price }
   end
