@@ -1,18 +1,40 @@
+# app/controllers/admin/orders_controller.rb
 class Admin::OrdersController < ApplicationController
   before_action :authenticate_admin
   before_action :set_order, only: [:show, :update_status_to_on_transit, :destroy]
 
   def index
-    @orders = Order.all
-    render json: @orders
+    @orders = Order.includes(:purchaser, order_items: { product: :vendor }).all
+    render json: @orders.as_json(
+      include: { 
+        purchaser: {}, 
+        order_items: { 
+          include: { 
+            product: { include: :vendor } 
+          } 
+        }
+      },
+      methods: [:order_date, :total_price]
+    )
   end
 
   def show
-    render json: @order
+    render json: @order.as_json(
+      include: { 
+        purchaser: {}, 
+        order_items: { 
+          include: { 
+            product: { include: :vendor } 
+          } 
+        }
+      },
+      methods: [:order_date, :total_price]
+    )
   end
+
   # PUT /admin/orders/:id/on-transit
   def update_status_to_on_transit
-    if @order.update(status: 'on-transit')
+    if @order.update(status: params[:status])
       render json: @order
     else
       render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
@@ -31,7 +53,7 @@ class Admin::OrdersController < ApplicationController
   end
 
   def order_params
-    params.require(:order).permit(:purchaser_id, :status, :total_amount, :is_sent_out, :is_processing, :is_delivered)
+    params.require(:order).permit(:purchaser_id, :status, :total_amount)
   end
   
   def authenticate_admin
