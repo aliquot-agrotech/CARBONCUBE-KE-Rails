@@ -53,18 +53,18 @@ class Admin::VendorsController < ApplicationController
     end
   end
 
-# PUT /admin/vendors/:id/unblock
-def unblock
-  if @vendor
-    if @vendor.update(blocked: false)
-      render json: { message: 'Vendor was unblocked successfully' }, status: :ok
+  # PUT /admin/vendors/:id/unblock
+  def unblock
+    if @vendor
+      if @vendor.update(blocked: false)
+        render json: { message: 'Vendor was unblocked successfully' }, status: :ok
+      else
+        render json: @vendor.errors, status: :unprocessable_entity
+      end
     else
-      render json: @vendor.errors, status: :unprocessable_entity
+      render json: { error: 'Vendor not found' }, status: :not_found
     end
-  else
-    render json: { error: 'Vendor not found' }, status: :not_found
   end
-end
 
   private
 
