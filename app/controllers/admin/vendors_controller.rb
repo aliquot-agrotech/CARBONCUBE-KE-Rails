@@ -2,20 +2,19 @@ class Admin::VendorsController < ApplicationController
   before_action :authenticate_admin
   before_action :set_vendor, only: [:block, :unblock, :show, :update, :destroy]
 
-
   def index
     @vendors = Vendor.all
-    render json: @vendors
+    render json: @vendors.as_json(only: [:id, :fullname, :phone_number, :email, :enterprise_name, :location, :blocked])
   end
 
   def show
-    render json: @vendor
+    render json: @vendor.as_json(only: [:id, :fullname, :phone_number, :email, :enterprise_name, :location, :blocked])
   end
 
   def create
     @vendor = Vendor.new(vendor_params)
     if @vendor.save
-      render json: @vendor, status: :created
+      render json: @vendor.as_json(only: [:id, :fullname, :enterprise_name, :location, :blocked]), status: :created
     else
       render json: @vendor.errors, status: :unprocessable_entity
     end
@@ -23,7 +22,7 @@ class Admin::VendorsController < ApplicationController
 
   def update
     if @vendor.update(vendor_params)
-      render json: @vendor
+      render json: @vendor.as_json(only: [:id, :fullname, :phone_number, :email, :enterprise_name, :location, :blocked])
     else
       render json: @vendor.errors, status: :unprocessable_entity
     end
@@ -41,7 +40,7 @@ class Admin::VendorsController < ApplicationController
 
       if mean_rating < 3.0
         if @vendor.update(blocked: true)
-          render json: { message: 'Vendor was blocked successfully' }, status: :ok
+          render json: @vendor.as_json(only: [:id, :fullname, :enterprise_name, :location, :blocked]), status: :ok
         else
           render json: @vendor.errors, status: :unprocessable_entity
         end
@@ -57,7 +56,7 @@ class Admin::VendorsController < ApplicationController
   def unblock
     if @vendor
       if @vendor.update(blocked: false)
-        render json: { message: 'Vendor was unblocked successfully' }, status: :ok
+        render json: @vendor.as_json(only: [:id, :fullname, :enterprise_name, :location, :blocked]), status: :ok
       else
         render json: @vendor.errors, status: :unprocessable_entity
       end
