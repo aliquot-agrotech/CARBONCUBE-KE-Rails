@@ -35,7 +35,19 @@ class Admin::OrdersController < ApplicationController
   # PUT /admin/orders/:id/on-transit
   def update_status_to_on_transit
     if @order.update(status: params[:status])
-      render json: @order
+      # Re-fetch the order with all related data to ensure full information is included
+      @order.reload
+      render json: @order.as_json(
+        include: { 
+          purchaser: {}, 
+          order_items: { 
+            include: { 
+              product: { include: :vendor } 
+            } 
+          }
+        },
+        methods: [:order_date, :total_price]
+      )
     else
       render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
     end
