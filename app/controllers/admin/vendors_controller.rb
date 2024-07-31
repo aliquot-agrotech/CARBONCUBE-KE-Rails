@@ -8,7 +8,10 @@ class Admin::VendorsController < ApplicationController
   end
 
   def show
-    render json: @vendor.as_json(only: [:id, :fullname, :phone_number, :email, :enterprise_name, :location, :blocked])
+    render json: @vendor.as_json(
+      only: [:id, :fullname, :phone_number, :email, :enterprise_name, :location, :blocked],
+      methods: [:category_names]
+    )
   end
 
   def create

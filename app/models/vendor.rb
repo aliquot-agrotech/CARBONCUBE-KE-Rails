@@ -19,6 +19,10 @@ class Vendor < ApplicationRecord
     reviews.average(:rating).to_f
   end
 
+  def category_names
+    categories.pluck(:name)
+  end
+
   def check_and_block
     if calculate_mean_rating < 3.0
       update(blocked: true)
