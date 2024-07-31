@@ -1,6 +1,6 @@
 class Admin::VendorsController < ApplicationController
   before_action :authenticate_admin
-  before_action :set_vendor, only: [:block, :unblock, :show, :update, :destroy, :analytics, :orders]
+  before_action :set_vendor, only: [:block, :unblock, :show, :update, :destroy, :analytics, :orders, :products]
 
   def index
     @vendors = Vendor.all
@@ -37,6 +37,11 @@ class Admin::VendorsController < ApplicationController
   def destroy
     @vendor.destroy
     head :no_content
+  end
+
+  def products
+    products = @vendor.products
+    render json: products
   end
 
   def block
