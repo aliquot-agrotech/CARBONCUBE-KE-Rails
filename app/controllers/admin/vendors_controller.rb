@@ -1,6 +1,6 @@
 class Admin::VendorsController < ApplicationController
   before_action :authenticate_admin
-  before_action :set_vendor, only: [:block, :unblock, :show, :update, :destroy, :analytics]
+  before_action :set_vendor, only: [:block, :unblock, :show, :update, :destroy, :analytics, :orders]
 
   def index
     @vendors = Vendor.all
@@ -12,7 +12,6 @@ class Admin::VendorsController < ApplicationController
       only: [:id, :fullname, :phone_number, :email, :enterprise_name, :location, :blocked],
       methods: [:category_names]
     )
-    # Fetch analytics data
     analytics_data = fetch_analytics(@vendor)
     vendor_data.merge!(analytics: analytics_data)
     render json: vendor_data
@@ -40,7 +39,6 @@ class Admin::VendorsController < ApplicationController
     head :no_content
   end
 
-  # PUT /admin/vendors/:id/block
   def block
     if @vendor
       mean_rating = @vendor.reviews.average(:rating).to_f
@@ -59,7 +57,6 @@ class Admin::VendorsController < ApplicationController
     end
   end
 
-  # PUT /admin/vendors/:id/unblock
   def unblock
     if @vendor
       if @vendor.update(blocked: false)
@@ -72,11 +69,55 @@ class Admin::VendorsController < ApplicationController
     end
   end
 
-  # GET /admin/vendors/:id/analytics
   def analytics
     analytics_data = fetch_analytics(@vendor)
     render json: analytics_data
   end
+
+  def orders
+    # Ensure to preload associated records to avoid N+1 queries
+    orders = @vendor.orders.includes(order_items: :product, purchaser: :orders)
+                     .where(order_items: { product_id: @vendor.products.pluck(:id) })
+  
+    # Debugging: Log the count of orders fetched
+    Rails.logger.info "Fetched #{orders.size} orders for vendor #{@vendor.id}"
+  
+    filtered_orders = orders.map do |order|
+      {
+        id: order.id,
+        status: order.status,
+        created_at: order.created_at,
+        updated_at: order.updated_at,
+        mpesa_transaction_code: order.mpesa_transaction_code,
+        purchaser: {
+          id: order.purchaser.id,
+          fullname: order.purchaser.fullname,
+          email: order.purchaser.email,
+          phone_number: order.purchaser.phone_number
+        },
+        order_items: order.order_items.select { |item| @vendor.products.exists?(item.product_id) }.map do |item|
+          {
+            id: item.id,
+            quantity: item.quantity,
+            product: {
+              id: item.product.id,
+              title: item.product.title,
+              price: item.product.price
+            }
+          }
+        end
+      }
+    end
+  
+    # Debugging: Log the count of filtered orders and items
+    Rails.logger.info "Filtered orders count: #{filtered_orders.size}"
+    filtered_orders.each do |order|
+      Rails.logger.info "Order ID: #{order[:id]} has #{order[:order_items].size} items"
+    end
+  
+    render json: filtered_orders
+  end
+  
 
   private
 

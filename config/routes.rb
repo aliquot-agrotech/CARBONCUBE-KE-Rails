@@ -39,6 +39,7 @@ Rails.application.routes.draw do
         put 'block'
         put 'unblock'
         get 'analytics'
+        get 'orders', to: 'vendors#orders'
       end
     end
     resources :purchasers
