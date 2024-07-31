@@ -14,7 +14,6 @@ Rails.application.routes.draw do
       get ':vendor_id/products', to: 'products#index'
       get ':vendor_id/products/:product_id/reviews', to: 'reviews#index'
       get ':vendor_id/orders', to: 'orders#index_for_vendor'
-      get ':vendor_id/analytics', to: 'analytics#show'
     end
 
     namespace :purchaser do
@@ -39,6 +38,7 @@ Rails.application.routes.draw do
       member do
         put 'block'
         put 'unblock'
+        get 'analytics'
       end
     end
     resources :purchasers
