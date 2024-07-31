@@ -75,11 +75,15 @@ class Admin::VendorsController < ApplicationController
   end
 
   def orders
-    # Ensure to preload associated records to avoid N+1 queries
-    orders = @vendor.orders.includes(order_items: :product, purchaser: :orders)
-                     .where(order_items: { product_id: @vendor.products.pluck(:id) })
+    # Log the SQL query being executed
+    sql_query = @vendor.orders.includes(order_items: :product, purchaser: :orders)
+                        .where(order_items: { product_id: @vendor.products.pluck(:id) }).to_sql
+    Rails.logger.info "SQL Query: #{sql_query}"
   
-    # Debugging: Log the count of orders fetched
+    orders = @vendor.orders.includes(order_items: :product, purchaser: :orders)
+                      .where(order_items: { product_id: @vendor.products.pluck(:id) })
+  
+    # Log the count of orders fetched
     Rails.logger.info "Fetched #{orders.size} orders for vendor #{@vendor.id}"
   
     filtered_orders = orders.map do |order|
@@ -109,15 +113,14 @@ class Admin::VendorsController < ApplicationController
       }
     end
   
-    # Debugging: Log the count of filtered orders and items
+    # Log the count of filtered orders and items
     Rails.logger.info "Filtered orders count: #{filtered_orders.size}"
     filtered_orders.each do |order|
       Rails.logger.info "Order ID: #{order[:id]} has #{order[:order_items].size} items"
     end
   
     render json: filtered_orders
-  end
-  
+  end 
 
   private
 
