@@ -3,7 +3,7 @@ class OrderItemSerializer < ActiveModel::Serializer
   attributes :id, :quantity, :product_name, :price, :vendor_name
 
   belongs_to :order
-  belongs_to :product
+  belongs_to :product, serializer: ProductSerializer
 
   def product_name
     object.product.title
