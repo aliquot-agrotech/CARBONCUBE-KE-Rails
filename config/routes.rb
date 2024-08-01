@@ -31,6 +31,7 @@ Rails.application.routes.draw do
     resources :products do
       collection do
         get 'search'
+        patch 'soft_delete'
         get 'soft_deleted'
       end
     end

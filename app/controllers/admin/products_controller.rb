@@ -46,6 +46,15 @@ class Admin::ProductsController < ApplicationController
     render json: @soft_deleted_products
   end
 
+  # Update soft-delete status
+  def soft_delete
+    product = Product.find(params[:id])
+    if product.update(deleted_at: Time.current)
+      head :no_content
+    else
+      render json: { error: 'Failed to delete product' }, status: :unprocessable_entity
+    end
+  end
 
   # POST /admin/products/:id/notify
 def notify_vendor
