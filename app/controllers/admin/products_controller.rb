@@ -42,8 +42,8 @@ class Admin::ProductsController < ApplicationController
   end
 
   def soft_deleted
-    @products = Product.where.not(deleted_at: nil)
-    render json: @products
+    @soft_deleted_products = Product.where.not(deleted_at: nil)
+    render json: @soft_deleted_products
   end
 
 
