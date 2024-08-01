@@ -41,6 +41,36 @@ class Admin::ProductsController < ApplicationController
     head :no_content
   end
 
+  def soft_deleted
+    @products = Product.where.not(deleted_at: nil)
+    render json: @products
+  end
+
+
+  # POST /admin/products/:id/notify
+def notify_vendor
+  @product = Product.find(params[:id])
+
+  if @product
+    # Here you would implement the logic to notify the vendor, e.g., sending an email
+    # For simplicity, let's assume we are saving notification data in a Notification model.
+
+    notification_params = {
+      product_id: @product.id,
+      vendor_id: @product.vendor_id,
+      options: params[:options],
+      notes: params[:notes]
+    }
+
+    # Save notification details (you'll need to create a Notification model for this)
+    Notification.create(notification_params)
+    
+    render json: { message: 'Notification sent successfully' }, status: :ok
+  else
+    render json: { error: 'Product not found' }, status: :not_found
+  end
+end
+
   # GET /admin/products/search
   def search
     if params[:query].present?

@@ -8,6 +8,8 @@ class Product < ApplicationRecord
     trigram: {}
   }
 
+  default_scope { where(deleted_at: nil) }
+
   belongs_to :vendor
   belongs_to :category
   has_many :order_items
@@ -23,4 +25,14 @@ class Product < ApplicationRecord
 
   # Ensure media can accept a string or array of strings
   serialize :media, coder: JSON
+
+   # Soft delete
+   def soft_delete
+    update(deleted_at: Time.current)
+  end
+  
+  # Restore soft-deleted product
+  def restore
+    update(deleted_at: nil)
+  end
 end

@@ -31,6 +31,7 @@ Rails.application.routes.draw do
     resources :products do
       collection do
         get 'search'
+        get 'soft_deleted'
       end
     end
     resources :cms_pages

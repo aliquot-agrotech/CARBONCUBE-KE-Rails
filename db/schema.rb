@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_24_074148) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_01_092820) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -72,6 +72,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_24_074148) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.bigint "vendor_id", null: false
+    t.text "options", default: [], array: true
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_notifications_on_product_id"
+    t.index ["vendor_id"], name: "index_notifications_on_vendor_id"
+  end
+
   create_table "order_items", force: :cascade do |t|
     t.bigint "order_id", null: false
     t.bigint "product_id", null: false
@@ -119,6 +130,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_24_074148) do
     t.decimal "package_height", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["description"], name: "index_products_on_description", opclass: :gin_trgm_ops, using: :gin
     t.index ["title"], name: "index_products_on_title", opclass: :gin_trgm_ops, using: :gin
@@ -195,6 +207,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_24_074148) do
   add_foreign_key "bookmarks", "purchasers"
   add_foreign_key "cart_items", "products"
   add_foreign_key "cart_items", "purchasers"
+  add_foreign_key "notifications", "products"
+  add_foreign_key "notifications", "vendors"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "order_vendors", "orders"
