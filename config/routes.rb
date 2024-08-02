@@ -31,8 +31,10 @@ Rails.application.routes.draw do
     resources :products do
       collection do
         get 'search'
-        patch 'soft_delete'
         get 'soft_deleted'
+      end
+      member do
+        patch 'soft_delete'
       end
     end
     resources :cms_pages
