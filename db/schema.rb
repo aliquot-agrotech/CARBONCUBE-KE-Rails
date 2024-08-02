@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_01_092820) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_02_075957) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -128,9 +128,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_01_092820) do
     t.decimal "package_length", precision: 10, scale: 2
     t.decimal "package_width", precision: 10, scale: 2
     t.decimal "package_height", precision: 10, scale: 2
-    t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "flagged", default: false, null: false
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["description"], name: "index_products_on_description", opclass: :gin_trgm_ops, using: :gin
     t.index ["title"], name: "index_products_on_title", opclass: :gin_trgm_ops, using: :gin

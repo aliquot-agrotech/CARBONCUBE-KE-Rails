@@ -41,19 +41,24 @@ class Admin::ProductsController < ApplicationController
     head :no_content
   end
 
-  def soft_deleted
-    @soft_deleted_products = Product.where.not(deleted_at: nil)
-    render json: @soft_deleted_products
-  end
-
   # Update soft-delete status
   def soft_delete
-    product = Product.find(params[:id])
-    if product.update(deleted_at: Time.current)
-      head :no_content
-    else
-      render json: { error: 'Failed to delete product' }, status: :unprocessable_entity
-    end
+    @product = Product.find(params[:id])
+    @product.update(flagged: true)  # Set flagged to true
+    head :no_content
+  end
+
+# Update soft-delete status
+  def unflag
+    @product = Product.find(params[:id])
+    @product.update(flagged: false)  # Set flagged to false
+    head :no_content
+  end
+
+# GET /admin/products/soft_deleted
+  def soft_deleted
+    @products = Product.where(flagged: true)  # Fetch flagged products
+    render json: @products
   end
 
   # POST /admin/products/:id/notify
