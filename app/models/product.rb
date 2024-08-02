@@ -8,7 +8,7 @@ class Product < ApplicationRecord
     trigram: {}
   }
 
-  default_scope { where(deleted_at: nil) }
+  default_scope { where(flagged: false) }
 
   belongs_to :vendor
   belongs_to :category
@@ -27,12 +27,12 @@ class Product < ApplicationRecord
   serialize :media, coder: JSON
 
    # Soft delete
-   def soft_delete
-    update(deleted_at: Time.current)
+   def flag
+    update(flagged: true)
   end
-  
-  # Restore soft-deleted product
-  def restore
-    update(deleted_at: nil)
+
+  # Restore flagged product
+  def unflag
+    update(flagged: false)
   end
 end

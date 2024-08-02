@@ -31,10 +31,11 @@ Rails.application.routes.draw do
     resources :products do
       collection do
         get 'search'
-        get 'soft_deleted'
+        get 'flagged'
       end
       member do
-        patch 'soft_delete'
+        patch 'flag'
+        patch 'unflag'
       end
     end
     resources :cms_pages
