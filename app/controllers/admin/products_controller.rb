@@ -3,8 +3,7 @@ class Admin::ProductsController < ApplicationController
 
   # GET /admin/products
   def index
-    @products = Product.joins(:vendor)  # Only filter blocked vendors
-                       .where(vendors: { blocked: false })
+    @products = Product.where(deleted_at: nil)
     render json: @products
   end
 

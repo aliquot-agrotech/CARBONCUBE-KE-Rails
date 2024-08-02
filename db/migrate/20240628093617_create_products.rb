@@ -14,7 +14,7 @@ class CreateProducts < ActiveRecord::Migration[7.1]
       t.decimal :package_length, precision: 10, scale: 2
       t.decimal :package_width, precision: 10, scale: 2
       t.decimal :package_height, precision: 10, scale: 2
-      t.datetime :deleted_at 
+      t.boolean :flagged, default: false 
       t.timestamps
     end
   end
