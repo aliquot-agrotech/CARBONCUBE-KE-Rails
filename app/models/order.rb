@@ -1,4 +1,3 @@
-# app/models/order.rb
 class Order < ApplicationRecord
   belongs_to :purchaser
   has_many :order_items, dependent: :destroy
@@ -22,10 +21,14 @@ class Order < ApplicationRecord
   end
 
   def total_price
-    order_items.sum { |item| item.quantity * item.product.price }
+    order_items.sum do |item|
+      item.product ? item.quantity * item.product.price : 0
+    end
   end
-  
+
   def calculate_total_amount
-    self.total_amount = order_items.sum { |item| item.quantity * item.price }
+    self.total_amount = order_items.sum do |item|
+      item.product ? item.quantity * item.product.price : 0
+    end
   end
 end

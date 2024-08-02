@@ -1,9 +1,9 @@
-class Admin::ProductsController < ApplicationController 
+class Admin::ProductsController < ApplicationController
   before_action :authenticate_admin
 
   # GET /admin/products
   def index
-    @products = Product.where(flagged: false) # Fetch only non-flagged products
+    @products = Product.all  # Fetch all products
     render json: @products
   end
 
@@ -54,12 +54,6 @@ class Admin::ProductsController < ApplicationController
     head :no_content
   end
 
-  # GET /admin/products/flagged
-  def flagged
-    @products = Product.where(flagged: true)  # Fetch flagged products
-    render json: @products
-  end
-
   # POST /admin/products/:id/notify
   def notify_vendor
     @product = Product.find(params[:id])
@@ -88,11 +82,11 @@ class Admin::ProductsController < ApplicationController
   def search
     if params[:query].present?
       title_description_search = Product.joins(:vendor)
-                                        .where(vendors: { blocked: false }, flagged: false) # Exclude flagged products
+                                        .where(vendors: { blocked: false })
                                         .search_by_title_and_description(params[:query])
 
       category_search = Product.joins(:vendor, :category)
-                              .where(vendors: { blocked: false }, flagged: false) # Exclude flagged products
+                              .where(vendors: { blocked: false })
                               .where('categories.name ILIKE ?', "%#{params[:query]}%")
                               .select('products.*')
 
@@ -100,7 +94,7 @@ class Admin::ProductsController < ApplicationController
       @products = (title_description_search.to_a + category_search.to_a).uniq
     else
       @products = Product.joins(:vendor)
-                        .where(vendors: { blocked: false }, flagged: false) # Exclude flagged products
+                        .where(vendors: { blocked: false })
     end
 
     render json: @products
