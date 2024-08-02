@@ -3,9 +3,13 @@ class Admin::ProductsController < ApplicationController
 
   # GET /admin/products
   def index
-    @products = Product.all  # Fetch all products
-    render json: @products
+    @products = Product.all_products
+    flagged_products = @products.select { |product| product.flagged }
+    non_flagged_products = @products.reject { |product| product.flagged }
+  
+    render json: { flagged: flagged_products, non_flagged: non_flagged_products }
   end
+  
 
   # GET /admin/products/:id
   def show

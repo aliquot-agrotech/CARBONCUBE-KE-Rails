@@ -8,7 +8,7 @@ class Product < ApplicationRecord
     trigram: {}
   }
 
-  default_scope { where(flagged: false) }
+  scope :all_products, -> { unscope(:where).all }
 
   belongs_to :vendor
   belongs_to :category
