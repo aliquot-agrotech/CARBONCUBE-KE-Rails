@@ -7,7 +7,7 @@ class CreatePurchasers < ActiveRecord::Migration[7.1]
       t.string :email
       t.string :phone_number
       t.string :location
-      t.string :role
+      t.boolean :blocked, default: false
 
       t.timestamps
     end

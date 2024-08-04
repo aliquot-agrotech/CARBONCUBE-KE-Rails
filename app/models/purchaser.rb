@@ -15,7 +15,6 @@ class Purchaser < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :phone_number, presence: true
   validates :location, presence: true
-
   attribute :cart_total_price, :decimal, default: 0
 
 

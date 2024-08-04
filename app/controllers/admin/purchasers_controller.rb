@@ -1,6 +1,6 @@
 class Admin::PurchasersController < ApplicationController
   before_action :authenticate_admin
-  before_action :set_purchaser, only: [:show, :update, :destroy]
+  before_action :set_purchaser, only: [:block, :unblock, :show, :update, :destroy]
 
   def index
     @purchasers = Purchaser.all
@@ -32,6 +32,30 @@ class Admin::PurchasersController < ApplicationController
       render json: @purchaser
     else
       render json: @purchaser.errors, status: :unprocessable_entity
+    end
+  end
+
+  def block
+    if @purchaser
+      if @purchaser.update(blocked: true)
+        render json: @purchaser.as_json(only: [:id, :fullname, :email, :location, :blocked]), status: :ok
+      else
+        render json: @purchaser.errors, status: :unprocessable_entity
+      end
+    else
+      render json: { error: 'Purchaser not found' }, status: :not_found
+    end
+  end
+
+  def unblock
+    if @purchaser
+      if @purchaser.update(blocked: false)
+        render json: @purchaser.as_json(only: [:id, :fullname, :email, :location, :blocked]), status: :ok
+      else
+        render json: @purchaser.errors, status: :unprocessable_entity
+      end
+    else
+      render json: { error: 'Purchaser not found' }, status: :not_found
     end
   end
 

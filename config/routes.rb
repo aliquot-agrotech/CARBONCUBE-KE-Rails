@@ -48,7 +48,14 @@ Rails.application.routes.draw do
         get 'products'
       end
     end
-    resources :purchasers
+
+    resources :purchasers do
+      member do
+        put 'block'
+        put 'unblock'
+      end
+    end
+
     resources :analytics
     resources :reviews
   end

@@ -156,7 +156,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_01_092820) do
     t.string "email"
     t.string "phone_number"
     t.string "location"
-    t.string "role"
+    t.boolean "blocked", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_purchasers_on_email"
@@ -197,7 +197,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_01_092820) do
     t.string "business_registration_number"
     t.string "enterprise_name"
     t.string "email"
-    t.boolean "blocked"
+    t.boolean "blocked", default: false
     t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
