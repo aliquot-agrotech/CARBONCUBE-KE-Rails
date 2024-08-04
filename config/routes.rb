@@ -35,7 +35,7 @@ Rails.application.routes.draw do
       end
       member do
         patch 'flag'
-        patch 'unflag'
+        patch 'restore'
       end
     end
     resources :cms_pages

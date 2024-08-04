@@ -52,7 +52,7 @@ class Admin::ProductsController < ApplicationController
   end
 
   # Update flagged status
-  def unflag
+  def restore
     @product = Product.find(params[:id])
     @product.update(flagged: false)  # Set flagged to false
     head :no_content
