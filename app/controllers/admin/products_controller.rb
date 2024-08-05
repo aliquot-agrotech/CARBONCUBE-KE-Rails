@@ -11,10 +11,25 @@ class Admin::ProductsController < ApplicationController
   end
   
 
-  # GET /admin/products/:id
   def show
-    @product = Product.find(params[:id])
-    render json: @product
+    @product = Product.includes(:vendor, :category)
+                      .find(params[:id])
+                      .tap do |product|
+                        product.define_singleton_method(:quantity_sold) do
+                          OrderItem.where(product_id: id).count
+                        end
+                        product.define_singleton_method(:mean_rating) do
+                          reviews = Review.where(product_id: id)
+                          reviews.average(:rating).to_f
+                        end
+                      end
+    render json: @product.as_json(
+      include: {
+        vendor: { only: [:fullname] },
+        category: { only: [:name] }
+      },
+      methods: [:quantity_sold, :mean_rating]
+    )
   end
 
   # POST /admin/products
