@@ -4,7 +4,6 @@ class Order < ApplicationRecord
   has_many :order_vendors, dependent: :destroy
   has_many :products, through: :order_items
   has_many :vendors, through: :order_vendors
-  has_one :invoice, dependent: :destroy
 
   before_save :calculate_total_amount
 
