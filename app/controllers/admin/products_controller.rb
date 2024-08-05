@@ -12,7 +12,7 @@ class Admin::ProductsController < ApplicationController
   
 
   def show
-    @product = Product.includes(:vendor, :category)
+    @product = Product.includes(:vendor, :category, :reviews => :purchaser)
                       .find(params[:id])
                       .tap do |product|
                         product.define_singleton_method(:quantity_sold) do
@@ -26,7 +26,13 @@ class Admin::ProductsController < ApplicationController
     render json: @product.as_json(
       include: {
         vendor: { only: [:fullname] },
-        category: { only: [:name] }
+        category: { only: [:name] },
+        reviews: {
+          include: {
+            purchaser: { only: [:fullname] }
+          },
+          only: [:rating, :review]
+        }
       },
       methods: [:quantity_sold, :mean_rating]
     )
