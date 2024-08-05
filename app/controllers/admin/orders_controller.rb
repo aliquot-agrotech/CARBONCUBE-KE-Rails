@@ -26,7 +26,9 @@ class Admin::OrdersController < ApplicationController
         purchaser: {}, 
         order_items: { 
           include: { 
-            product: { include: :vendor } 
+            product: { 
+              include: { vendor: { only: [:name] } } 
+            } 
           } 
         }
       },
