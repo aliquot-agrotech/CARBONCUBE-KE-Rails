@@ -1,6 +1,6 @@
 class Admin::VendorsController < ApplicationController
   before_action :authenticate_admin
-  before_action :set_vendor, only: [:block, :unblock, :show, :update, :destroy, :analytics, :orders, :products]
+  before_action :set_vendor, only: [:block, :unblock, :show, :update, :destroy, :analytics, :orders, :products, :reviews]
 
   def index
     @vendors = Vendor.all
@@ -38,6 +38,15 @@ class Admin::VendorsController < ApplicationController
     @vendor.destroy
     head :no_content
   end
+
+  def reviews
+    reviews = @vendor.reviews.joins(:product, :purchaser)
+                           .where(products: { id: @vendor.products.pluck(:id) })
+                           .select('reviews.*, purchasers.fullname AS purchaser_name, products.title AS product_title')
+    render json: reviews.as_json(only: [:id, :rating, :review, :created_at],
+                                 methods: [:purchaser_name, :product_title])
+  end
+  
 
   def products
     products = @vendor.products

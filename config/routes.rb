@@ -46,6 +46,7 @@ Rails.application.routes.draw do
         get 'analytics'
         get 'orders', to: 'vendors#orders'
         get 'products'
+        get 'reviews'
       end
     end
 
