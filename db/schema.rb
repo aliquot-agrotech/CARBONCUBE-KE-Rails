@@ -10,10 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_01_092820) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_06_113236) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
+
+  create_table "abouts", force: :cascade do |t|
+    t.text "description"
+    t.text "mission"
+    t.text "vision"
+    t.jsonb "values", default: []
+    t.text "why_choose_us"
+    t.string "image_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "admins", force: :cascade do |t|
     t.string "fullname"
@@ -68,6 +79,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_01_092820) do
   create_table "cms_pages", force: :cascade do |t|
     t.string "title"
     t.text "content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "faqs", force: :cascade do |t|
+    t.string "question"
+    t.text "answer"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

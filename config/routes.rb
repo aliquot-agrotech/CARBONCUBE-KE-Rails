@@ -59,6 +59,8 @@ Rails.application.routes.draw do
 
     resources :analytics
     resources :reviews
+    resources :abouts, only: [:show, :update]
+    resources :faqs, only: [:index, :show, :update, :create, :destroy]
   end
 
   # Vendor namespace for vendor-specific functionality
