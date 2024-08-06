@@ -1,19 +1,19 @@
 class Admin::AboutsController < ApplicationController
   before_action :authenticate_admin
-  before_action :set_about, only: [:show, :update, :destroy, :create, :index]
+  before_action :set_about, only: [:show, :update, :destroy]
 
-  # GET /abouts
+  # GET /admin/abouts
   def index
-    @abouts = About.all
+    @abouts = About.first
     render json: @abouts
   end
 
-  # GET /abouts/1
+  # GET /admin/abouts/1
   def show
     render json: @about
   end
 
-  # POST /abouts
+  # POST /admin/abouts
   def create
     @about = About.new(about_params)
 
@@ -24,7 +24,7 @@ class Admin::AboutsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /abouts/1
+  # PATCH/PUT /admin/abouts/1
   def update
     if @about.update(about_params)
       render json: @about
@@ -33,28 +33,32 @@ class Admin::AboutsController < ApplicationController
     end
   end
 
-  # DELETE /abouts/1
+  # DELETE /admin/abouts/1
   def destroy
     @about.destroy
+    head :no_content
   end
 
   private
-    def set_about
-      @about = About.find(params[:id])
-    end
 
-    def about_params
-      params.require(:about).permit(:description, :mission, :vision, { values: [] }, :why_choose_us, :image_url)
-    end
+  def set_about
+    @about = About.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'About not found' }, status: :not_found
+  end
 
-    def authenticate_admin
-      @current_user = AdminAuthorizeApiRequest.new(request.headers).result
-      unless @current_user && @current_user.is_a?(Admin)
-        render json: { error: 'Not Authorized' }, status: :unauthorized
-      end
+  def about_params
+    params.require(:about).permit(:description, :mission, :vision, { values: [] }, :why_choose_us, :image_url)
+  end
+
+  def authenticate_admin
+    @current_user = AdminAuthorizeApiRequest.new(request.headers).result
+    unless @current_user && @current_user.is_a?(Admin)
+      render json: { error: 'Not Authorized' }, status: :unauthorized
     end
-  
-    def current_admin
-      @current_user
-    end
+  end
+
+  def current_admin
+    @current_user
+  end
 end

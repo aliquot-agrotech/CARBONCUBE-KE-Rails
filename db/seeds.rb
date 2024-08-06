@@ -222,5 +222,39 @@ reviews_data.each do |review_data|
 end
 
 
+# Clear existing records
+Faq.delete_all
+
+# Create FAQs
+Faq.create!(
+  [
+    { question: 'What is the return policy?', answer: 'You can return items within 30 days of purchase for a full refund.' },
+    { question: 'How can I track my order?', answer: 'You will receive a tracking number via email once your order has shipped.' },
+    { question: 'Do you offer international shipping?', answer: 'Yes, we ship internationally. Shipping costs will be calculated at checkout.' },
+    { question: 'Can I change or cancel my order?', answer: 'Orders can be modified or canceled within 1 hour of placing them.' },
+    { question: 'What payment methods are accepted?', answer: 'We accept Visa, MasterCard, American Express, and PayPal.' },
+    { question: 'How do I contact customer service?', answer: 'You can reach our customer service team by emailing support@example.com.' },
+    { question: 'Is my personal information safe?', answer: 'Yes, we use SSL encryption to protect your personal information.' },
+    { question: 'Do you offer gift cards?', answer: 'Yes, gift cards are available for purchase on our website.' },
+    { question: 'How can I return a defective item?', answer: 'Please contact our customer service team for instructions on returning defective items.' },
+    { question: 'What is your warranty policy?', answer: 'We offer a one-year warranty on all products. Please keep your receipt for warranty claims.' }
+  ]
+)
+
+# Clear existing records
+About.delete_all
+
+# Create About entry
+About.create!(
+  description: 'We are a leading provider of high-quality products designed to improve your life. Our mission is to deliver exceptional value through innovative solutions and outstanding customer service.',
+  mission: 'To provide our customers with the best products and services that meet their needs and exceed their expectations.',
+  vision: 'To be the most trusted and preferred brand in our industry, known for our commitment to quality and customer satisfaction.',
+  values: ['Integrity', 'Innovation', 'Customer Focus', 'Excellence', 'Sustainability'],
+  why_choose_us: 'Our products are crafted with precision and care, ensuring top-notch quality and performance. We prioritize customer satisfaction and continuously strive to exceed expectations.',
+  image_url: 'https://example.com/images/about-us.jpg'
+)
+
+
+
 puts 'Seed data created successfully!'
 

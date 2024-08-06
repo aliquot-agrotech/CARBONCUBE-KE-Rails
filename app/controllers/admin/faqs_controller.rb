@@ -35,12 +35,15 @@ class Admin::FaqsController < ApplicationController
   # DELETE /admin/faqs/:id
   def destroy
     @faq.destroy
+    head :no_content
   end
 
   private
 
   def set_faq
     @faq = Faq.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'FAQ not found' }, status: :not_found
   end
 
   def faq_params
