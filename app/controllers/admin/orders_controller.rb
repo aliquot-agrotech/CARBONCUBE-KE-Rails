@@ -11,7 +11,7 @@ class Admin::OrdersController < ApplicationController
         order_items: { 
           include: { 
             product: { 
-              include: { vendor: { only: [:name] } } 
+              include: { vendor: { only: [:fullname] } } 
             } 
           } 
         }
@@ -27,7 +27,7 @@ class Admin::OrdersController < ApplicationController
         order_items: { 
           include: { 
             product: { 
-              include: { vendor: { only: [:name] } } 
+              include: { vendor: { only: [:fullname] } } 
             } 
           } 
         }
