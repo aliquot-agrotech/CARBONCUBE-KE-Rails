@@ -4,7 +4,7 @@ class Admin::AboutsController < ApplicationController
 
   # GET /admin/abouts
   def index
-    @abouts = About.first
+    @abouts = About.all
     render json: @abouts
   end
 
