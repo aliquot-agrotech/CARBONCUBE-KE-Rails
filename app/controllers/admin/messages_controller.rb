@@ -4,7 +4,7 @@ class Admin::MessagesController < ApplicationController
 
   def index
     @messages = @conversation.messages.includes(:sender)
-    render json: @messages.as_json(include: :sender)
+    render json: @messages, each_serializer: MessageSerializer
   end
 
   def create
@@ -12,7 +12,7 @@ class Admin::MessagesController < ApplicationController
     @message.sender = current_admin
 
     if @message.save
-      render json: @message, status: :created
+      render json: @message, serializer: MessageSerializer, status: :created
     else
       render json: @message.errors, status: :unprocessable_entity
     end
