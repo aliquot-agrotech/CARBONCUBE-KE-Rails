@@ -30,7 +30,7 @@ class Admin::MessagesController < ApplicationController
 
   def authenticate_admin
     @current_user = AdminAuthorizeApiRequest.new(request.headers).result
-    render json: { error: 'Not Authorized' }, status: :unauthorized unless @current_user&.admin?
+    render json: { error: 'Not Authorized' }, status: :unauthorized unless @current_user.is_a?(Admin)
   end
 
   def current_admin
