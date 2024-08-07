@@ -1,7 +1,10 @@
 class Admin < ApplicationRecord
-    has_secure_password
-
-
+    has_many :sent_messages, as: :sender, class_name: 'Message'
+    has_many :conversations
+    
+    validates :username, presence: true
     validates :fullname, presence: true
     validates :email, presence: true, uniqueness: true
+
+    has_secure_password
 end

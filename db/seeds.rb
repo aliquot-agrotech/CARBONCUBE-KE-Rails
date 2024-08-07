@@ -28,9 +28,11 @@ end
 
 # Seed admin data
 Admin.find_or_create_by(email: 'admin@example.com') do |admin|
-    admin.fullname = 'Admin Name'
-    admin.password = 'adminpassword'
+  admin.fullname = 'Admin Name'
+  admin.username = 'admin'
+  admin.password = 'adminpassword'
 end
+
 
 # Seed purchaser data
 purchasers = [
@@ -253,6 +255,82 @@ About.create!(
   why_choose_us: 'Our products are crafted with precision and care, ensuring top-notch quality and performance. We prioritize customer satisfaction and continuously strive to exceed expectations.',
   image_url: 'https://example.com/images/about-us.jpg'
 )
+
+# db/seeds.rb
+
+# Seed data for Conversations
+admin = Admin.find_by(email: 'admin@example.com')
+purchasers = Purchaser.all
+vendors = Vendor.all
+
+# Ensure there is an admin present
+raise 'Admin not found' unless admin
+
+# Create conversations between admin and each purchaser
+purchasers.each do |purchaser|
+  Conversation.find_or_create_by!(admin_id: admin.id, purchaser_id: purchaser.id) do |conversation|
+    conversation.save!
+  end
+end
+
+# Create conversations between admin and each vendor
+vendors.each do |vendor|
+  Conversation.find_or_create_by!(admin_id: admin.id, vendor_id: vendor.id) do |conversation|
+    conversation.save!
+  end
+end
+
+# Generate some detailed messages for each conversation
+def create_messages(conversation, sender, receiver)
+  # Example messages with more detail
+  messages = [
+    { sender: sender, content: 'Hello, how can I assist you today?' },
+    { sender: receiver, content: 'I need help with updating my product listings.' },
+    { sender: sender, content: 'Sure, I can help with that. Could you provide more details about the products you want to update?' },
+    { sender: receiver, content: 'I have a few new products that need to be added, and some existing products need their prices updated.' },
+    { sender: sender, content: 'Got it. Please send me the details of the new products and the changes you need for the existing ones.' },
+    { sender: receiver, content: 'I’ve attached a document with the product details. Let me know if you need anything else.' },
+    { sender: sender, content: 'Thanks for the document. I’ll review it and get back to you shortly.' },
+    { sender: sender, content: 'I have reviewed the document. All updates have been made. Is there anything else you need help with?' },
+    { sender: receiver, content: 'No, that’s all for now. Thank you for your assistance!' },
+    { sender: sender, content: 'You’re welcome! If you have any more questions in the future, feel free to reach out.' }
+  ]
+
+  messages.each do |message_data|
+    Message.create!(
+      conversation: conversation,
+      sender: message_data[:sender],
+      content: message_data[:content]
+    )
+  end
+end
+
+# Generate messages for each conversation with detailed scenarios
+Conversation.all.each do |conversation|
+  if conversation.purchaser_id.present?
+    create_messages(conversation, admin, Purchaser.find(conversation.purchaser_id))
+  elsif conversation.vendor_id.present?
+    create_messages(conversation, admin, Vendor.find(conversation.vendor_id))
+  end
+end
+
+# Example of additional conversations with varied scenarios
+
+# Create additional specific conversations
+additional_conversations = [
+  { admin_id: admin.id, purchaser_id: purchasers.first.id },
+  { admin_id: admin.id, vendor_id: vendors.first.id }
+]
+
+additional_conversations.each do |conv_data|
+  conversation = Conversation.find_or_create_by!(conv_data)
+  
+  if conversation.purchaser_id.present?
+    create_messages(conversation, admin, Purchaser.find(conversation.purchaser_id))
+  elsif conversation.vendor_id.present?
+    create_messages(conversation, admin, Vendor.find(conversation.vendor_id))
+  end
+end
 
 
 

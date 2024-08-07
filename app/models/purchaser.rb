@@ -8,6 +8,8 @@ class Purchaser < ApplicationRecord
   has_many :cart_items
   has_many :bookmarks, dependent: :destroy
   has_many :bookmarked_products, through: :bookmarks, source: :product
+  has_many :sent_messages, as: :sender, class_name: 'Message'
+  has_many :conversations
 
 
   validates :username, presence: false, uniqueness: true

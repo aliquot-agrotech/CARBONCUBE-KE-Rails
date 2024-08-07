@@ -1,13 +1,11 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  sender: one
-  receiver: one
-  order: one
+  conversation_id: 1
+  sender_id: 1
   content: MyText
 
 two:
-  sender: two
-  receiver: two
-  order: two
+  conversation_id: 1
+  sender_id: 1
   content: MyText
