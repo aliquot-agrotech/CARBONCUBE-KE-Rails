@@ -1,10 +1,11 @@
-# app/controllers/notifications_controller.rb
-class NotificationsController < ApplicationController
+class Admin::NotificationsController < ApplicationController
+  before_action :authenticate_admin
+
   def create
     notification = Notification.create!(notification_params)
     NotificationsChannel.broadcast_to(
-      Admin.find(notification.admin_id),
-      notification: render_to_string(notification)
+      current_admin,
+      notification: render_to_string(partial: 'notification', locals: { notification: notification })
     )
     head :ok
   end
@@ -12,6 +13,7 @@ class NotificationsController < ApplicationController
   private
 
   def notification_params
-    params.require(:notification).permit(:admin_id, :order_id, :status, :created_at)
+    params.require(:notification).permit(:order_id, :status)
+          .merge(notifiable: current_admin)  # Assign current_admin to notifiable
   end
 end

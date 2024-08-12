@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_07_053517) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -112,14 +112,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_07_053517) do
   end
 
   create_table "notifications", force: :cascade do |t|
-    t.bigint "product_id", null: false
-    t.bigint "vendor_id", null: false
-    t.text "options", default: [], array: true
-    t.text "notes"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["product_id"], name: "index_notifications_on_product_id"
-    t.index ["vendor_id"], name: "index_notifications_on_vendor_id"
+    t.string "notifiable_type"
+    t.bigint "notifiable_id"
+    t.integer "order_id"
+    t.string "status"
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable_type_and_notifiable_id"
   end
 
   create_table "order_items", force: :cascade do |t|
@@ -248,8 +247,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_07_053517) do
   add_foreign_key "conversations", "admins"
   add_foreign_key "conversations", "purchasers"
   add_foreign_key "conversations", "vendors"
-  add_foreign_key "notifications", "products"
-  add_foreign_key "notifications", "vendors"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "order_vendors", "orders"

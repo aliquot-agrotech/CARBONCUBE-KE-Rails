@@ -73,7 +73,7 @@ class Admin::OrdersController < ApplicationController
 
   def notify_admin(order)
     Notification.create!(
-      admin_id: current_admin.id,
+      notifiable: current_admin,
       order_id: order.id,
       status: order.status,
       created_at: Time.now

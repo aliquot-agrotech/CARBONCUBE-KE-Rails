@@ -10,6 +10,7 @@ class Purchaser < ApplicationRecord
   has_many :bookmarked_products, through: :bookmarks, source: :product
   has_many :sent_messages, as: :sender, class_name: 'Message'
   has_many :conversations
+  has_many :notifications, as: :notifiable
 
 
   validates :username, presence: false, uniqueness: true

@@ -66,6 +66,7 @@ Rails.application.routes.draw do
     resources :faqs
     resources :promotions, except: [:new, :edit]
     get 'identify', to: 'admins#identify'
+    resources :notifications, only: [:create]
   end
 
   # Vendor namespace for vendor-specific functionality
@@ -112,4 +113,6 @@ Rails.application.routes.draw do
 
     resources :reviews
   end
+
+  mount ActionCable.server => '/cable'
 end
