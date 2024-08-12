@@ -333,6 +333,29 @@ additional_conversations.each do |conv_data|
 end
 
 
+require 'faker'
+
+# Function to generate a random coupon code with the discount percentage
+def generate_coupon_code(discount_percentage)
+  random_string = Faker::Alphanumeric.alpha(number: 4).upcase
+  "#{random_string}#{discount_percentage.to_s.rjust(2, '0')}"
+end
+
+# Create 10 promotions with random data
+10.times do
+  discount_percentage = rand(1..14)  # Random percentage between 1 and 100
+  Promotion.create!(
+    title: Faker::Commerce.product_name,
+    description: Faker::Lorem.sentence,
+    discount_percentage: discount_percentage,
+    coupon_code: generate_coupon_code(discount_percentage),
+    start_date: Faker::Date.backward(days: 0),
+    end_date: Faker::Date.forward(days: rand(10..20))
+  )
+end
+
+
+
 
 puts 'Seed data created successfully!'
 

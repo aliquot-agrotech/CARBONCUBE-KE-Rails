@@ -113,6 +113,8 @@ GEM
       railties (>= 6.1)
     drb (2.2.1)
     erubi (1.13.0)
+    faker (3.4.2)
+      i18n (>= 1.8.11, < 2)
     globalid (1.2.1)
       activesupport (>= 6.1)
     groupdate (6.4.0)
@@ -297,6 +299,7 @@ DEPENDENCIES
   capybara
   debug
   dotenv-rails
+  faker
   groupdate
   importmap-rails
   jbuilder
