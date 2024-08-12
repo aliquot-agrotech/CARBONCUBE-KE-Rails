@@ -1,6 +1,6 @@
 # app/serializers/order_item_serializer.rb
 class OrderItemSerializer < ActiveModel::Serializer
-  attributes :id, :quantity, :product_name, :price, :vendor_name
+  attributes :id, :order_id, :product_id, :quantity, :product_name, :price, :vendor_name
 
   belongs_to :order
   belongs_to :product, serializer: ProductSerializer

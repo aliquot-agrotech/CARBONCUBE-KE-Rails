@@ -1,8 +1,8 @@
 # app/serializers/order_serializer.rb
 class OrderSerializer < ActiveModel::Serializer
-  attributes :id, :status, :total_amount, :mpesa_transaction_code, :created_at, :updated_at
-  belongs_to :purchaser
-  has_many :order_items
+  attributes :id, :purchaser_id, :status, :total_amount, :mpesa_transaction_code, :created_at, :updated_at
+  belongs_to :purchaser, serializer: PurchaserSerializer
+  has_many :order_items, serializer: OrderItemSerializer
 
   def total_amount
     object.order_items.sum { |item| item.quantity * item.product.price }

@@ -1,4 +1,3 @@
-# app/controllers/admin/orders_controller.rb
 class Admin::OrdersController < ApplicationController
   before_action :authenticate_admin
   before_action :set_order, only: [:show, :update_status_to_on_transit, :destroy]
@@ -6,14 +5,14 @@ class Admin::OrdersController < ApplicationController
   def index
     @orders = Order.includes(:purchaser, order_items: { product: :vendor }).all
     render json: @orders.as_json(
-      include: { 
-        purchaser: {}, 
-        order_items: { 
-          include: { 
-            product: { 
-              include: { vendor: { only: [:fullname] } } 
-            } 
-          } 
+      include: {
+        purchaser: { only: [:fullname] },  # Include only the fullname of the purchaser
+        order_items: {
+          include: {
+            product: {
+              include: { vendor: { only: [:fullname] } }  # Include only the fullname of the vendor
+            }
+          }
         }
       },
       methods: [:order_date, :total_price]
@@ -22,14 +21,14 @@ class Admin::OrdersController < ApplicationController
 
   def show
     render json: @order.as_json(
-      include: { 
-        purchaser: {}, 
-        order_items: { 
-          include: { 
-            product: { 
-              include: { vendor: { only: [:fullname] } } 
-            } 
-          } 
+      include: {
+        purchaser: { only: [:fullname] },  # Include only the fullname of the purchaser
+        order_items: {
+          include: {
+            product: {
+              include: { vendor: { only: [:fullname] } }  # Include only the fullname of the vendor
+            }
+          }
         }
       },
       methods: [:order_date, :total_price]
@@ -42,12 +41,14 @@ class Admin::OrdersController < ApplicationController
       # Re-fetch the order with all related data to ensure full information is included
       @order.reload
       render json: @order.as_json(
-        include: { 
-          purchaser: {}, 
-          order_items: { 
-            include: { 
-              product: { include: :vendor } 
-            } 
+        include: {
+          purchaser: { only: [:fullname] },  # Include only the fullname of the purchaser
+          order_items: {
+            include: {
+              product: {
+                include: { vendor: { only: [:fullname] } }  # Include only the fullname of the vendor
+              }
+            }
           }
         },
         methods: [:order_date, :total_price]
