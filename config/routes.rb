@@ -64,6 +64,7 @@ Rails.application.routes.draw do
     resources :reviews
     resources :abouts
     resources :faqs
+    resources :promotions, except: [:new, :edit]
   end
 
   # Vendor namespace for vendor-specific functionality
