@@ -65,6 +65,7 @@ Rails.application.routes.draw do
     resources :abouts
     resources :faqs
     resources :promotions, except: [:new, :edit]
+    get 'identify', to: 'admins#identify'
   end
 
   # Vendor namespace for vendor-specific functionality
@@ -78,7 +79,8 @@ Rails.application.routes.draw do
     resources :reviews, only: [:index, :show] do
       post 'reply', on: :member
     end      
-    resource :profile, only: [:show, :update] 
+    resource :profile, only: [:show, :update]
+
   end
 
   # Purchaser namespace for purchaser-specific functionality

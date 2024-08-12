@@ -1,3 +1,4 @@
+# app/controllers/admin/orders_controller.rb
 class Admin::OrdersController < ApplicationController
   before_action :authenticate_admin
   before_action :set_order, only: [:show, :update_status_to_on_transit, :destroy]
@@ -6,11 +7,11 @@ class Admin::OrdersController < ApplicationController
     @orders = Order.includes(:purchaser, order_items: { product: :vendor }).all
     render json: @orders.as_json(
       include: {
-        purchaser: { only: [:fullname] },  # Include only the fullname of the purchaser
+        purchaser: { only: [:fullname] },
         order_items: {
           include: {
             product: {
-              include: { vendor: { only: [:fullname] } }  # Include only the fullname of the vendor
+              include: { vendor: { only: [:fullname] } }
             }
           }
         }
@@ -22,11 +23,11 @@ class Admin::OrdersController < ApplicationController
   def show
     render json: @order.as_json(
       include: {
-        purchaser: { only: [:fullname] },  # Include only the fullname of the purchaser
+        purchaser: { only: [:fullname] },
         order_items: {
           include: {
             product: {
-              include: { vendor: { only: [:fullname] } }  # Include only the fullname of the vendor
+              include: { vendor: { only: [:fullname] } }
             }
           }
         }
@@ -38,15 +39,16 @@ class Admin::OrdersController < ApplicationController
   # PUT /admin/orders/:id/on-transit
   def update_status_to_on_transit
     if @order.update(status: params[:status])
-      # Re-fetch the order with all related data to ensure full information is included
-      @order.reload
+      # Notify the admin about the order status change
+      notify_admin(@order)
+
       render json: @order.as_json(
         include: {
-          purchaser: { only: [:fullname] },  # Include only the fullname of the purchaser
+          purchaser: { only: [:fullname] },
           order_items: {
             include: {
               product: {
-                include: { vendor: { only: [:fullname] } }  # Include only the fullname of the vendor
+                include: { vendor: { only: [:fullname] } }
               }
             }
           }
@@ -67,6 +69,15 @@ class Admin::OrdersController < ApplicationController
 
   def set_order
     @order = Order.find(params[:id])
+  end
+
+  def notify_admin(order)
+    Notification.create!(
+      admin_id: current_admin.id,
+      order_id: order.id,
+      status: order.status,
+      created_at: Time.now
+    )
   end
 
   def order_params
