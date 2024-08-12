@@ -4,7 +4,7 @@
 
     # GET /admin/promotions
     def index
-      @promotions = Promotion.includes(:vendor).all
+      @promotions = Promotion.all
       render json: @promotions, each_serializer: PromotionSerializer
     end
 

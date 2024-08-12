@@ -85,11 +85,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_07_053517) do
   end
 
   create_table "conversations", force: :cascade do |t|
-    t.integer "admin_id"
-    t.integer "purchaser_id"
-    t.integer "vendor_id"
+    t.bigint "admin_id"
+    t.bigint "purchaser_id"
+    t.bigint "vendor_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["admin_id"], name: "index_conversations_on_admin_id"
+    t.index ["purchaser_id"], name: "index_conversations_on_purchaser_id"
+    t.index ["vendor_id"], name: "index_conversations_on_vendor_id"
   end
 
   create_table "faqs", force: :cascade do |t|
@@ -174,15 +177,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_07_053517) do
   end
 
   create_table "promotions", force: :cascade do |t|
-    t.bigint "vendor_id", null: false
     t.string "title"
     t.text "description"
     t.decimal "discount_percentage"
+    t.string "coupon_code"
     t.datetime "start_date"
     t.datetime "end_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["vendor_id"], name: "index_promotions_on_vendor_id"
   end
 
   create_table "purchasers", force: :cascade do |t|
@@ -243,6 +245,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_07_053517) do
   add_foreign_key "bookmarks", "purchasers"
   add_foreign_key "cart_items", "products"
   add_foreign_key "cart_items", "purchasers"
+  add_foreign_key "conversations", "admins"
+  add_foreign_key "conversations", "purchasers"
+  add_foreign_key "conversations", "vendors"
   add_foreign_key "notifications", "products"
   add_foreign_key "notifications", "vendors"
   add_foreign_key "order_items", "orders"
@@ -252,7 +257,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_07_053517) do
   add_foreign_key "orders", "purchasers"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "vendors"
-  add_foreign_key "promotions", "vendors"
   add_foreign_key "reviews", "products"
   add_foreign_key "reviews", "purchasers"
   add_foreign_key "shipments", "orders"

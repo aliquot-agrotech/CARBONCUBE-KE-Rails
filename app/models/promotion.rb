@@ -1,6 +1,4 @@
 class Promotion < ApplicationRecord
-  belongs_to :vendor
-  
   validates :title, presence: true
   validates :description, presence: true
   validates :discount_percentage, presence: true, numericality: { greater_than: 0, less_than_or_equal_to: 100 }
