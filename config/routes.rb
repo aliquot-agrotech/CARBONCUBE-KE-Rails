@@ -66,7 +66,7 @@ Rails.application.routes.draw do
     resources :faqs
     resources :promotions, except: [:new, :edit]
     get 'identify', to: 'admins#identify'
-    resources :notifications, only: [:create]
+    resources :notifications, only: [:index, :create]
   end
 
   # Vendor namespace for vendor-specific functionality
