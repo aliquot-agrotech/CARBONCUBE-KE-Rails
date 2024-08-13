@@ -1,5 +1,3 @@
-# app/services/admin_authorize_api_request.rb
-
 class AdminAuthorizeApiRequest
   def initialize(headers = {})
     @headers = headers
@@ -12,14 +10,15 @@ class AdminAuthorizeApiRequest
   private
 
   def find_admin
-    admin_id = decoded_token[:user_id] if decoded_token.present?
+    token = decoded_token
+    admin_id = token[:user_id] if token.present?
 
     if admin_id
       admin = Admin.find_by(id: admin_id)
       return admin if admin
     end
 
-    admin_email = decoded_token[:email] if decoded_token.present?
+    admin_email = token[:email] if token.present?
 
     if admin_email
       admin = Admin.find_by(email: admin_email)
@@ -35,7 +34,7 @@ class AdminAuthorizeApiRequest
 
   def http_auth_header
     if @headers['Authorization'].present?
-      return @headers['Authorization'].split(' ').last
+      @headers['Authorization'].split(' ').last
     else
       raise ExceptionHandler::MissingToken, 'Missing token'
     end
