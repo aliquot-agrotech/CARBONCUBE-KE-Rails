@@ -10,6 +10,7 @@ class Admin::MessagesController < ApplicationController
   def create
     @message = @conversation.messages.build(message_params)
     @message.sender = current_admin
+    @message.sender_type = 'Admin' # Set sender_type explicitly
 
     if @message.save
       render json: @message, serializer: MessageSerializer, status: :created
