@@ -26,6 +26,7 @@ class Admin::MessagesController < ApplicationController
   end
 
   def message_params
+    # Only permit :content as it's the only parameter from user input
     params.require(:message).permit(:content)
   end
 
