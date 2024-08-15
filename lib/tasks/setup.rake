@@ -48,7 +48,7 @@ namespace :setup do
     begin
       establish_connection
       if ActiveRecord::Base.connection
-        puts 'Seeding database...'
+        puts 'Seeding data for the database...'
         system('rails db:seed')
       end
     rescue ActiveRecord::NoDatabaseError
