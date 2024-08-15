@@ -241,5 +241,5 @@ end
 end
 
 
-puts 'Congeatularions!! Seed data created successfully!'
+puts 'Congratulations!! Seed data created successfully!'
 
