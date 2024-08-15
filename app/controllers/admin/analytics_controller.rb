@@ -27,7 +27,7 @@ class Admin::AnalyticsController < ApplicationController
                                    .select('purchasers.fullname, COUNT(orders.id) AS total_orders')
                                    .group('purchasers.id')
                                    .order('total_orders DESC')
-                                   .limit(5)
+                                   .limit(6)
 
     # Total Revenue
     total_revenue = Order.joins(:order_items)
