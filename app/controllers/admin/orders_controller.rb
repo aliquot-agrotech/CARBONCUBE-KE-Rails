@@ -3,8 +3,16 @@ class Admin::OrdersController < ApplicationController
   before_action :authenticate_admin
   before_action :set_order, only: [:show, :update_status_to_on_transit, :destroy]
 
+  # app/controllers/admin/orders_controller.rb
   def index
-    @orders = Order.includes(:purchaser, order_items: { product: :vendor }).all
+    if params[:phone_number].present?
+      @orders = Order.joins(:purchaser)
+                    .where(purchasers: { phone_number: params[:phone_number] })
+                    .includes(:purchaser, order_items: { product: :vendor })
+    else
+      @orders = Order.includes(:purchaser, order_items: { product: :vendor }).all
+    end
+
     render json: @orders.as_json(
       include: {
         purchaser: { only: [:fullname] },
@@ -19,7 +27,7 @@ class Admin::OrdersController < ApplicationController
       methods: [:order_date, :total_price]
     )
   end
-
+  
   def show
     render json: @order.as_json(
       include: {

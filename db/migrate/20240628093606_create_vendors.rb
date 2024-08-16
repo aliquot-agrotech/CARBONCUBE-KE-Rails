@@ -3,7 +3,7 @@ class CreateVendors < ActiveRecord::Migration[7.1]
     create_table :vendors do |t|
       t.string :fullname
       t.text :description
-      t.string :phone_number
+      t.string :phone_number, limit: 10
       t.string :location
       t.decimal :total_revenue
       t.integer :total_orders

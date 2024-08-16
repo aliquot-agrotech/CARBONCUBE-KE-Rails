@@ -5,7 +5,7 @@ class CreatePurchasers < ActiveRecord::Migration[7.1]
       t.string :username
       t.string :password_digest
       t.string :email
-      t.string :phone_number
+      t.string :phone_number, limit: 10
       t.string :location
       t.boolean :blocked, default: false
 

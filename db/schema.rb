@@ -191,7 +191,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
     t.string "username"
     t.string "password_digest"
     t.string "email"
-    t.string "phone_number"
+    t.string "phone_number", limit: 10
     t.string "location"
     t.boolean "blocked", default: false
     t.datetime "created_at", null: false
@@ -225,7 +225,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
   create_table "vendors", force: :cascade do |t|
     t.string "fullname"
     t.text "description"
-    t.string "phone_number"
+    t.string "phone_number", limit: 10
     t.string "location"
     t.decimal "total_revenue"
     t.integer "total_orders"
