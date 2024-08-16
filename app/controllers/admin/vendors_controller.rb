@@ -165,8 +165,9 @@ class Admin::VendorsController < ApplicationController
                                   .where(order_items: { product_id: vendor.products.pluck(:id) })
                                   .sum('order_items.quantity'),
       mean_rating: vendor.reviews.joins(:product)
-                              .where(products: { id: vendor.products.pluck(:id) })
-                              .average(:rating).to_f,
+                                  .where(products: { id: vendor.products.pluck(:id) })
+                                  .average(:rating).to_f.round(2),
+            
       total_reviews: vendor.reviews.joins(:product)
                                .where(products: { id: vendor.products.pluck(:id) })
                                .group(:rating)
