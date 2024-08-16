@@ -103,19 +103,26 @@ class Admin::ProductsController < ApplicationController
     end
   end
 
-  # GET /admin/products/search
+# GET /admin/products/search
   def search
     if params[:query].present?
+      search_terms = params[:query].downcase.split(/\s+/)
+
+      # Build the search conditions
+      title_description_conditions = search_terms.map do |term|
+        "(LOWER(products.title) LIKE ? OR LOWER(products.description) LIKE ?)"
+      end.join(" AND ")
+
       title_description_search = Product.joins(:vendor)
                                         .where(vendors: { blocked: false })
-                                        .search_by_title_and_description(params[:query])
+                                        .where(title_description_conditions, *search_terms.flat_map { |term| ["%#{term}%", "%#{term}%"] })
 
       category_search = Product.joins(:vendor, :category)
                               .where(vendors: { blocked: false })
-                              .where('categories.name ILIKE ?', "%#{params[:query]}%")
+                              .where('LOWER(categories.name) ILIKE ?', "%#{params[:query].downcase}%")
                               .select('products.*')
 
-      # Combine results manually
+      # Combine results and remove duplicates
       @products = (title_description_search.to_a + category_search.to_a).uniq
     else
       @products = Product.joins(:vendor)
@@ -124,6 +131,8 @@ class Admin::ProductsController < ApplicationController
 
     render json: @products
   end
+
+
 
   private
 
