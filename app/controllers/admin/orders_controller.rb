@@ -5,14 +5,14 @@ class Admin::OrdersController < ApplicationController
 
   # app/controllers/admin/orders_controller.rb
   def index
-    if params[:phone_number].present?
+    if params[:search_query].present?
       @orders = Order.joins(:purchaser)
-                    .where(purchasers: { phone_number: params[:phone_number] })
+                    .where("purchasers.phone_number = :query OR orders.id = :query", query: params[:search_query])
                     .includes(:purchaser, order_items: { product: :vendor })
     else
       @orders = Order.includes(:purchaser, order_items: { product: :vendor }).all
     end
-
+  
     render json: @orders.as_json(
       include: {
         purchaser: { only: [:fullname] },
@@ -27,6 +27,7 @@ class Admin::OrdersController < ApplicationController
       methods: [:order_date, :total_price]
     )
   end
+  
   
   def show
     render json: @order.as_json(
