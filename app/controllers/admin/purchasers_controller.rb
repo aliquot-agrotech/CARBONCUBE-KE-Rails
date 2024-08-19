@@ -2,8 +2,13 @@ class Admin::PurchasersController < ApplicationController
   before_action :authenticate_admin
   before_action :set_purchaser, only: [:block, :unblock, :show, :update, :destroy]
 
-  def index
-    @purchasers = Purchaser.all
+  def index 
+    if params[:search_query].present?
+      @purchasers=Purchaser.where("phone_number = :query OR id = :query", query: params[:search_query])
+    else
+      @purchasers = Purchaser.all
+    end
+
     render json: @purchasers
   end
 
