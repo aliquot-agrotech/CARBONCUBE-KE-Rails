@@ -8,20 +8,66 @@
 
 require 'faker'
 require 'set'
-
-# Create categories
+# Create categories with descriptions
 categories = [
     { name: 'Filtration Solutions', description: 'Products related to filtration solutions' },
-    { name: 'Hardware Tools', description: 'Various Hardware Tools' },
-    { name: 'Automotive Spares', description: 'Spare parts for automobiles' },
-    { name: 'Computer Parts and Accessories', description: 'Components and accessories for computers' }
+    { name: 'Hardware Tools & Equipment', description: 'Various Hardware Tools' },
+    { name: 'Automotive Parts & Accessories', description: 'Spare parts for automobiles' },
+    { name: 'Computer Parts & Accessories', description: 'Components and accessories for computers' }
 ]
 
+
+# Create or find categories and add subcategories
 categories.each do |category_data|
-    Category.find_or_create_by(name: category_data[:name]) do |category|
-        category.description = category_data[:description]
+  category = Category.find_or_create_by(name: category_data[:name]) do |c|
+    c.description = category_data[:description]
+  end
+
+  # Define subcategories based on category name
+  case category.name
+  when 'Automotive Parts & Accessories'
+    subcategories = [
+      { name: 'Batteries' },
+      { name: 'Lubrication' },
+      { name: 'Mechanical Tools' },
+      { name: 'Spare Parts' },
+      { name: 'Tyres' }
+    ]
+  when 'Computer Parts & Accessories'
+    subcategories = [
+      { name: 'Cooling & Maintenance' },
+      { name: 'Internal Components' },
+      { name: 'Networking Equipment' },
+      { name: 'Peripherals' },
+      { name: 'Storage Solutions' }
+    ]
+  when 'Filtration Solutions'
+    subcategories = [
+      { name: 'Air Filters' },
+      { name: 'Fuel Filters' },
+      { name: 'Industrial Ventilation Filters' },
+      { name: 'Oil & Hydraulic Filters' },
+      { name: 'Specialised Filtration Solutions' }
+    ]
+  when 'Hardware Tools & Equipment'
+    subcategories = [
+      { name: 'Building Materials' },
+      { name: 'Cleaning Supplies' },
+      { name: 'Hand & Power Tools' },
+      { name: 'Power & Electrical Equipment' },
+      { name: 'Plumbing Supplies' }
+    ]
+  end
+
+  # Create subcategories
+  if subcategories
+    subcategories.each do |subcategory_data|
+      category.subcategories.find_or_create_by(name: subcategory_data[:name])
     end
+  end
 end
+
+
 
 # Seed admin data
 Admin.find_or_create_by(email: 'admin@example.com') do |admin|
@@ -1390,13 +1436,21 @@ category_products = {
 
 # Seed products
 category_products.each do |category_name, products|
+  # Find the category by name
   category = Category.find_by(name: category_name)
   next unless category
   
+  # Fetch all subcategories for this category
+  subcategories = category.subcategories
+  
   products.each do |product_data|
+    # Randomly assign a subcategory
+    random_subcategory = subcategories.sample
+    
     Product.find_or_create_by(title: product_data[:title]) do |product|
       product.description = product_data[:description]
       product.category_id = category.id
+      product.subcategory_id = random_subcategory.id if random_subcategory.present?
       product.vendor_id = Vendor.all.sample.id
       product.price = Faker::Commerce.price(range: 200..10000)
       product.quantity = Faker::Number.between(from: 30, to: 100)
@@ -1410,7 +1464,6 @@ category_products.each do |category_name, products|
     end
   end
 end
-
 
 # Generate 500 orders
 500.times do

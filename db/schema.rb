@@ -155,6 +155,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
   create_table "products", force: :cascade do |t|
     t.bigint "vendor_id", null: false
     t.bigint "category_id", null: false
+    t.bigint "subcategory_id", null: false
     t.string "title"
     t.text "description"
     t.text "media"
@@ -171,6 +172,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["description"], name: "index_products_on_description", opclass: :gin_trgm_ops, using: :gin
+    t.index ["subcategory_id"], name: "index_products_on_subcategory_id"
     t.index ["title"], name: "index_products_on_title", opclass: :gin_trgm_ops, using: :gin
     t.index ["vendor_id"], name: "index_products_on_vendor_id"
   end
@@ -222,6 +224,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
     t.index ["order_id"], name: "index_shipments_on_order_id"
   end
 
+  create_table "subcategories", force: :cascade do |t|
+    t.string "name"
+    t.integer "category_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "vendors", force: :cascade do |t|
     t.string "fullname"
     t.text "description"
@@ -253,6 +262,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
   add_foreign_key "order_vendors", "vendors"
   add_foreign_key "orders", "purchasers"
   add_foreign_key "products", "categories"
+  add_foreign_key "products", "subcategories"
   add_foreign_key "products", "vendors"
   add_foreign_key "reviews", "products"
   add_foreign_key "reviews", "purchasers"

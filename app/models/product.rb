@@ -12,6 +12,7 @@ class Product < ApplicationRecord
 
   belongs_to :vendor
   belongs_to :category
+  belongs_to :subcategory
   has_many :order_items
   has_many :orders, through: :order_items
   has_many :reviews, dependent: :destroy

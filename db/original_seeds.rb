@@ -131,6 +131,35 @@ products.each do |product_data|
     end
 end
 
+
+# second seeds
+# 
+# Seed products
+category_products.each do |category_name, products|
+  category = Category.find_by(name: category_name)
+  next unless category
+  
+  products.each do |product_data|
+    Product.find_or_create_by(title: product_data[:title]) do |product|
+      product.description = product_data[:description]
+      product.category_id = category.id
+      product.vendor_id = Vendor.all.sample.id
+      product.price = Faker::Commerce.price(range: 200..10000)
+      product.quantity = Faker::Number.between(from: 30, to: 100)
+      product.brand = Faker::Company.name
+      product.manufacturer = Faker::Company.name
+      product.package_length = Faker::Number.between(from: 10, to: 50)
+      product.package_width = Faker::Number.between(from: 10, to: 50)
+      product.package_height = Faker::Number.between(from: 10, to: 50)
+      product.package_weight = Faker::Number.decimal(l_digits: 1, r_digits: 2)
+      product.media = [Faker::LoremFlickr.image, Faker::LoremFlickr.image]
+    end
+  end
+end
+
+
+
+
 # Seed orders data
 orders = [
   { purchaser_id: Purchaser.first.id, status: 'processing', total_amount: 129.98, mpesa_transaction_code: 'SGA96AZWUR' },
