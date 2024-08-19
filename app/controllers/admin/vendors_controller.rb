@@ -3,9 +3,15 @@ class Admin::VendorsController < ApplicationController
   before_action :set_vendor, only: [:block, :unblock, :show, :update, :destroy, :analytics, :orders, :products, :reviews]
 
   def index
-    @vendors = Vendor.all
+    if params[:search_query].present?
+      @vendors = Vendor.where("phone_number = :query OR id = :query", query: params[:search_query])
+    else
+      @vendors = Vendor.all
+    end
+  
     render json: @vendors.as_json(only: [:id, :fullname, :phone_number, :email, :enterprise_name, :location, :blocked])
   end
+  
 
   def show
     vendor_data = @vendor.as_json(
