@@ -10,10 +10,10 @@ require 'faker'
 require 'set'
 # Create categories with descriptions
 categories = [
-    { name: 'Filtration Solutions', description: 'Products related to filtration solutions' },
-    { name: 'Hardware Tools & Equipment', description: 'Various Hardware Tools' },
-    { name: 'Automotive Parts & Accessories', description: 'Spare parts for automobiles' },
-    { name: 'Computer Parts & Accessories', description: 'Components and accessories for computers' }
+  { name: 'Automotive Parts & Accessories', description: 'Spare parts for automobiles' },
+  { name: 'Computer Parts & Accessories', description: 'Components and accessories for computers' },
+  { name: 'Filtration Solutions', description: 'Products related to filtration solutions' },
+  { name: 'Hardware Tools & Equipment', description: 'Various Hardware Tools' }
 ]
 
 
