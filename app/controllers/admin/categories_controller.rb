@@ -1,6 +1,6 @@
 class Admin::CategoriesController < ApplicationController
   before_action :authenticate_admin
-  before_action :set_category, only: [:show, :update, :destroy, :add_subcategory, :remove_subcategory]
+  before_action :set_category, only: [:show, :update, :destroy]
 
   def index
     @categories = Category.includes(:subcategories).all
@@ -33,21 +33,6 @@ class Admin::CategoriesController < ApplicationController
     head :no_content
   end
 
-  def add_subcategory
-    subcategory = @category.subcategories.build(subcategory_params)
-    if subcategory.save
-      render json: subcategory, status: :created
-    else
-      render json: subcategory.errors, status: :unprocessable_entity
-    end
-  end
-
-  def remove_subcategory
-    subcategory = @category.subcategories.find(params[:subcategory_id])
-    subcategory.destroy
-    head :no_content
-  end
-
   private
 
   def set_category
@@ -55,11 +40,7 @@ class Admin::CategoriesController < ApplicationController
   end
 
   def category_params
-    params.require(:category).permit(:name, :description, subcategories_attributes: [:id, :name, :description, :_destroy])
-  end
-
-  def subcategory_params
-    params.require(:subcategory).permit(:name, :description)
+    params.require(:category).permit(:name, :description)
   end
 
   def authenticate_admin

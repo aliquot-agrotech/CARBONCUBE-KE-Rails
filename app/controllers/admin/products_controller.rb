@@ -3,12 +3,23 @@ class Admin::ProductsController < ApplicationController
 
   # GET /admin/products
   def index
-    @products = Product.all_products
+    @products = Product.joins(:vendor, :category, :subcategory)
+                       .where(vendors: { blocked: false })
+    
+    if params[:category_id].present?
+      @products = @products.where(category_id: params[:category_id])
+    end
+  
+    if params[:subcategory_id].present?
+      @products = @products.where(subcategory_id: params[:subcategory_id])
+    end
+  
     flagged_products = @products.select { |product| product.flagged }
     non_flagged_products = @products.reject { |product| product.flagged }
-  
+    
     render json: { flagged: flagged_products, non_flagged: non_flagged_products }
   end
+  
   
 
   def show
@@ -105,33 +116,37 @@ class Admin::ProductsController < ApplicationController
   end
 
 # GET /admin/products/search
-  def search
-    if params[:query].present?
-      search_terms = params[:query].downcase.split(/\s+/)
+def search
+  if params[:query].present?
+    search_terms = params[:query].downcase.split(/\s+/)
 
-      # Build the search conditions
-      title_description_conditions = search_terms.map do |term|
-        "(LOWER(products.title) LIKE ? OR LOWER(products.description) LIKE ?)"
-      end.join(" AND ")
+    title_description_conditions = search_terms.map do |term|
+      "(LOWER(products.title) LIKE ? OR LOWER(products.description) LIKE ?)"
+    end.join(" AND ")
 
-      title_description_search = Product.joins(:vendor)
-                                        .where(vendors: { blocked: false })
-                                        .where(title_description_conditions, *search_terms.flat_map { |term| ["%#{term}%", "%#{term}%"] })
+    title_description_search = Product.joins(:vendor)
+                                      .where(vendors: { blocked: false })
+                                      .where(title_description_conditions, *search_terms.flat_map { |term| ["%#{term}%", "%#{term}%"] })
 
-      category_search = Product.joins(:vendor, :category)
-                              .where(vendors: { blocked: false })
-                              .where('LOWER(categories.name) ILIKE ?', "%#{params[:query].downcase}%")
-                              .select('products.*')
+    category_search = Product.joins(:vendor, :category)
+                             .where(vendors: { blocked: false })
+                             .where('LOWER(categories.name) ILIKE ?', "%#{params[:query].downcase}%")
+                             .select('products.*')
 
-      # Combine results and remove duplicates
-      @products = (title_description_search.to_a + category_search.to_a).uniq
-    else
-      @products = Product.joins(:vendor)
-                        .where(vendors: { blocked: false })
-    end
+    subcategory_search = Product.joins(:vendor, :subcategory)
+                                .where(vendors: { blocked: false })
+                                .where('LOWER(subcategories.name) ILIKE ?', "%#{params[:query].downcase}%")
+                                .select('products.*')
 
-    render json: @products
+    # Combine results and remove duplicates
+    @products = (title_description_search.to_a + category_search.to_a + subcategory_search.to_a).uniq
+  else
+    @products = Product.joins(:vendor)
+                       .where(vendors: { blocked: false })
   end
+
+  render json: @products
+end
 
 
 
