@@ -31,7 +31,8 @@ categories.each do |category_data|
       { name: 'Lubrication' },
       { name: 'Mechanical Tools' },
       { name: 'Spare Parts' },
-      { name: 'Tyres' }
+      { name: 'Tyres' },
+      { name: 'Others' }
     ]
   when 'Computer Parts & Accessories'
     subcategories = [
@@ -39,7 +40,8 @@ categories.each do |category_data|
       { name: 'Internal Components' },
       { name: 'Networking Equipment' },
       { name: 'Peripherals' },
-      { name: 'Storage Solutions' }
+      { name: 'Storage Solutions' },
+      { name: 'Others' }
     ]
   when 'Filtration Solutions'
     subcategories = [
@@ -47,7 +49,8 @@ categories.each do |category_data|
       { name: 'Fuel Filters' },
       { name: 'Industrial Ventilation Filters' },
       { name: 'Oil & Hydraulic Filters' },
-      { name: 'Specialised Filtration Solutions' }
+      { name: 'Specialised Filtration Solutions' },
+      { name: 'Others' }
     ]
   when 'Hardware Tools & Equipment'
     subcategories = [
@@ -55,7 +58,8 @@ categories.each do |category_data|
       { name: 'Cleaning Supplies' },
       { name: 'Hand & Power Tools' },
       { name: 'Power & Electrical Equipment' },
-      { name: 'Plumbing Supplies' }
+      { name: 'Plumbing Supplies' },
+      { name: 'Others' }
     ]
   end
 
