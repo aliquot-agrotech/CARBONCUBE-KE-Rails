@@ -385,7 +385,7 @@ category_products = {
   { title: 'Custom Filtration Solution', description: 'Tailored filtration solution to meet specific needs' }
 ],
 
-'Hardware Tools' => [
+'Hardware Tools & Equipment' => [
   { title: 'Hammer', description: 'Durable hammer for various tasks' },
   { title: 'Screwdriver Set', description: 'Set of screwdrivers with various heads' },
   { title: 'Adjustable Wrench', description: 'Versatile wrench for multiple applications' },
@@ -764,7 +764,7 @@ category_products = {
   { title: 'Supercharger Installation Tool', description: 'Tool for installing superchargers'}
 ],
 
-'Automotive Spares' => [
+'Automotive Parts & Accessories' => [
   { title: 'Car Battery', description: 'Long-lasting car battery' },
   { title: 'Brake Pads', description: 'High-quality brake pads for cars' },
   { title: 'Oil Filter', description: 'Filter for cleaning engine oil' },
@@ -1076,7 +1076,7 @@ category_products = {
   { title: 'Anti-Sway Bars', description: 'Bars for reducing body roll' }
 ],
 
-'Computer Parts and Accessories' => [
+'Computer Parts & Accessories' => [
   { title: 'Graphics Card', description: 'High-performance graphics card for gaming' },
   { title: 'RAM Module', description: '8GB RAM module for computers' },
   { title: 'Solid State Drive', description: '500GB SSD for faster storage' },
@@ -1433,7 +1433,6 @@ category_products = {
 ]
 }
 
-
 # Seed products
 category_products.each do |category_name, products|
   # Find the category by name
@@ -1447,7 +1446,10 @@ category_products.each do |category_name, products|
     # Randomly assign a subcategory
     random_subcategory = subcategories.sample
     
-    Product.find_or_create_by(title: product_data[:title]) do |product|
+    # Find or create the product
+    product = Product.find_or_initialize_by(title: product_data[:title])
+    
+    if product.new_record?
       product.description = product_data[:description]
       product.category_id = category.id
       product.subcategory_id = random_subcategory.id if random_subcategory.present?
@@ -1461,9 +1463,12 @@ category_products.each do |category_name, products|
       product.package_height = Faker::Number.between(from: 10, to: 50)
       product.package_weight = Faker::Number.decimal(l_digits: 1, r_digits: 2)
       product.media = [Faker::LoremFlickr.image, Faker::LoremFlickr.image]
+      product.save!
     end
   end
 end
+
+
 
 # Generate 500 orders
 500.times do
