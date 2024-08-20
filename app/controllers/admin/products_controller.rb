@@ -12,7 +12,7 @@ class Admin::ProductsController < ApplicationController
   
 
   def show
-    @product = Product.includes(:vendor, :category, :reviews => :purchaser)
+    @product = Product.includes(:vendor, :category, :subcategory, :reviews => :purchaser)
                       .find(params[:id])
                       .tap do |product|
                         product.define_singleton_method(:quantity_sold) do
