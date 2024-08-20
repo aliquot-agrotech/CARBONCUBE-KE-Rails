@@ -27,6 +27,7 @@ class Admin::ProductsController < ApplicationController
       include: {
         vendor: { only: [:fullname] },
         category: { only: [:name] },
+        subcategory: { only: [:name] },
         reviews: {
           include: {
             purchaser: { only: [:fullname] }
