@@ -28,7 +28,7 @@ Rails.application.routes.draw do
     end
     
     resources :categories
-    resources :subcategories, only: [:index]
+    resources :subcategories
     resources :products do
       collection do
         get 'search'

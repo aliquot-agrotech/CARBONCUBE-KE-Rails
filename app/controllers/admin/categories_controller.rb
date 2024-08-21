@@ -49,7 +49,6 @@ class Admin::CategoriesController < ApplicationController
     render json: { error: 'Failed to delete category' }, status: :unprocessable_entity
   end
 
-
   private
 
   def set_category
@@ -57,7 +56,7 @@ class Admin::CategoriesController < ApplicationController
   end
 
   def category_params
-    params.require(:category).permit(:name, :description)
+    params.require(:category).permit(:name, :description, subcategories_attributes: [:id, :name, :_destroy])
   end
 
   def authenticate_admin
