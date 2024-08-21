@@ -29,9 +29,26 @@ class Admin::CategoriesController < ApplicationController
   end
 
   def destroy
-    @category.destroy
+    ActiveRecord::Base.transaction do
+      # Find the category
+      category = Category.find(params[:id])
+
+      # Delete associated subcategories
+      category.subcategories.destroy_all
+
+      # Alternatively, if you want to delete related products:
+      # category.products.update_all(subcategory_id: nil) # Or handle them as needed
+
+      # Delete the category
+      category.destroy!
+    end
+
     head :no_content
+  rescue StandardError => e
+    Rails.logger.error(e.message)
+    render json: { error: 'Failed to delete category' }, status: :unprocessable_entity
   end
+
 
   private
 
