@@ -30,20 +30,25 @@ class Admin::AnalyticsController < ApplicationController
                                    .limit(10)
 
     # Total Revenue
-    total_revenue = Order.joins(:order_items)
-                         .sum('order_items.price * order_items.quantity')
+    total_revenue = Order.joins(:order_items).sum('order_items.price * order_items.quantity')
 
     # Sales Performance (example: revenue by month)
+    # Sales Performance for the last 3 months
+    current_month = Date.current.beginning_of_month
+    three_months_ago = 2.months.ago.beginning_of_month
+  
     sales_performance = Order.joins(:order_items)
+                             .where(created_at: three_months_ago..current_month.end_of_month)
                              .group("DATE_TRUNC('month', orders.created_at)")
                              .sum('order_items.price * order_items.quantity')
+                             .transform_keys { |k| k.strftime("%B %Y") }
 
     # Best Selling Categories Analytics
     best_selling_categories = Category.joins(products: :order_items)
                                       .select('categories.name AS category_name, SUM(order_items.quantity) AS total_sold')
                                       .group('categories.id')
                                       .order('total_sold DESC')
-                                      .limit(3)
+                                      .limit(4)
                                       .map { |record| { category_name: record.category_name, total_sold: record.total_sold } }
 
     render json: {
