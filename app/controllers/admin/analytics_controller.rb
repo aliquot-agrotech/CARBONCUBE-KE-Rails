@@ -8,14 +8,14 @@ class Admin::AnalyticsController < ApplicationController
     @total_products = Product.count
     @total_reviews = Review.count
 
-    # Best Selling Product for Each Category
-    best_selling_products = Category.joins(products: :order_items)
-                                    .select('categories.id AS category_id, categories.name AS category_name, products.id AS product_id, products.title AS product_title, products.price AS product_price, SUM(order_items.quantity) AS total_sold')
-                                    .group('categories.id, products.id')
-                                    .order('categories.id, total_sold DESC')
-                                    .map { |record| { category_name: record.category_name, product_id: record.product_id, product_title: record.product_title, product_price: record.product_price, total_sold: record.total_sold } }
-                                    .group_by { |record| record[:category_name] }
-                                    .transform_values(&:first)
+    # Top 6 Best Selling Products Overall
+    best_selling_products = Product.joins(:order_items)
+                                  .select('products.id AS product_id, products.title AS product_title, products.price AS product_price, SUM(order_items.quantity) AS total_sold')
+                                  .group('products.id')
+                                  .order('total_sold DESC')
+                                  .limit(6)
+                                  .map { |record| { product_id: record.product_id, product_title: record.product_title, product_price: record.product_price, total_sold: record.total_sold } }
+
 
     # Total Products Sold Out
     total_products_sold_out = Product.joins(:order_items)
@@ -27,7 +27,7 @@ class Admin::AnalyticsController < ApplicationController
                                    .select('purchasers.fullname, COUNT(orders.id) AS total_orders')
                                    .group('purchasers.id')
                                    .order('total_orders DESC')
-                                   .limit(6)
+                                   .limit(10)
 
     # Total Revenue
     total_revenue = Order.joins(:order_items)
