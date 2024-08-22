@@ -4,7 +4,8 @@ class CreateOrderVendors < ActiveRecord::Migration[7.1]
       t.references :order, null: false, foreign_key: true
       t.references :vendor, null: false, foreign_key: true
 
-      t.timestamps
+      t.datetime :created_at, null: false, default: -> { 'CURRENT_TIMESTAMP' }
+      t.datetime :updated_at, null: false, default: -> { 'CURRENT_TIMESTAMP' }
     end
   end
 end

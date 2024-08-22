@@ -127,8 +127,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
     t.integer "quantity", default: 1, null: false
     t.decimal "price", precision: 10, scale: 2, default: "0.0", null: false
     t.decimal "total_price", precision: 10, scale: 2, default: "0.0", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.index ["order_id"], name: "index_order_items_on_order_id"
     t.index ["product_id"], name: "index_order_items_on_product_id"
   end
@@ -136,8 +136,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
   create_table "order_vendors", force: :cascade do |t|
     t.bigint "order_id", null: false
     t.bigint "vendor_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.index ["order_id"], name: "index_order_vendors_on_order_id"
     t.index ["vendor_id"], name: "index_order_vendors_on_vendor_id"
   end
@@ -147,8 +147,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
     t.string "status", default: "processing"
     t.decimal "total_amount"
     t.string "mpesa_transaction_code"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.index ["purchaser_id"], name: "index_orders_on_purchaser_id"
   end
 
@@ -168,8 +168,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
     t.decimal "package_width", precision: 10, scale: 2
     t.decimal "package_height", precision: 10, scale: 2
     t.boolean "flagged", default: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["description"], name: "index_products_on_description", opclass: :gin_trgm_ops, using: :gin
     t.index ["subcategory_id"], name: "index_products_on_subcategory_id"

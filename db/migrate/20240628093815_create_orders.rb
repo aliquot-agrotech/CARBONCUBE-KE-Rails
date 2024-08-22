@@ -6,7 +6,8 @@ class CreateOrders < ActiveRecord::Migration[7.1]
       t.decimal :total_amount
       t.string :mpesa_transaction_code
 
-      t.timestamps
+      t.datetime :created_at, null: false, default: -> { 'CURRENT_TIMESTAMP' }
+      t.datetime :updated_at, null: false, default: -> { 'CURRENT_TIMESTAMP' }
     end
   end
 end

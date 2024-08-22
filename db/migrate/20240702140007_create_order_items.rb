@@ -7,7 +7,9 @@ class CreateOrderItems < ActiveRecord::Migration[7.1]
       t.decimal :price, precision: 10, scale: 2, default: "0.0", null: false
       t.decimal :total_price, precision: 10, scale: 2, default: "0.0", null: false
 
-      t.timestamps
+
+      t.datetime :created_at, null: false, default: -> { 'CURRENT_TIMESTAMP' }
+      t.datetime :updated_at, null: false, default: -> { 'CURRENT_TIMESTAMP' }
     end
   end
 end

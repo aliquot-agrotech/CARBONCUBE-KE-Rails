@@ -1437,6 +1437,9 @@ category_products = {
 ]
 }
 
+# Define the date range for April
+april_range = (Date.new(2024, 4, 1)..Date.new(2024, 4, 30))
+
 # Seed products
 category_products.each do |category_name, products|
   # Find the category by name
@@ -1454,6 +1457,9 @@ category_products.each do |category_name, products|
     product = Product.find_or_initialize_by(title: product_data[:title])
     
     if product.new_record?
+      # Generate a random date in April
+      created_at = Faker::Date.between(from: april_range.begin, to: april_range.end)
+      
       product.description = product_data[:description]
       product.category_id = category.id
       product.subcategory_id = random_subcategory.id if random_subcategory.present?
@@ -1467,12 +1473,31 @@ category_products.each do |category_name, products|
       product.package_height = Faker::Number.between(from: 10, to: 50)
       product.package_weight = Faker::Number.decimal(l_digits: 1, r_digits: 2)
       product.media = [Faker::LoremFlickr.image, Faker::LoremFlickr.image]
+      product.created_at = created_at
+      product.updated_at = created_at
       product.save!
     end
   end
 end
 
 
+
+
+# Define the date range for each month
+date_ranges = {
+  May: (Date.new(2024, 5, 1)..Date.new(2024, 5, 31)),
+  June: (Date.new(2024, 6, 1)..Date.new(2024, 6, 30)),
+  July: (Date.new(2024, 7, 1)..Date.new(2024, 7, 31)),
+  August: (Date.new(2024, 8, 1)..Date.today) # Up to the current date
+}
+
+# Define the date range for each month
+date_ranges = {
+  May: (Date.new(2024, 5, 1)..Date.new(2024, 5, 31)),
+  June: (Date.new(2024, 6, 1)..Date.new(2024, 6, 30)),
+  July: (Date.new(2024, 7, 1)..Date.new(2024, 7, 31)),
+  August: (Date.new(2024, 8, 1)..Date.today) # Up to the current date
+}
 
 # Generate 500 orders
 500.times do
@@ -1481,11 +1506,18 @@ end
   total_amount = Faker::Commerce.price(range: 50..500)
   mpesa_transaction_code = Faker::Alphanumeric.unique.alpha(number: 10).upcase
 
+  # Randomly select a month and date range
+  selected_month = date_ranges.keys.sample
+  date_range = date_ranges[selected_month]
+  created_at = Faker::Date.between(from: date_range.begin, to: date_range.end)
+
   order = Order.create!(
     purchaser_id: purchaser.id,
     status: status,
     total_amount: total_amount,
-    mpesa_transaction_code: mpesa_transaction_code
+    mpesa_transaction_code: mpesa_transaction_code,
+    created_at: created_at,
+    updated_at: created_at
   )
 
   # For each order, create between 1 to 5 order items
@@ -1500,16 +1532,21 @@ end
       product_id: product.id,
       quantity: quantity,
       price: price,
-      total_price: total_price
+      total_price: total_price,
+      created_at: created_at,
+      updated_at: created_at
     )
 
     # Associate the order with a vendor
     OrderVendor.create!(
       order_id: order.id,
-      vendor_id: product.vendor_id
+      vendor_id: product.vendor_id,
+      created_at: created_at,
+      updated_at: created_at
     )
   end
 end
+
 
 # Generate 10 reviews for each product
 Product.all.each do |product|
