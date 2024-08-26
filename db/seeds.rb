@@ -93,9 +93,14 @@ end
 
 # Seed purchasers data
 100.times do
-  Purchaser.find_or_create_by(email: Faker::Internet.unique.email) do |purchaser|
-    purchaser.fullname = Faker::Name.name
-    purchaser.username = Faker::Internet.username
+  Purchaser.find_or_create_by(email: nil) do |purchaser|
+    fullname = Faker::Name.name
+    username = fullname.downcase.gsub(/\s+/, "") # remove spaces and lowercase the name
+    email = "#{username}@example.com"
+
+    purchaser.fullname = fullname
+    purchaser.username = username
+    purchaser.email = email
     purchaser.phone_number = generate_custom_phone_number(used_phone_numbers)
     used_phone_numbers.add(purchaser.phone_number)
     purchaser.location = Faker::Address.full_address
@@ -103,10 +108,15 @@ end
   end
 end
 
+
 # Seed vendors data
 100.times do
-  Vendor.find_or_create_by(email: Faker::Internet.unique.email) do |vendor|
-    vendor.fullname = Faker::Name.name
+  Vendor.find_or_create_by(email: nil) do |vendor|
+    fullname = Faker::Name.name
+    email = "#{fullname.downcase.gsub(/\s+/, "")}@example.com"
+
+    vendor.fullname = fullname
+    vendor.email = email
     vendor.phone_number = generate_custom_phone_number(used_phone_numbers)
     used_phone_numbers.add(vendor.phone_number)
     vendor.enterprise_name = "#{Faker::Company.name} #{Faker::Company.suffix}"
@@ -116,6 +126,8 @@ end
     vendor.category_ids = [Category.all.sample.id]
   end
 end
+
+
 
 
 
@@ -1502,9 +1514,18 @@ date_ranges = {
 # Generate 500 order data hashes
 order_data = 500.times.map do
   purchaser = Purchaser.all.sample
-  status = ['processing', 'on-transit', 'delivered', 'dispatched'].sample
+  status = ['Processing', 'Dispatched', 'On-Transit', 'Delivered'].sample
   total_amount = Faker::Commerce.price(range: 50..500)
-  mpesa_transaction_code = Faker::Alphanumeric.unique.alpha(number: 10).upcase
+  def generate_mpesa_transaction_code
+    alpha_part = Faker::Alphanumeric.unique.alpha(number: 7).upcase # Generate 7 alphabetic characters
+    random_digits = Faker::Number.number(digits: 3) # Generate 3 random digits
+    unique_part = Faker::Alphanumeric.unique.alpha(number: 3).upcase # Generate 3 more alphabetic characters
+  
+    # Combine parts: insert random_digits after the second character
+    "#{alpha_part[0..1]}#{random_digits}#{alpha_part[2..-1]}#{unique_part}"
+  end
+  
+  mpesa_transaction_code = generate_mpesa_transaction_code
 
   # Randomly select a month and date range
   selected_month = date_ranges.keys.sample

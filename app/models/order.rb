@@ -10,7 +10,7 @@ class Order < ApplicationRecord
   accepts_nested_attributes_for :order_items, allow_destroy: true
   accepts_nested_attributes_for :order_vendors, allow_destroy: true
 
-  validates :status, inclusion: { in: %w[processing on-transit delivered] }
+  validates :status, inclusion: { in: %w[Processing Dispatched On-Transit Delivered] }
   validates :mpesa_transaction_code, presence: true
 
   private
