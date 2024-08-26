@@ -1,5 +1,5 @@
 class VendorOrderSerializer < ActiveModel::Serializer
-  attributes :id, :status, :total_price, :order_date, :created_at, :updated_at
+  attributes :id, :status, :total_price, :order_date, :status, :created_at, :updated_at
 
   has_many :order_items, serializer: VendorOrderItemSerializer
 
