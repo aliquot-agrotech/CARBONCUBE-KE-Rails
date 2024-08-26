@@ -1,24 +1,43 @@
 class Vendor::OrdersController < ApplicationController
   before_action :authenticate_vendor
-  before_action :set_order, only: [:show, :destroy]
+  before_action :set_order, only: [:show]
 
   # GET /vendor/orders
   def index
-    @orders = current_vendor.orders.includes(order_items: :product).where(order_items: { product_id: current_vendor.products.ids }).distinct
-    render json: @orders, include: ['order_items.product'], except: [:mpesa_transaction_code], each_serializer: VendorOrderSerializer
+    @orders = current_vendor.orders
+                            .includes(order_items: :product)
+                            .where(order_items: { product_id: current_vendor.products.ids })
+                            .distinct
+    render json: @orders, include: ['order_items.product'], each_serializer: VendorOrderSerializer
   end
 
   # GET /vendor/orders/:id
   def show
-    render json: @order, include: ['order_items.product'], except: [:mpesa_transaction_code], serializer: VendorOrderSerializer
+    @order = current_vendor.orders.includes(order_items: :product).find_by(id: params[:id])
+    if @order
+      render json: @order, include: ['order_items.product'], serializer: VendorOrderSerializer
+    else
+      render json: { error: 'Order not found' }, status: :not_found
+    end
   end
-
-
-
-  # DELETE /vendor/orders/:id
-  def destroy
-    @order.destroy
-    head :no_content
+  
+  # PUT /vendor/orders/:id/status
+  def update_status
+    @order = current_vendor.orders.find_by(id: params[:id])
+    
+    unless @order
+      return render json: { error: 'Order not found' }, status: :not_found
+    end
+    
+    if params[:status] == 'dispatch'
+      if @order.update(status: params[:status])
+        render json: @order, include: ['order_items.product'], serializer: VendorOrderSerializer
+      else
+        render json: { error: 'Failed to update order status' }, status: :unprocessable_entity
+      end
+    else
+      render json: { error: 'Invalid status update' }, status: :forbidden
+    end
   end
 
   private

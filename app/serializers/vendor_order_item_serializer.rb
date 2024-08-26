@@ -1,11 +1,11 @@
 class VendorOrderItemSerializer < ActiveModel::Serializer
-  attributes :id, :quantity, :product_name, :price
+  attributes :id, :quantity, :product_title, :price
 
-  def product_name
-    object.product.title
+  def product_title
+    object.product&.title || 'Unknown Product'
   end
 
   def price
-    object.product.price
+    object.product&.price || 0
   end
 end

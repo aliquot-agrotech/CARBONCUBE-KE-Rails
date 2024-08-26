@@ -1502,7 +1502,7 @@ date_ranges = {
 # Generate 500 order data hashes
 order_data = 500.times.map do
   purchaser = Purchaser.all.sample
-  status = ['processing', 'on-transit', 'delivered'].sample
+  status = ['processing', 'on-transit', 'delivered', 'dispatched'].sample
   total_amount = Faker::Commerce.price(range: 50..500)
   mpesa_transaction_code = Faker::Alphanumeric.unique.alpha(number: 10).upcase
 
