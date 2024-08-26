@@ -82,7 +82,7 @@ Rails.application.routes.draw do
       post 'reply', on: :member
     end      
     resource :profile, only: [:show, :update]
-
+    resources :messages
   end
 
   # Purchaser namespace for purchaser-specific functionality
