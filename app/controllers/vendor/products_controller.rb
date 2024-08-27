@@ -3,19 +3,19 @@ class Vendor::ProductsController < ApplicationController
   before_action :set_product, only: [:show, :update, :destroy]
 
   def index
-    @products = current_vendor.products
-    render json: @products
+    @products = current_vendor.products.includes(:category, :reviews) # Ensure category and reviews are included
+    render json: @products.to_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating])
   end
 
   def show
-    render json: @product
+    render json: @product.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating])
   end
 
   def create
     @product = current_vendor.products.build(product_params)
 
     if @product.save
-      render json: @product, status: :created
+      render json: @product.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating]), status: :created
     else
       render json: @product.errors, status: :unprocessable_entity
     end
@@ -23,7 +23,7 @@ class Vendor::ProductsController < ApplicationController
 
   def update
     if @product.update(product_params)
-      render json: @product
+      render json: @product.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating])
     else
       render json: @product.errors, status: :unprocessable_entity
     end

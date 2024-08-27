@@ -27,13 +27,23 @@ class Product < ApplicationRecord
   # Ensure media can accept a string or array of strings
   serialize :media, coder: JSON
 
-   # Soft delete
-   def flag
+  # Soft delete
+  def flag
     update(flagged: true)
   end
 
   # Restore flagged product
   def unflag
     update(flagged: false)
+  end
+
+  # Calculate the total quantity sold for the product
+  def quantity_sold
+    order_items.sum(:quantity)
+  end
+
+  # Calculate the average rating for the product
+  def mean_rating
+    reviews.average(:rating).to_f
   end
 end
