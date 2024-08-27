@@ -81,6 +81,8 @@ Rails.application.routes.draw do
     end
     resources :shipments
     resources :categories, only: [:index, :show]
+    get 'categories', to: 'categories#index'
+    get 'subcategories', to: 'subcategories#index'
     resources :analytics, only: [:index]
     resources :reviews, only: [:index, :show] do
       post 'reply', on: :member
