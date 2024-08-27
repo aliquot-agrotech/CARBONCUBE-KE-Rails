@@ -29,7 +29,9 @@ class Vendor::OrdersController < ApplicationController
       return render json: { error: 'Order not found' }, status: :not_found
     end
     
-    if params[:status] == 'dispatch'
+    allowed_statuses = %w[Processing Dispatched On-Transit Delivered] # List all valid statuses
+
+    if allowed_statuses.include?(params[:status])
       if @order.update(status: params[:status])
         render json: @order, include: ['order_items.product'], serializer: VendorOrderSerializer
       else

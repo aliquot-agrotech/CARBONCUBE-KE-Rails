@@ -74,7 +74,11 @@ Rails.application.routes.draw do
   namespace :vendor do
     post 'signup', to: 'vendors#create'
     resources :products
-    resources :orders
+    resources :orders do
+      member do
+        put 'update_status', to: 'orders#update_status' # Custom route for updating order status
+      end
+    end
     resources :shipments
     resources :categories, only: [:index, :show]
     resources :analytics, only: [:index]
