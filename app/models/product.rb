@@ -20,6 +20,9 @@ class Product < ApplicationRecord
   has_many :bookmarks, dependent: :destroy
   has_many :purchasers, through: :bookmarks
 
+  accepts_nested_attributes_for :category
+  accepts_nested_attributes_for :reviews
+
   validates :title, :description, :price, :quantity, :brand, :manufacturer, :package_length, :package_width, :package_height, :package_weight, presence: true
   validates :price, :quantity, :package_length, :package_width, :package_height, numericality: true
   validates :package_weight, numericality: { greater_than: 0 }

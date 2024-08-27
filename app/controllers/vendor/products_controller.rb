@@ -61,6 +61,12 @@ class Vendor::ProductsController < ApplicationController
   end
 
   def product_params
-    params.require(:product).permit(:title, :description, :media, :category_id, :price, :quantity, :brand, :manufacturer, :package_length, :package_width, :package_height, :package_weight)
+    params.require(:product).permit(
+      :title, :description, :media, :category_id, :subcategory_id, :price, 
+      :quantity, :brand, :manufacturer, :package_length, :package_width, 
+      :package_height, :package_weight, :flagged,
+      category: [:id, :name, :description],
+      reviews: [:id, :rating, :review, :created_at, :updated_at]
+    )
   end
 end
