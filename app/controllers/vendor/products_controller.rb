@@ -24,30 +24,10 @@ class Vendor::ProductsController < ApplicationController
   end
   
 
-  # def update
-  #   # Check if we're updating media separately
-  #   if params[:product][:media].present?
-  #     # Ensure media is an array
-  #     media = params[:product][:media].is_a?(Array) ? params[:product][:media] : [params[:product][:media]]
-      
-  #     # Merge the new media with existing media
-  #     @product.media = (@product.media || []) | media
-  #   end
-
-  #   if @product.update(product_params)
-  #     render json: @product.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating])
-  #   else
-  #     render json: @product.errors, status: :unprocessable_entity
-  #   end
-  # end
-
 
   def update
     if params[:product][:media].present?
-      # Ensure media is an array
       media = params[:product][:media].is_a?(Array) ? params[:product][:media] : [params[:product][:media]]
-      
-      # Replace the existing media with the provided media array
       @product.media = media
     end
   
@@ -57,6 +37,7 @@ class Vendor::ProductsController < ApplicationController
       render json: @product.errors, status: :unprocessable_entity
     end
   end
+  
   
 
 
@@ -98,10 +79,7 @@ class Vendor::ProductsController < ApplicationController
       :title, :description, :category_id, :subcategory_id, :price, 
       :quantity, :brand, :manufacturer, :package_length, :package_width, 
       :package_height, :package_weight, :flagged,
-      media: [], # Allow an array of media
-      category: [:id, :name, :description],
-      reviews: [:id, :rating, :review, :created_at, :updated_at]
+      media: [] # Allow an array of media
     )
   end
-
 end
