@@ -12,14 +12,17 @@ class Vendor::ProductsController < ApplicationController
   end
 
   def create
+    # Build the product with the permitted parameters
     @product = current_vendor.products.build(product_params)
-
+  
+    # Save the product and return appropriate JSON response
     if @product.save
       render json: @product.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating]), status: :created
     else
       render json: @product.errors, status: :unprocessable_entity
     end
   end
+  
 
   # def update
   #   # Check if we're updating media separately
@@ -64,12 +67,14 @@ class Vendor::ProductsController < ApplicationController
 
   private
 
+  # app/controllers/vendor/products_controller.rb
   def authenticate_vendor
     @current_user = VendorAuthorizeApiRequest.new(request.headers).result
     unless @current_user && @current_user.is_a?(Vendor)
-      render json: { error: 'Not Authorized' }, status: 401
+      render json: { error: 'Not Authorized' }, status: :unauthorized
     end
   end
+
 
   def current_vendor
     @current_user
