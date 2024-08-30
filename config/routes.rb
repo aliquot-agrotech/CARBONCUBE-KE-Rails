@@ -89,6 +89,8 @@ Rails.application.routes.draw do
     end      
     resource :profile, only: [:show, :update]
     resources :messages
+    get 'identify', to: 'vendors#identify'
+    resources :notifications
   end
 
   # Purchaser namespace for purchaser-specific functionality

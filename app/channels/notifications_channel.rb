@@ -1,7 +1,12 @@
 class NotificationsChannel < ApplicationCable::Channel
   def subscribed
-    # stream_from "some_channel"
-    stream_for Admin.find(params[:admin_id])
+    if params[:admin_id]
+      stream_for Admin.find(params[:admin_id])
+    elsif params[:vendor_id]
+      stream_for Vendor.find(params[:vendor_id])
+    elsif params[:purchaser_id]
+      stream_for Purchaser.find(params[:purchaser_id])
+    end
   end
 
   def unsubscribed
