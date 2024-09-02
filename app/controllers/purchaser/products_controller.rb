@@ -4,7 +4,10 @@ class Purchaser::ProductsController < ApplicationController
 
   # GET /purchaser/products
   def index
-    @products = Product.joins(:vendor).where(vendors: { blocked: false })
+    @products = Product.joins(:vendor)
+                      .where(vendors: { blocked: false })
+                      .where(flagged: false) # Exclude flagged products
+
     filter_by_category if params[:category_id].present?
 
     # Include associated media URLs
@@ -16,6 +19,7 @@ class Purchaser::ProductsController < ApplicationController
 
     render json: products_with_media
   end
+
 
 
   # GET /purchaser/products/:id
