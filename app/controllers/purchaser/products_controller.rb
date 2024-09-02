@@ -6,8 +6,17 @@ class Purchaser::ProductsController < ApplicationController
   def index
     @products = Product.joins(:vendor).where(vendors: { blocked: false })
     filter_by_category if params[:category_id].present?
-    render json: @products
+
+    # Include associated media URLs
+    products_with_media = @products.map do |product|
+      product.as_json.merge(
+        media_urls: product.media.map { |media| url_for(media) }
+      )
+    end
+
+    render json: products_with_media
   end
+
 
   # GET /purchaser/products/:id
   def show
