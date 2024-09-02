@@ -5,6 +5,7 @@ class Purchaser::ProductsController < ApplicationController
   # GET /purchaser/products
   def index
     @products = Product.joins(:vendor).where(vendors: { blocked: false })
+    filter_by_category if params[:category_id].present?
     render json: @products
   end
 
@@ -15,7 +16,7 @@ class Purchaser::ProductsController < ApplicationController
 
   # GET /purchaser/products/search
   def search
-    query = params[:query].present? ? params[:query] : ''
+    query = params[:query].to_s.strip
 
     @products = Product.joins(:vendor, :category)
                        .where(vendors: { blocked: false })
@@ -32,6 +33,10 @@ class Purchaser::ProductsController < ApplicationController
     @product = Product.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: 'Product not found' }, status: :not_found
+  end
+
+  def filter_by_category
+    @products = @products.where(category_id: params[:category_id])
   end
 
   def product_params

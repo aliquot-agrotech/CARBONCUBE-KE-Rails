@@ -98,17 +98,23 @@ Rails.application.routes.draw do
     post 'signup', to: 'purchasers#create'
 
     resource :profile, only: [:show, :update]
-    resources :bookmarks, only: [:index, :show, :create, :destroy]   
+    resources :bookmarks, only: [:index, :show, :create, :destroy]
+    resources :reviews
+    resources :messages
+    resources :categories
+    resources :notifications
+    resources :subcategories
+
     resources :cart_items, only: [:index, :create, :destroy] do
       collection do
         post :checkout
       end
     end
+    
     resources :products, only: [:index, :show] do
       collection do
         get 'search'
       end
-
       member do
         post 'add_to_cart'
       end
@@ -119,8 +125,6 @@ Rails.application.routes.draw do
         put 'deliver', to: 'orders#update_status_to_delivered'
       end
     end
-
-    resources :reviews
   end
 
   mount ActionCable.server => '/cable'
