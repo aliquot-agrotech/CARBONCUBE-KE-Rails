@@ -50,4 +50,7 @@ class Product < ApplicationRecord
     reviews.average(:rating).to_f
   end
   
+  def media_urls
+    media.map { |url| url }
+  end
 end

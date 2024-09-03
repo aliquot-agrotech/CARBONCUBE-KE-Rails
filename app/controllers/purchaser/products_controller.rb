@@ -10,14 +10,8 @@ class Purchaser::ProductsController < ApplicationController
 
     filter_by_category if params[:category_id].present?
 
-    # Include associated media URLs
-    products_with_media = @products.map do |product|
-      product.as_json.merge(
-        media_urls: product.media.map { |media| url_for(media) }
-      )
-    end
-
-    render json: products_with_media
+    # Render the products with associated media URLs using a serializer
+    render json: @products, each_serializer: ProductSerializer
   end
 
   # GET /purchaser/products/:id
