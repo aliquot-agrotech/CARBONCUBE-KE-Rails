@@ -49,4 +49,5 @@ class Product < ApplicationRecord
   def mean_rating
     reviews.average(:rating).to_f
   end
+  
 end

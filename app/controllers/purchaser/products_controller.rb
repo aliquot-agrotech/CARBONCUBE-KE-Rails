@@ -20,8 +20,6 @@ class Purchaser::ProductsController < ApplicationController
     render json: products_with_media
   end
 
-
-
   # GET /purchaser/products/:id
   def show
     render json: @product
