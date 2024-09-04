@@ -7,9 +7,7 @@ class Purchaser::ProductsController < ApplicationController
     @products = Product.joins(:vendor)
                       .where(vendors: { blocked: false })
                       .where(flagged: false) # Exclude flagged products
-
     filter_by_category if params[:category_id].present?
-
     # Render the products with associated media URLs using a serializer
     render json: @products, each_serializer: ProductSerializer
   end
@@ -22,12 +20,12 @@ class Purchaser::ProductsController < ApplicationController
   # GET /purchaser/products/search
   def search
     query = params[:query].to_s.strip
-
     @products = Product.joins(:vendor, :category)
-                       .where(vendors: { blocked: false })
-                       .where('products.title ILIKE ? OR products.description ILIKE ? OR categories.name ILIKE ?', 
+                      .where(vendors: { blocked: false })
+                      .where(flagged: false)  # Exclude flagged products
+                      .where('products.title ILIKE ? OR products.description ILIKE ? OR categories.name ILIKE ?', 
                               "%#{query}%", "%#{query}%", "%#{query}%")
-                       .distinct
+                      .distinct
 
     render json: @products
   end
