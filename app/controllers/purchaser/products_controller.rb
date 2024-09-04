@@ -8,7 +8,7 @@ class Purchaser::ProductsController < ApplicationController
                       .where(vendors: { blocked: false })
                       .where(flagged: false) # Exclude flagged products
     filter_by_category if params[:category_id].present?
-    # Render the products with associated media URLs using a serializer
+    filter_by_subcategory if params[:subcategory_id].present? # New subcategory filtering
     render json: @products, each_serializer: ProductSerializer
   end
 
@@ -20,12 +20,21 @@ class Purchaser::ProductsController < ApplicationController
   # GET /purchaser/products/search
   def search
     query = params[:query].to_s.strip
-    @products = Product.joins(:vendor, :category)
+    query_words = query.split(/\s+/)
+
+    @products = Product.joins(:vendor, :category, :subcategory)
                       .where(vendors: { blocked: false })
                       .where(flagged: false)  # Exclude flagged products
-                      .where('products.title ILIKE ? OR products.description ILIKE ? OR categories.name ILIKE ?', 
-                              "%#{query}%", "%#{query}%", "%#{query}%")
-                      .distinct
+                      
+    query_words.each do |word|
+      @products = @products.where('products.title ILIKE :word OR products.description ILIKE :word OR categories.name ILIKE :word OR subcategories.name ILIKE :word', 
+                                  word: "%#{word}%") # Include subcategory in search
+    end
+
+    filter_by_category if params[:category_id].present?
+    filter_by_subcategory if params[:subcategory_id].present? # Include subcategory filtering in search
+
+    @products = @products.distinct
 
     render json: @products
   end
@@ -40,6 +49,10 @@ class Purchaser::ProductsController < ApplicationController
 
   def filter_by_category
     @products = @products.where(category_id: params[:category_id])
+  end
+
+  def filter_by_subcategory
+    @products = @products.where(subcategory_id: params[:subcategory_id])
   end
 
   def product_params
