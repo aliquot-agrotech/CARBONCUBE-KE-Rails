@@ -122,7 +122,7 @@ Rails.application.routes.draw do
     
     resources :orders, only: [:index, :show, :create] do
       member do
-        put 'deliver', to: 'orders#update_status_to_delivered'
+        put  :update_status_to_delivered
       end
     end
   end

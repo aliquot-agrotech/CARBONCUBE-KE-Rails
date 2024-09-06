@@ -2,14 +2,15 @@ class Purchaser::OrdersController < ApplicationController
   before_action :authenticate_purchaser
 
   def index
-    @orders = current_purchaser.orders
-    render json: @orders
+    @orders = current_purchaser.orders.includes(order_items: [product: :vendor])
+    render json: @orders, each_serializer: OrderSerializer
   end
 
   def show
-    @order = current_purchaser.orders.find(params[:id])
-    render json: @order
+    @order = current_purchaser.orders.includes(order_items: [product: :vendor]).find(params[:id])
+    render json: @order, serializer: OrderSerializer
   end
+  
 
   def create
     if params[:mpesa_transaction_code].blank?
@@ -42,7 +43,7 @@ class Purchaser::OrdersController < ApplicationController
   def update_status_to_delivered
     @order = current_purchaser.orders.find(params[:id])
 
-    if @order.update(status: 'delivered')
+    if @order.update(status: 'Delivered')
       render json: @order
     else
       render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
