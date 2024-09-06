@@ -28,7 +28,7 @@
         @vendor.categories = Category.find(vendor_params[:category_ids])
       
         if @vendor.save
-          token = JsonWebToken.encode(vendor_id: @vendor.id, role: 'vendor')
+          token = JsonWebToken.encode(vendor_id: @vendor.id, role: 'Vendor')
           render json: { token: token, vendor: @vendor }, status: :created
         else
           render json: @vendor.errors, status: :unprocessable_entity
