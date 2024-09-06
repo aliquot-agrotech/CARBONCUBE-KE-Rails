@@ -125,6 +125,8 @@ Rails.application.routes.draw do
         put  :update_status_to_delivered
       end
     end
+
+    get 'identify', to: 'purchasers#identify'
   end
 
   mount ActionCable.server => '/cable'
