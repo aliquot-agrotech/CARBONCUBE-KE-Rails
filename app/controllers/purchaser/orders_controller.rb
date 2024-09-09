@@ -39,18 +39,32 @@ class Purchaser::OrdersController < ApplicationController
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
   end
   
-  # PUT /purchaser/orders/:id/deliver
   def update_status_to_delivered
-    @order = current_purchaser.orders.find(params[:id])
-
-    if @order.update(status: 'Delivered')
+    @order = Order.find(params[:id])
+    
+    if @order.update(order_params)
+      create_notification_for_order_status(@order)
       render json: @order
     else
       render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
     end
   end
-
+  
   private
+  
+  def create_notification_for_order_status(order)
+    Notification.create!(
+      order_id: order.id,
+      status: order.status,
+      notifiable: order.purchaser # or the user related to the order
+    )
+    
+    NotificationsChannel.broadcast_to(
+      order.purchaser,
+      notification: NotificationSerializer.new(notification).as_json
+    )
+  end
+  
 
   def authenticate_purchaser
     @current_user = PurchaserAuthorizeApiRequest.new(request.headers).result
