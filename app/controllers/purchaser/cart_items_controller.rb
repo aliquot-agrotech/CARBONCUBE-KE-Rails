@@ -22,6 +22,17 @@ class Purchaser::CartItemsController < ApplicationController
     end
   end
 
+  # Purchaser::CartItemsController
+  def update
+    cart_item = CartItem.find(params[:id])
+    if cart_item.update(quantity: params[:quantity])
+      render json: cart_item, status: :ok
+    else
+      render json: { error: 'Failed to update item' }, status: :unprocessable_entity
+    end
+  end
+
+
   # DELETE /purchaser/cart_items/:id
   def destroy
     @cart_item = current_purchaser.cart_items.find(params[:id])

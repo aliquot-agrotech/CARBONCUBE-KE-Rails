@@ -109,7 +109,7 @@ Rails.application.routes.draw do
     resources :notifications
     resources :subcategories
 
-    resources :cart_items, only: [:index, :create, :destroy] do
+    resources :cart_items, only: [:index, :create, :destroy, :update] do
       collection do
         post :checkout
       end
