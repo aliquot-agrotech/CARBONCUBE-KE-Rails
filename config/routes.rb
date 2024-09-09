@@ -98,7 +98,11 @@ Rails.application.routes.draw do
     post 'signup', to: 'purchasers#create'
 
     resource :profile, only: [:show, :update]
-    resources :bookmarks, only: [:index, :show, :create, :destroy]
+    resources :bookmarks, only: [:index, :create, :destroy] do
+      member do
+        post 'add_to_cart' # This route adds the product to the cart
+      end
+    end
     resources :reviews
     resources :messages
     resources :categories

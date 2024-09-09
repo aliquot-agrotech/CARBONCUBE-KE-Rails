@@ -53,4 +53,8 @@ class Product < ApplicationRecord
   def media_urls
     media.map { |url| url }
   end
+
+  def first_media_url
+    media[0] # Directly access the first URL in the media array
+  end  
 end

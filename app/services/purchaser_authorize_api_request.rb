@@ -39,6 +39,5 @@ class PurchaserAuthorizeApiRequest
     else
       raise ExceptionHandler::MissingToken, 'Missing token'
     end
-    nil
   end
 end
