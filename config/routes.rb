@@ -115,6 +115,8 @@ Rails.application.routes.draw do
       end
     end
     
+    post 'validate_coupon', to: 'promotions#validate_coupon'
+
     resources :products, only: [:index, :show] do
       collection do
         get 'search'
