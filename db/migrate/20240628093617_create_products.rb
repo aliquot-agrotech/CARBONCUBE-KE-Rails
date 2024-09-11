@@ -11,10 +11,11 @@ class CreateProducts < ActiveRecord::Migration[7.1]
       t.integer :quantity
       t.string :brand
       t.string :manufacturer
-      t.decimal :package_weight, precision: 10, scale: 2
-      t.decimal :package_length, precision: 10, scale: 2
-      t.decimal :package_width, precision: 10, scale: 2
-      t.decimal :package_height, precision: 10, scale: 2
+      t.decimal :item_weight, precision: 10, scale: 2
+      t.string :weight_unit, default: 'Grams' # Add weight unit field
+      t.decimal :item_length, precision: 10, scale: 2
+      t.decimal :item_width, precision: 10, scale: 2
+      t.decimal :item_height, precision: 10, scale: 2
       t.boolean :flagged, default: false 
       
       t.datetime :created_at, null: false, default: -> { 'CURRENT_TIMESTAMP' }

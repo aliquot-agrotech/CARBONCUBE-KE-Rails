@@ -12,8 +12,8 @@ require 'set'
 categories = [
   { name: 'Automotive Parts & Accessories', description: 'Spare parts for automobiles' },
   { name: 'Computer Parts & Accessories', description: 'Components and accessories for computers' },
-  { name: 'Filtration Solutions', description: 'Products related to filtration solutions' },
-  { name: 'Hardware Tools & Equipment', description: 'Various Hardware Tools' }
+  { name: 'Filtration', description: 'Products related to filtration solutions' },
+  { name: 'Hardware Tools', description: 'Various Hardware Tools' }
 ]
 
 
@@ -25,42 +25,41 @@ categories.each do |category_data|
 
   # Define subcategories based on category name
   case category.name
-  when 'Automotive Parts & Accessories'
-    subcategories = [
-      { name: 'Batteries' },
-      { name: 'Lubrication' },
-      { name: 'Mechanical Tools' },
-      { name: 'Spare Parts' },
-      { name: 'Tyres' },
-      { name: 'Others' }
-    ]
-  when 'Computer Parts & Accessories'
-    subcategories = [
-      { name: 'Cooling & Maintenance' },
-      { name: 'Internal Components' },
-      { name: 'Networking Equipment' },
-      { name: 'Peripherals' },
-      { name: 'Storage Solutions' },
-      { name: 'Others' }
-    ]
-  when 'Filtration Solutions'
-    subcategories = [
-      { name: 'Air Filters' },
-      { name: 'Fuel Filters' },
-      { name: 'Industrial Ventilation Filters' },
-      { name: 'Oil & Hydraulic Filters' },
-      { name: 'Specialised Filtration Solutions' },
-      { name: 'Others' }
-    ]
-  when 'Hardware Tools & Equipment'
-    subcategories = [
-      { name: 'Building Materials' },
-      { name: 'Cleaning Supplies' },
-      { name: 'Hand & Power Tools' },
-      { name: 'Power & Electrical Equipment' },
-      { name: 'Plumbing Supplies' },
-      { name: 'Others' }
-    ]
+    when 'Automotive Parts & Accessories'
+      subcategories = [
+        { name: 'Batteries' },
+        { name: 'Lubricants' },
+        { name: 'Accessories' },
+        { name: 'Spare Parts' },
+        { name: 'Tyres' },
+        { name: 'Others' }
+      ]
+    when 'Computer Parts & Accessories'
+      subcategories = [
+        { name: 'Cooling & Maintenance' },
+        { name: 'Internal Components' },
+        { name: 'Networking Equipment' },
+        { name: 'Peripherals' },
+        { name: 'Storage' },
+        { name: 'Accessories' },
+        { name: 'Others' }
+      ]
+    when 'Filtration'
+      subcategories = [
+        { name: 'Air Filters' },
+        { name: 'Fuel Filters' },
+        { name: 'Industrial Filters' },
+        { name: 'Oil & Hydraulic Filters' },
+        { name: 'Others' }
+      ]
+    when 'Hardware Tools'
+      subcategories = [
+        { name: 'Safety Wear' },
+        { name: 'Hand & Power Tools' },
+        { name: 'Power & Electrical Equipment' },
+        { name: 'Plumbing Supplies' },
+        { name: 'Others' }
+      ]
   end
 
   # Create subcategories
@@ -105,8 +104,16 @@ end
     used_phone_numbers.add(purchaser.phone_number)
     purchaser.location = Faker::Address.full_address
     purchaser.password = 'password'
+
+    # Additional fields
+    purchaser.birthdate = Faker::Date.birthday(min_age: 18, max_age: 65)
+    purchaser.zipcode = Faker::Address.zip_code
+    purchaser.city = Faker::Address.city
+    purchaser.gender = ['Male', 'Female'].sample
+    purchaser.profilepicture = Faker::Avatar.image
   end
 end
+
 
 
 # Seed vendors data
@@ -134,7 +141,7 @@ end
 
 
 category_products = {
-  'Filtration Solutions' => [
+  'Filtration' => [
   { title: 'Water Filter', description: 'High-quality water filter for home use' },
   { title: 'Air Purifier Filter', description: 'Filter for air purifiers' },
   { title: 'HEPA Filter', description: 'High-efficiency particulate air filter for air purification' },
@@ -401,7 +408,7 @@ category_products = {
   { title: 'Custom Filtration Solution', description: 'Tailored filtration solution to meet specific needs' }
 ],
 
-'Hardware Tools & Equipment' => [
+'Hardware Tools' => [
   { title: 'Hammer', description: 'Durable hammer for various tasks' },
   { title: 'Screwdriver Set', description: 'Set of screwdrivers with various heads' },
   { title: 'Adjustable Wrench', description: 'Versatile wrench for multiple applications' },
@@ -1480,10 +1487,11 @@ category_products.each do |category_name, products|
       product.quantity = Faker::Number.between(from: 30, to: 100)
       product.brand = Faker::Company.name
       product.manufacturer = Faker::Company.name
-      product.package_length = Faker::Number.between(from: 10, to: 50)
-      product.package_width = Faker::Number.between(from: 10, to: 50)
-      product.package_height = Faker::Number.between(from: 10, to: 50)
-      product.package_weight = Faker::Number.decimal(l_digits: 1, r_digits: 2)
+      product.item_length = Faker::Number.between(from: 10, to: 50)
+      product.item_width = Faker::Number.between(from: 10, to: 50)
+      product.item_height = Faker::Number.between(from: 10, to: 50)
+      product.item_weight = Faker::Number.decimal(l_digits: 1, r_digits: 2)
+      product.weight_unit = ['Grams', 'Kilograms'].sample
       product.media = [Faker::LoremFlickr.image, Faker::LoremFlickr.image]
       product.created_at = created_at
       product.updated_at = created_at

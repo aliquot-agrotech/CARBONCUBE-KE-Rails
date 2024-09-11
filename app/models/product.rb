@@ -23,9 +23,10 @@ class Product < ApplicationRecord
   accepts_nested_attributes_for :category
   accepts_nested_attributes_for :reviews
 
-  validates :title, :description, :price, :quantity, :brand, :manufacturer, :package_length, :package_width, :package_height, :package_weight, presence: true
-  validates :price, :quantity, :package_length, :package_width, :package_height, numericality: true
-  validates :package_weight, numericality: { greater_than: 0 }
+  validates :title, :description, :price, :quantity, :brand, :manufacturer, :item_length, :item_width, :item_height, :item_weight, presence: true
+  validates :price, :quantity, :item_length, :item_width, :item_height, numericality: true
+  validates :item_weight, numericality: { greater_than: 0 }
+  validates :weight_unit, inclusion: { in: ['Grams', 'Kilograms'] }
 
   # Ensure media can accept a string or array of strings
   serialize :media, coder: JSON

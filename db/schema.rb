@@ -144,7 +144,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
 
   create_table "orders", force: :cascade do |t|
     t.bigint "purchaser_id", null: false
-    t.string "status", default: "processing"
+    t.string "status", default: "Processing"
     t.decimal "total_amount"
     t.string "mpesa_transaction_code"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -163,10 +163,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
     t.integer "quantity"
     t.string "brand"
     t.string "manufacturer"
-    t.decimal "package_weight", precision: 10, scale: 2
-    t.decimal "package_length", precision: 10, scale: 2
-    t.decimal "package_width", precision: 10, scale: 2
-    t.decimal "package_height", precision: 10, scale: 2
+    t.decimal "item_weight", precision: 10, scale: 2
+    t.string "weight_unit", default: "Grams"
+    t.decimal "item_length", precision: 10, scale: 2
+    t.decimal "item_width", precision: 10, scale: 2
+    t.decimal "item_height", precision: 10, scale: 2
     t.boolean "flagged", default: false
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -194,7 +195,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
     t.string "password_digest"
     t.string "email"
     t.string "phone_number", limit: 10
+    t.datetime "birthdate"
+    t.string "zipcode"
+    t.string "city"
+    t.string "gender", default: "Male"
     t.string "location"
+    t.string "profilepicture"
     t.boolean "blocked", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

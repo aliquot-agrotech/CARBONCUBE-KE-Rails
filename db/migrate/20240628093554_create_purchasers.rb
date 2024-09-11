@@ -6,7 +6,12 @@ class CreatePurchasers < ActiveRecord::Migration[7.1]
       t.string :password_digest
       t.string :email
       t.string :phone_number, limit: 10
+      t.datetime :birthdate
+      t.string :zipcode
+      t.string :city
+      t.string :gender, default: 'Male'
       t.string :location
+      t.string :profilepicture
       t.boolean :blocked, default: false
 
       t.timestamps

@@ -56,6 +56,6 @@ class Purchaser::ProductsController < ApplicationController
   end
 
   def product_params
-    params.require(:product).permit(:title, :description, { media: [] }, :subcategory_id, :category_id, :vendor_id, :price, :quantity, :brand, :manufacturer, :package_length, :package_width, :package_height, :package_weight)
+    params.require(:product).permit(:title, :description, { media: [] }, :subcategory_id, :category_id, :vendor_id, :price, :quantity, :brand, :manufacturer, :item_length, :item_width, :item_height, :item_weight)
   end
 end

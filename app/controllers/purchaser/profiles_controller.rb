@@ -29,7 +29,8 @@ class Purchaser::ProfilesController < ApplicationController
     @current_user
   end
 
+  # Updated purchaser_params to permit top-level parameters
   def purchaser_params
-    params.require(:purchaser).permit(:fullname, :username, :phone_number, :email, :location)
+    params.permit(:fullname, :username, :phone_number, :email, :location, :zipcode, :fullname, :location)
   end
 end
