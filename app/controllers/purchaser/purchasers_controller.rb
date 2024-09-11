@@ -44,6 +44,7 @@ class Purchaser::PurchasersController < ApplicationController
   def set_purchaser
     @purchaser = Purchaser.find(params[:id])
   end
+  end
 
   def purchaser_params
     params.require(:purchaser).permit(:fullname, :username, :phone_number, :email, :location, :password, :password_confirmation)
