@@ -58,7 +58,7 @@ class Purchaser::OrdersController < ApplicationController
   def update_status_to_delivered
     @order = Order.find(params[:id])
     
-    if @order.update(order_params)
+    if @order.update(params.require(:order).permit(:status))
       create_notification_for_order_status(@order)
       render json: @order
     else

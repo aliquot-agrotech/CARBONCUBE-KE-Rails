@@ -7,19 +7,12 @@ class Notification < ApplicationRecord
   private
 
   def broadcast_notification
-    # Broadcast to the purchaser channel
-    if notifiable.is_a?(Purchaser)
-      PurchaserNotificationsChannel.broadcast_to(notifiable, notification: self.as_json)
-    end
-
-    # Broadcast to the vendor channel
-    if notifiable.is_a?(Vendor)
-      VendorNotificationsChannel.broadcast_to(notifiable, notification: self.as_json)
-    end
-
-    # Broadcast to the admin channel
-    if notifiable.is_a?(Admin)
-      AdminNotificationsChannel.broadcast_to(notifiable, notification: self.as_json)
+    if self.purchaser_id
+      NotificationsChannel.broadcast_to(Purchaser.find(self.purchaser_id), self)
+    elsif self.vendor_id
+      NotificationsChannel.broadcast_to(Vendor.find(self.vendor_id), self)
+    elsif self.admin_id
+      NotificationsChannel.broadcast_to(Admin.find(self.admin_id), self)
     end
   end
 end
