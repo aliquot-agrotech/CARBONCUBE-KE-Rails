@@ -23,7 +23,7 @@ class Vendor::ProfilesController < ApplicationController
   end
 
   def vendor_params
-    params.require(:vendor).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :business_registration_number, category_ids: [])
+    params.permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :business_registration_number, :gender, :city, :birthdate, :zipcode, :username)
   end
 
   def authenticate_vendor
