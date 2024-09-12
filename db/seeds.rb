@@ -25,7 +25,7 @@ categories.each do |category_data|
 
   # Define subcategories based on category name
   case category.name
-    when 'Automotive Parts & Accessories'
+  when 'Automotive Parts & Accessories'
       subcategories = [
         { name: 'Batteries' },
         { name: 'Lubricants' },
@@ -34,7 +34,7 @@ categories.each do |category_data|
         { name: 'Tyres' },
         { name: 'Others' }
       ]
-    when 'Computer Parts & Accessories'
+  when 'Computer Parts & Accessories'
       subcategories = [
         { name: 'Cooling & Maintenance' },
         { name: 'Internal Components' },
@@ -44,7 +44,7 @@ categories.each do |category_data|
         { name: 'Accessories' },
         { name: 'Others' }
       ]
-    when 'Filtration'
+  when 'Filtration'
       subcategories = [
         { name: 'Air Filters' },
         { name: 'Fuel Filters' },
@@ -52,7 +52,7 @@ categories.each do |category_data|
         { name: 'Oil & Hydraulic Filters' },
         { name: 'Others' }
       ]
-    when 'Hardware Tools'
+  when 'Hardware Tools'
       subcategories = [
         { name: 'Safety Wear' },
         { name: 'Hand & Power Tools' },
@@ -120,17 +120,25 @@ end
 100.times do
   Vendor.find_or_create_by(email: nil) do |vendor|
     fullname = Faker::Name.name
-    email = "#{fullname.downcase.gsub(/\s+/, "")}@example.com"
+    username = fullname.downcase.gsub(/\s+/, "") # remove spaces and lowercase the name
+    email = "#{username}@example.com"
 
     vendor.fullname = fullname
+    vendor.username = username
     vendor.email = email
     vendor.phone_number = generate_custom_phone_number(used_phone_numbers)
     used_phone_numbers.add(vendor.phone_number)
     vendor.enterprise_name = "#{Faker::Company.name} #{Faker::Company.suffix}"
+    vendor.description = Faker::Company.bs
     vendor.location = Faker::Address.full_address
     vendor.password = 'password'
     vendor.business_registration_number = "BN/#{Faker::Number.number(digits: 4)}/#{Faker::Number.number(digits: 6)}"
     vendor.category_ids = [Category.all.sample.id]
+    vendor.birthdate = Faker::Date.birthday(min_age: 18, max_age: 65)
+    vendor.zipcode = Faker::Address.zip_code
+    vendor.city = Faker::Address.city
+    vendor.gender = ['Male', 'Female'].sample
+    vendor.profilepicture = Faker::Avatar.image
   end
 end
 

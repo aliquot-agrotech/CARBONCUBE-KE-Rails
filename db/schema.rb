@@ -239,16 +239,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_12_125648) do
 
   create_table "vendors", force: :cascade do |t|
     t.string "fullname"
-    t.text "description"
+    t.string "username"
+    t.string "description"
     t.string "phone_number", limit: 10
     t.string "location"
-    t.decimal "total_revenue"
-    t.integer "total_orders"
-    t.jsonb "customer_demographics"
-    t.jsonb "analytics"
     t.string "business_registration_number"
     t.string "enterprise_name"
     t.string "email"
+    t.string "profilepicture"
+    t.datetime "birthdate"
+    t.string "zipcode"
+    t.string "city"
+    t.string "gender", default: "Male"
     t.boolean "blocked", default: false
     t.string "password_digest"
     t.datetime "created_at", null: false
