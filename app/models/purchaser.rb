@@ -13,11 +13,17 @@ class Purchaser < ApplicationRecord
   has_many :notifications, as: :notifiable
 
 
-  validates :username, presence: false, uniqueness: true
   validates :fullname, presence: true
   validates :email, presence: true, uniqueness: true
-  validates :phone_number, presence: true
+  validates :username, presence: true, uniqueness: true
+  validates :password, presence: true, length: { minimum: 6 }, if: :password_required?
+  validates :phone_number, presence: true, length: { is: 10 }, format: { with: /\A\d{10}\z/ }
+  validates :birthdate, presence: true
+  validates :zipcode, presence: true
+  validates :city, presence: true
+  validates :gender, inclusion: { in: %w(Male Female Other) }
   validates :location, presence: true
+
   attribute :cart_total_price, :decimal, default: 0
 
 
@@ -32,4 +38,9 @@ class Purchaser < ApplicationRecord
   def bookmarked?(product)
     bookmarked_products.include?(product)
   end
+
+  def password_required?
+    new_record? || password.present?
+  end
+
 end

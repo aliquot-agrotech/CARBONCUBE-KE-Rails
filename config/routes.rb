@@ -94,7 +94,7 @@ Rails.application.routes.draw do
   end
 
   # Purchaser namespace for purchaser-specific functionality
-  namespace :purchaser, path: 'purchaser' do
+  namespace :purchaser, defaults:{ format: :json}, path: 'purchaser' do
     post 'signup', to: 'purchasers#create'
 
     resource :profile, only: [:show, :update]

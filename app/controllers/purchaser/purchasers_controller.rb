@@ -1,6 +1,7 @@
 class Purchaser::PurchasersController < ApplicationController
   before_action :set_purchaser, only: [:show, :update]
   before_action :authenticate_purchaser, only: [:identify, :show, :update]
+  before_action :set_default_format
 
   # GET /purchaser/identify
   def identify
@@ -12,18 +13,24 @@ class Purchaser::PurchasersController < ApplicationController
     render json: current_purchaser
   end
 
-  # POST /purchasers
   def create
+    logger.debug "Purchaser Params Received: #{purchaser_params.inspect}"
+    
     @purchaser = Purchaser.new(purchaser_params)
     
-    if @purchaser.save
+    if Purchaser.exists?(email: @purchaser.email)
+      render json: { errors: ['Email has already been taken'] }, status: :unprocessable_entity
+    elsif Purchaser.exists?(username: @purchaser.username)
+      render json: { errors: ['Username has already been taken'] }, status: :unprocessable_entity
+    elsif @purchaser.save
       token = JsonWebToken.encode(purchaser_id: @purchaser.id, role: 'Purchaser')
       render json: { token: token, purchaser: @purchaser }, status: :created
     else
+      logger.debug "Purchaser Errors: #{@purchaser.errors.full_messages}"
       render json: { errors: @purchaser.errors.full_messages }, status: :unprocessable_entity
     end
   end
-
+  
   # PATCH/PUT /purchasers/:id
   def update
     if current_purchaser.update(purchaser_params)
@@ -46,7 +53,12 @@ class Purchaser::PurchasersController < ApplicationController
   end
 
   def purchaser_params
-    params.require(:purchaser).permit(:fullname, :username, :phone_number, :email, :location, :password, :password_confirmation)
+    params.require(:purchaser).permit(:fullname, :username, :email, :phone_number, :password, :password_confirmation, :birthdate, :zipcode, :city, :gender, :location)
+  end
+  
+
+  def set_default_format
+    request.format = :json unless params[:format]
   end
 
   def authenticate_purchaser
