@@ -135,6 +135,6 @@ Rails.application.routes.draw do
 
     get 'identify', to: 'purchasers#identify'
   end
-
+  resources :banners, only: [:index]
   mount ActionCable.server => '/cable'
 end
