@@ -65,6 +65,7 @@ Rails.application.routes.draw do
     resources :reviews
     resources :abouts
     resources :faqs
+    resources :banners
     resources :promotions, except: [:new, :edit]
     get 'identify', to: 'admins#identify'
     resources :notifications, only: [:index, :create]

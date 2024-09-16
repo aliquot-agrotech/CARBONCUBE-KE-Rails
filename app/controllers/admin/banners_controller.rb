@@ -1,52 +1,44 @@
-module Admin
-  class BannersController < ApplicationController
-    before_action :set_banner, only: [:show, :edit, :update, :destroy]
+class Admin::BannersController < ApplicationController
+  before_action :set_banner, only: [:show, :update, :destroy]
 
-    def index
-      @banners = Banner.all
+  def index
+    @banners = Banner.all
+    render json: @banners
+  end
+
+  def show
+    render json: @banner
+  end
+
+  def create
+    @banner = Banner.new(banner_params)
+    if @banner.save
+      render json: @banner, status: :created
+    else
+      render json: @banner.errors, status: :unprocessable_entity
     end
+  end
 
-    def show
+  def update
+    if @banner.update(banner_params)
       render json: @banner
+    else
+      render json: @banner.errors, status: :unprocessable_entity
     end
+  end
 
-    def new
-      @banner = Banner.new
-    end
+  def destroy
+    @banner.destroy
+    head :no_content
+  end
 
-    def create
-      @banner = Banner.new(banner_params)
-      if @banner.save
-        redirect_to admin_banners_path, notice: 'Banner was successfully created.'
-      else
-        render :new
-      end
-    end
+  private
 
-    def edit
-    end
+  def set_banner
+    @banner = Banner.find(params[:id])
+  end
 
-    def update
-      if @banner.update(banner_params)
-        redirect_to admin_banners_path, notice: 'Banner was successfully updated.'
-      else
-        render :edit
-      end
-    end
-
-    def destroy
-      @banner.destroy
-      redirect_to admin_banners_path, notice: 'Banner was successfully deleted.'
-    end
-
-    private
-
-    def set_banner
-      @banner = Banner.find(params[:id])
-    end
-
-    def banner_params
-      params.require(:banner).permit(:image_url)
-    end
+  def banner_params
+    params.require(:banner).permit(:image_url)
   end
 end
