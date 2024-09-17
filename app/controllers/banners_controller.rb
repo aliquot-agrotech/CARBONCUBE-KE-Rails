@@ -1,5 +1,5 @@
 class BannersController < ApplicationController
-  skip_before_action :authenticate_user! # Skip authentication for this action
+  # skip_before_action :authenticate_user! # Skip authentication for this action
 
   def index
     @banners = Banner.all
