@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
   post 'auth/login', to: 'authentication#login'
+  resources :banners, only: [:index]
 
   # Admin namespace for admin-specific functionality
   namespace :admin do
@@ -135,6 +136,5 @@ Rails.application.routes.draw do
 
     get 'identify', to: 'purchasers#identify'
   end
-  resources :banners, only: [:index]
   mount ActionCable.server => '/cable'
 end
