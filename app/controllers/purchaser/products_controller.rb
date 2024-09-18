@@ -39,6 +39,23 @@ class Purchaser::ProductsController < ApplicationController
     render json: @products
   end
 
+  # GET /purchaser/products/:id/related
+  def related
+    product = Product.find(params[:id])
+    
+    # Find products from the same subcategory
+    related_products = Product.where(subcategory: product.subcategory)
+
+    # Find products that share words in the title
+    title_words = product.title.split(' ')
+    related_by_title = Product.where('title ILIKE ANY (array[?])', title_words.map { |word| "%#{word}%" })
+
+    # Combine results, excluding the original product
+    related_products = related_products.or(related_by_title).where.not(id: product.id).distinct
+
+    render json: related_products
+  end
+
   private
 
   def set_product
