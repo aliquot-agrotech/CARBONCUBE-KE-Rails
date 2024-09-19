@@ -33,29 +33,6 @@ class Vendor::OrdersController < ApplicationController
 
     if allowed_statuses.include?(params[:status])
         if @order.update(status: params[:status])
-
-            # Create a notification for the vendor
-            Notification.create!(
-                order_id: @order.id,
-                status: params[:status],
-                notifiable: current_vendor
-            )
-
-            # Create a notification for the purchaser
-            Notification.create!(
-                order_id: @order.id,
-                status: params[:status],
-                notifiable: @order.purchaser # assuming `purchaser` is an association on the Order model
-            )
-
-            # Create a notification for the admin
-            admin = Admin.first # assuming you have a way to identify which admin should be notified
-            Notification.create!(
-                order_id: @order.id,
-                status: params[:status],
-                notifiable: admin
-            )
-
             render json: @order, include: ['order_items.product'], serializer: VendorOrderSerializer
         else
             render json: { error: 'Failed to update order status' }, status: :unprocessable_entity
@@ -64,9 +41,6 @@ class Vendor::OrdersController < ApplicationController
         render json: { error: 'Invalid status update' }, status: :forbidden
     end
   end
-
-
-
 
   private
 

@@ -10,7 +10,6 @@ class Purchaser::OrdersController < ApplicationController
     @order = current_purchaser.orders.includes(order_items: [product: :vendor]).find(params[:id])
     render json: @order, serializer: OrderSerializer
   end
-  
 
   def create
     if params[:mpesa_transaction_code].blank?
@@ -53,34 +52,18 @@ class Purchaser::OrdersController < ApplicationController
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
   end
-  
-  
+
   def update_status_to_delivered
     @order = Order.find(params[:id])
-    
+
     if @order.update(params.require(:order).permit(:status))
-      create_notification_for_order_status(@order)
       render json: @order
     else
       render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
     end
   end
-  
+
   private
-  
-  def create_notification_for_order_status(order)
-    Notification.create!(
-      order_id: order.id,
-      status: order.status,
-      notifiable: order.purchaser # or the user related to the order
-    )
-    
-    NotificationsChannel.broadcast_to(
-      order.purchaser,
-      notification: NotificationSerializer.new(notification).as_json
-    )
-  end
-  
 
   def authenticate_purchaser
     @current_user = PurchaserAuthorizeApiRequest.new(request.headers).result

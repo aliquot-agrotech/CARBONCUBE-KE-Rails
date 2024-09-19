@@ -1,4 +1,3 @@
-# app/controllers/admin/orders_controller.rb
 class Admin::OrdersController < ApplicationController
   before_action :authenticate_admin
   before_action :set_order, only: [:show, :update_status_to_on_transit, :destroy]
@@ -28,7 +27,6 @@ class Admin::OrdersController < ApplicationController
     )
   end
   
-  
   def show
     render json: @order.as_json(
       include: {
@@ -48,9 +46,6 @@ class Admin::OrdersController < ApplicationController
   # PUT /admin/orders/:id/on-transit
   def update_status_to_on_transit
     if @order.update(status: params[:status])
-      # Notify the admin about the order status change
-      notify_admin(@order)
-
       render json: @order.as_json(
         include: {
           purchaser: { only: [:fullname] },
@@ -78,15 +73,6 @@ class Admin::OrdersController < ApplicationController
 
   def set_order
     @order = Order.find(params[:id])
-  end
-
-  def notify_admin(order)
-    Notification.create!(
-      notifiable: current_admin,
-      order_id: order.id,
-      status: order.status,
-      created_at: Time.now
-    )
   end
 
   def order_params
