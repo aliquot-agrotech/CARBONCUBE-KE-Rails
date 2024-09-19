@@ -14,8 +14,10 @@ class Purchaser::ProductsController < ApplicationController
 
   # GET /purchaser/products/:id
   def show
-    render json: @product
+    @product = Product.find(params[:id])
+    render json: @product, serializer: ProductSerializer
   end
+  
 
   # GET /purchaser/products/search
   def search
