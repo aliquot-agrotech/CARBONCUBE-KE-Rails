@@ -1,6 +1,6 @@
 # app/serializers/product_serializer.rb
 class ProductSerializer < ActiveModel::Serializer
-  attributes :id, :vendor_id, :category_id, :subcategory_id, :category_name, :subcategory_name, :title, :description, :price, :quantity, :brand, :manufacturer, :item_weight, :item_length, :item_width, :item_height, :media_urls, :first_media_url, :mean_rating
+  attributes :id, :vendor_id, :category_id, :subcategory_id, :category_name, :subcategory_name, :title, :description, :price, :quantity, :brand, :manufacturer, :item_weight, :item_length, :item_width, :item_height, :media_urls, :first_media_url, :mean_rating, :review_count
 
   has_one :vendor, serializer: VendorSerializer
   has_many :reviews
@@ -24,6 +24,10 @@ class ProductSerializer < ActiveModel::Serializer
 
   def mean_rating
     object.reviews.average(:rating).to_f
+  end
+
+  def review_count
+    object.reviews.count
   end
 end
   
