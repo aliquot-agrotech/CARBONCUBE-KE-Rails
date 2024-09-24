@@ -51,14 +51,23 @@ class Vendor::AnalyticsController < ApplicationController
 
   def fetch_best_selling_products
     best_selling_products = current_vendor.products.joins(:order_items)
-                                  .select('products.id AS product_id, products.title AS product_title, products.price AS product_price, SUM(order_items.quantity) AS total_sold')
+                                  .select('products.id AS product_id, products.title AS product_title, products.price AS product_price, SUM(order_items.quantity) AS total_sold, products.media AS media')
                                   .group('products.id')
                                   .order('total_sold DESC')
                                   .limit(3)
-                                  .map { |record| { product_id: record.product_id, product_title: record.product_title, product_price: record.product_price, total_sold: record.total_sold } }
-    
+                                  .map { |record| 
+                                    {
+                                      product_id: record.product_id,
+                                      product_title: record.product_title,
+                                      product_price: record.product_price,
+                                      total_sold: record.total_sold,
+                                      media: record.media # Add media here
+                                    }
+                                  }
+  
     best_selling_products
   end
+  
 
   def authenticate_vendor
     @current_user = VendorAuthorizeApiRequest.new(request.headers).result
