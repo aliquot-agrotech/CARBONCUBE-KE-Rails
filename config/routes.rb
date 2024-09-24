@@ -89,7 +89,9 @@ Rails.application.routes.draw do
     resources :reviews, only: [:index, :show] do
       post 'reply', on: :member
     end      
-    resource :profile, only: [:show, :update]
+    resource :profile, only: [:show, :update] do
+      post 'change-password', to: 'profiles#change_password'
+    end
     resources :messages
     get 'identify', to: 'vendors#identify'
     resources :notifications
