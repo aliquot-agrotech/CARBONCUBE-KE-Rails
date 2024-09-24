@@ -99,7 +99,9 @@ Rails.application.routes.draw do
   namespace :purchaser, defaults:{ format: :json}, path: 'purchaser' do
     post 'signup', to: 'purchasers#create'
 
-    resource :profile, only: [:show, :update]
+    resource :profile, only: [:show, :update] do
+      post 'change-password', to: 'profiles#change_password'
+    end
     resources :bookmarks, only: [:index, :create, :destroy] do
       member do
         post 'add_to_cart' # This route adds the product to the cart
