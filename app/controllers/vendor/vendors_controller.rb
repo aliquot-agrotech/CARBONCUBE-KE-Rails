@@ -23,17 +23,21 @@
   
       # POST /vendor/signup
       def create
-        vendor_params = vendor_params_with_categories
-        @vendor = Vendor.new(vendor_params.except(:category_ids))
-        @vendor.categories = Category.find(vendor_params[:category_ids])
+        @vendor = Vendor.new(vendor_params)
+      
+        # Log the parameters for debugging
+        puts vendor_params.inspect
       
         if @vendor.save
           token = JsonWebToken.encode(vendor_id: @vendor.id, role: 'Vendor')
           render json: { token: token, vendor: @vendor }, status: :created
         else
+          # Log errors if save fails
+          puts @vendor.errors.full_messages.inspect
           render json: @vendor.errors, status: :unprocessable_entity
         end
-      end
+      end      
+      
   
       private
   
@@ -42,7 +46,7 @@
       end
   
       def vendor_params
-        params.require(:vendor).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :business_registration_number, category_ids: [])
+        params.require(:vendor).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :username, :birthdate, :zipcode, :city, :gender, :description, :business_registration_number, category_ids: [])
       end
     
       def vendor_params_with_categories
