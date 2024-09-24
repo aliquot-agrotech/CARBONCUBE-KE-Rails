@@ -10,12 +10,19 @@ class Admin::AnalyticsController < ApplicationController
 
     # Top 6 Best Selling Products Overall
     best_selling_products = Product.joins(:order_items)
-                                  .select('products.id AS product_id, products.title AS product_title, products.price AS product_price, SUM(order_items.quantity) AS total_sold')
-                                  .group('products.id')
-                                  .order('total_sold DESC')
-                                  .limit(6)
-                                  .map { |record| { product_id: record.product_id, product_title: record.product_title, product_price: record.product_price, total_sold: record.total_sold } }
-
+                                .select('products.id AS product_id, products.title AS product_title, products.price AS product_price, SUM(order_items.quantity) AS total_sold, products.media AS media')
+                                .group('products.id')
+                                .order('total_sold DESC')
+                                .limit(6)
+                                .map { |record| 
+                                  {
+                                    product_id: record.product_id,
+                                    product_title: record.product_title,
+                                    product_price: record.product_price,
+                                    total_sold: record.total_sold,
+                                    media: record.media # Add media here
+                                  }
+                                }
 
     # Total Products Sold Out
     total_products_sold_out = Product.joins(:order_items)
