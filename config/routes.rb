@@ -7,6 +7,10 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   post 'auth/login', to: 'authentication#login'
   resources :banners, only: [:index]
+  resources :products, only: [] do
+    get 'reviews', to: 'reviews#index', on: :member
+  end
+  
 
   # Admin namespace for admin-specific functionality
   namespace :admin do
