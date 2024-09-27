@@ -1530,7 +1530,7 @@ date_ranges = {
 # Generate 500 order data hashes
 order_data = 500.times.map do
   purchaser = Purchaser.all.sample
-  status = ['Processing', 'Dispatched', 'On-Transit', 'Delivered'].sample
+  status = ['Processing', 'Dispatched', 'On-Transit', 'Delivered', 'Cancelled', 'Returned'].sample
   total_amount = Faker::Commerce.price(range: 50..500)
   def generate_mpesa_transaction_code
     alpha_part = Faker::Alphanumeric.unique.alpha(number: 7).upcase # Generate 7 alphabetic characters
