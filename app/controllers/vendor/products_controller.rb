@@ -78,7 +78,7 @@ class Vendor::ProductsController < ApplicationController
     params.require(:product).permit(
       :title, :description, :category_id, :subcategory_id, :price, 
       :quantity, :brand, :manufacturer, :item_length, :item_width, 
-      :item_height, :item_weight, :flagged,
+      :item_height, :item_weight, :weight_unit, :flagged,
       media: [] # Allow an array of media
     )
   end

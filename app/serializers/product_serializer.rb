@@ -1,6 +1,6 @@
 # app/serializers/product_serializer.rb
 class ProductSerializer < ActiveModel::Serializer
-  attributes :id, :vendor_id, :category_id, :subcategory_id, :category_name, :subcategory_name, :title, :description, :price, :quantity, :brand, :manufacturer, :item_weight, :item_length, :item_width, :item_height, :media_urls, :first_media_url, :mean_rating, :review_count
+  attributes :id, :vendor_id, :category_id, :subcategory_id, :category_name, :subcategory_name, :title, :description, :price, :quantity, :brand, :manufacturer, :item_weight, :weight_unit, :item_length, :item_width, :item_height, :media_urls, :first_media_url, :mean_rating, :review_count
 
   has_one :vendor, serializer: VendorSerializer
   has_many :reviews
