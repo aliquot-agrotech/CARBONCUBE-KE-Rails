@@ -28,7 +28,7 @@ Rails.application.routes.draw do
 
     resources :orders, only: [:index, :show, :destroy] do
       member do
-        put 'on-transit', to: 'orders#update_status_to_on_transit'
+        put 'update-status', to: 'orders#update_status'
       end
     end
     

@@ -1,6 +1,6 @@
 class Admin::OrdersController < ApplicationController
   before_action :authenticate_admin
-  before_action :set_order, only: [:show, :update_status_to_on_transit, :destroy]
+  before_action :set_order, only: [:show, :update_status, :destroy]
 
   # app/controllers/admin/orders_controller.rb
   def index
@@ -43,8 +43,8 @@ class Admin::OrdersController < ApplicationController
     )
   end
 
-  # PUT /admin/orders/:id/on-transit
-  def update_status_to_on_transit
+  # PUT /admin/orders/:id/update-status
+  def update_status
     if @order.update(status: params[:status])
       render json: @order.as_json(
         include: {
