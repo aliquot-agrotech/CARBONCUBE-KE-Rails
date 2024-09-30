@@ -26,8 +26,6 @@ class Order < ApplicationRecord
   end
 
   def calculate_total_amount
-    self.total_amount = order_items.sum do |item|
-      item.product ? item.quantity * item.product.price : 0
-    end
+    self.total_amount = total_price + processing_fee.to_f + delivery_fee.to_f
   end
 end
