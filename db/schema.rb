@@ -152,6 +152,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_16_085516) do
     t.bigint "purchaser_id", null: false
     t.string "status", default: "Processing"
     t.decimal "total_amount"
+    t.decimal "processing_fee"
+    t.decimal "delivery_fee"
     t.string "mpesa_transaction_code"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false

@@ -4,6 +4,8 @@ class CreateOrders < ActiveRecord::Migration[7.1]
       t.references :purchaser, null: false, foreign_key: true
       t.string :status, default: 'Processing'  # Default status is 'processing'
       t.decimal :total_amount
+      t.decimal :processing_fee  # New column for processing fee
+      t.decimal :delivery_fee    # New column for delivery fee
       t.string :mpesa_transaction_code
 
       t.datetime :created_at, null: false, default: -> { 'CURRENT_TIMESTAMP' }
