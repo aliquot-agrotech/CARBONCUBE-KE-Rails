@@ -573,11 +573,18 @@ category_products.each do |category_name, products|
   
   # Fetch all subcategories for this category
   subcategories = category.subcategories
+  subcategory_count = subcategories.count
+
+  # Initialize a counter to track subcategory assignment
+  subcategory_index = 0
   
   products.each do |product_data|
-    # Randomly assign a subcategory
-    random_subcategory = subcategories.sample
+    # Assign the subcategory in a round-robin manner
+    assigned_subcategory = subcategories[subcategory_index]
     
+    # Update the index, looping back to the start if necessary
+    subcategory_index = (subcategory_index + 1) % subcategory_count
+
     # Find or create the product
     product = Product.find_or_initialize_by(title: product_data[:title])
     
@@ -587,7 +594,7 @@ category_products.each do |category_name, products|
       
       product.description = product_data[:description]
       product.category_id = category.id
-      product.subcategory_id = random_subcategory.id if random_subcategory.present?
+      product.subcategory_id = assigned_subcategory.id if assigned_subcategory.present?
       product.vendor_id = Vendor.all.sample.id
       product.price = Faker::Commerce.price(range: 200..10000)
       product.quantity = Faker::Number.between(from: 30, to: 100)
@@ -605,9 +612,6 @@ category_products.each do |category_name, products|
     end
   end
 end
-
-
-
 
 # Define the date range for each month
 date_ranges = {
