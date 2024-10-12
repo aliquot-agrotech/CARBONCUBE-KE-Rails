@@ -52,7 +52,8 @@ COPY --from=build /rails /rails
 
 # Run and own only the runtime files as a non-root user for security
 RUN useradd rails --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
+    chown -R rails:rails /rails
+
 USER rails:rails
 
 # Set DATABASE_URL for ActiveRecord connection
@@ -62,6 +63,7 @@ ENV DATABASE_URL="postgresql://carbonecomrails_development_owner:rjW5XJgH4hKv@ep
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start the server by default, this can be overwritten at runtime
-# RUN bundle exec rake setup:all
+# Explicitly run database setup and migration, then start the Rails server
+CMD ["sh", "-c", "bundle exec rake db:prepare && ./bin/rails server"]
+
 EXPOSE 3000
-CMD ["sh", "-c", "bundle exec rake setup:all && ./bin/rails server"]
