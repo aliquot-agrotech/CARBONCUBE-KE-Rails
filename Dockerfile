@@ -9,9 +9,6 @@ WORKDIR /rails
 
 # Set production environment
 ENV RAILS_ENV="production" \
-    BUNDLE_DEPLOYMENT="1" \
-    BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development" \
     PGHOST="ep-proud-cell-a20vvicd-pooler.eu-central-1.aws.neon.tech" \
     PGDATABASE="carbonecomrails_development" \
     PGUSER="carbonecomrails_development_owner" \
