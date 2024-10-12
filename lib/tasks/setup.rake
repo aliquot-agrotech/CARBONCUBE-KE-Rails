@@ -15,12 +15,12 @@ namespace :setup do
     ActiveRecord::Base.establish_connection(connection_string)
   end
 
-  task :db_setup => [:db_create, :db_migrate, :db_seed]
+  task :db_setup => [ :db_migrate, :db_seed]
 
-  task :db_create do
-    puts 'Creating database...'
-    system('rails db:create') || raise('Database creation failed')
-  end
+  # task :db_create do
+  #   puts 'Creating database...'
+  #   system('rails db:create') || raise('Database creation failed')
+  # end
 
   task :db_migrate do
     begin
