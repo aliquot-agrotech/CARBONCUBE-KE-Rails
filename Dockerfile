@@ -11,8 +11,11 @@ WORKDIR /rails
 ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
-
+    BUNDLE_WITHOUT="development" \
+    PGHOST="ep-proud-cell-a20vvicd-pooler.eu-central-1.aws.neon.tech" \
+    PGDATABASE="carbonecomrails_development" \
+    PGUSER="carbonecomrails_development_owner" \
+    PGPASSWORD="rjW5XJgH4hKv"
 
 # Throw-away build stage to reduce size of final image
 FROM base as build
@@ -38,7 +41,6 @@ RUN bundle exec bootsnap precompile app/ lib/
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
-
 # Final stage for app image
 FROM base
 
@@ -56,11 +58,13 @@ RUN useradd rails --create-home --shell /bin/bash && \
     chown -R rails:rails db log storage tmp
 USER rails:rails
 
+# Set DATABASE_URL for ActiveRecord connection
+ENV DATABASE_URL="postgresql://carbonecomrails_development_owner:rjW5XJgH4hKv@ep-proud-cell-a20vvicd-pooler.eu-central-1.aws.neon.tech/carbonecomrails_development?sslmode=require"
+
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start the server by default, this can be overwritten at runtime
-
-RUN rake setup:all
+RUN bundle exec rake setup:all
 EXPOSE 3000
 CMD ["./bin/rails", "server"]

@@ -7,27 +7,19 @@ namespace :setup do
 
   task :bundle_install do
     puts 'Running bundle install...'
-    system('bundle install')
+    system('bundle install') || raise('Bundle install failed')
   end
 
   def establish_connection
-    db_config = {
-      adapter:  'postgresql',
-      host:     ENV['DB_HOST'] || 'localhost',
-      username: ENV['DB_USERNAME'] || 'postgres',
-      password: ENV['DB_PASSWORD'] || ENV['DEVELOPMENT_DATABASE_PASSWORD'],
-      database: ENV['DB_NAME'] || 'carbonecomrails_development',
-      port:     ENV['DB_PORT'] || 5432
-    }
-    # puts "Connecting with config: #{db_config.inspect}"
-    ActiveRecord::Base.establish_connection(db_config)
+    connection_string = ENV['DATABASE_URL'] || "postgresql://#{ENV['PGUSER']}:#{ENV['PGPASSWORD']}@#{ENV['PGHOST']}/#{ENV['PGDATABASE']}?sslmode=require"
+    ActiveRecord::Base.establish_connection(connection_string)
   end
 
   task :db_setup => [:db_create, :db_migrate, :db_seed]
 
   task :db_create do
     puts 'Creating database...'
-    system('rails db:create')
+    system('rails db:create') || raise('Database creation failed')
   end
 
   task :db_migrate do
@@ -35,7 +27,7 @@ namespace :setup do
       establish_connection
       if ActiveRecord::Base.connection
         puts 'Running migrations...'
-        system('rails db:migrate')
+        system('rails db:migrate') || raise('Migration failed')
       end
     rescue ActiveRecord::NoDatabaseError
       puts 'Database does not exist. Skipping migrations...'
@@ -49,7 +41,7 @@ namespace :setup do
       establish_connection
       if ActiveRecord::Base.connection
         puts 'Seeding data for the database...'
-        system('rails db:seed')
+        system('rails db:seed') || raise('Seeding failed')
       end
     rescue ActiveRecord::NoDatabaseError
       puts 'Database does not exist. Skipping seeding...'
@@ -57,7 +49,4 @@ namespace :setup do
       puts "Connection failed: #{e.message}"
     end
   end
-
-  
 end
-
