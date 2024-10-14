@@ -1,21 +1,3 @@
-default: &default
-  url: <%= ENV['DATABASE_URL'] %>
-  adapter: postgresql
-  encoding: unicode
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: <%= ENV['PGUSER'] || 'postgres' %>
-  host: <%= ENV['PGHOST'] || 'localhost' %>
-  port: <%= ENV['DB_PORT'] || 5432 %>
-  password: <%= ENV['PGPASSWORD'] %>
-
-development:
-  <<: *default
-  database: carbonecomrails_development
-
-test:
-  <<: *default
-  database: carbonecomrails_test
-
 production:
   <<: *default
   url: <%= ENV['DATABASE_URL'] %>
