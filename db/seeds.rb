@@ -91,7 +91,7 @@ def generate_custom_phone_number(used_phone_numbers)
 end
 
 # Seed purchasers data
-100.times do
+50.times do
   Purchaser.find_or_create_by(email: nil) do |purchaser|
     fullname = Faker::Name.name
     username = fullname.downcase.gsub(/\s+/, "") # remove spaces and lowercase the name
@@ -117,7 +117,7 @@ end
 
 
 # Seed vendors data
-100.times do
+50.times do
   Vendor.find_or_create_by(email: nil) do |vendor|
     fullname = Faker::Name.name
     username = fullname.downcase.gsub(/\s+/, "") # remove spaces and lowercase the name
@@ -713,7 +713,7 @@ end
 
 # Generate 10 reviews for each product
 Product.all.each do |product|
-  10.times do
+  5.times do
     purchaser = Purchaser.all.sample
     rating = Faker::Number.between(from: 1, to: 5)
     review_text = Faker::Lorem.sentence(word_count: Faker::Number.between(from: 5, to: 15))
@@ -732,7 +732,7 @@ end
 Faq.delete_all
 
 # Create FAQs
-100.times do
+50.times do
   Faq.create!(
     question: Faker::Lorem.sentence(word_count: 6),
     answer: Faker::Lorem.paragraph(sentence_count: 2)
@@ -777,7 +777,7 @@ end
 
 # Generate unique messages for each conversation
 def create_messages(conversation, sender, receiver)
-  20.times do |i|
+  10.times do |i|
     Message.create!(
       conversation: conversation,
       sender: sender,
@@ -824,7 +824,7 @@ def generate_coupon_code(discount_percentage)
 end
 
 # Create 10 promotions with random data
-20.times do
+10.times do
   discount_percentage = rand(1..14)  # Random percentage between 1 and 100
   Promotion.create!(
     title: Faker::Commerce.product_name,
