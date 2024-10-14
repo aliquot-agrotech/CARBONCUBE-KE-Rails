@@ -63,7 +63,5 @@ ENV DATABASE_URL="postgresql://carbonecomrails_development_owner:rjW5XJgH4hKv@ep
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start the server by default, this can be overwritten at runtime
-# Explicitly run database setup and migration, then start the Rails server
-CMD ["sh", "-c", "bundle exec rake setup:all && exec ./bin/rails server -b 0.0.0.0 -p 3000"]
-
 EXPOSE 3000
+CMD ["./bin/rails", "server"]
