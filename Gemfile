@@ -46,9 +46,14 @@ gem 'jwt'
 gem 'bcrypt', '~> 3.1.7'  # for password hashing
 gem 'rack-cors', require: 'rack/cors'
 
+
+gem 'psych', '~> 5.1.0'
+gem 'rubyzip', '~> 2.3.2'
+
+
 # Sinatra
-gem "sinatra"
-gem "sinatra-activerecord"
+gem "sinatra", '~> 4.0.0'
+gem "sinatra-activerecord", '~> 2.0.27'
 
 # serializers
 gem 'active_model_serializers'
