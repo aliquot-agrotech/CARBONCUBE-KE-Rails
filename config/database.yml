@@ -1,9 +1,7 @@
 production:
   <<: *default
   url: <%= ENV['DATABASE_URL'] %>
-  database: <%= ENV['PGDATABASE'] %>
-  username: <%= ENV['PGUSER'] %>
-  password: <%= ENV['PGPASSWORD'] %>
-  host: <%= ENV['PGHOST'] %>
-  port: <%= ENV['DB_PORT'] || 5432 %>
-  sslmode: require
+  database: carboncube_ke
+  username: carboncube_ke_user
+  password: <%= ENV['MYSITE_DATABASE_PASSWORD'] %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
