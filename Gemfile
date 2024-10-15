@@ -51,9 +51,9 @@ gem 'psych', '~> 5.1.0'
 gem 'rubyzip', '~> 2.3.2'
 
 
-# Sinatra
-gem "sinatra", '~> 4.0.0'
-gem "sinatra-activerecord", '~> 2.0.27'
+# # Sinatra
+# gem "sinatra", '~> 4.0.0'
+# gem "sinatra-activerecord", '~> 2.0.27'
 
 # serializers
 gem 'active_model_serializers'
