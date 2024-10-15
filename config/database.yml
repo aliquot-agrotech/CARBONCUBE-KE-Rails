@@ -1,7 +1,6 @@
 production:
   <<: *default
-  url: <%= ENV['DATABASE_URL'] %>
   database: carboncube_ke
   username: carboncube_ke_user
-  password: <%= ENV['MYSITE_DATABASE_PASSWORD'] %>
+  password: <%= ENV['CARBONCUBE-KE_DATABASE_PASSWORD'] %>
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
