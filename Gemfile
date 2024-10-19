@@ -73,6 +73,11 @@ gem 'groupdate'
 # Seed generator
 gem 'faker'
 
+gem 'redis'
+
+# Use hiredis to get better performance than the "redis" gem
+gem 'hiredis'
+
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
