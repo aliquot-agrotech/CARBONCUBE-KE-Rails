@@ -671,51 +671,41 @@ order_data = 500.times.map do
   purchaser = Purchaser.all.sample
   status = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned'].sample
 
-  # Initialize variables for totals
-  vendor_totals = Hash.new(0) # To hold totals for each vendor
-  total_processing_fee = 0
+  # Initialize totals
+  sub_total = 0.to_d
+  total_processing_fee = 0.to_d
+  delivery_fee = 10.to_d # Set a default delivery fee
 
   # Generate order items
   order_items = rand(1..5).times.map do
     product = Product.all.sample
     quantity = Faker::Number.between(from: 1, to: 10)
     price = product.price
-    total_price = price * quantity
+    total_price = (price * quantity).to_d
 
-    # Accumulate product totals by vendor
-    vendor_totals[product.vendor_id] += total_price
+    # Accumulate totals
+    sub_total += total_price
+    total_processing_fee += calculate_mpesa_fee(total_price).to_d
 
     {
       product_id: product.id,
       quantity: quantity,
       price: price,
-      total_price: total_price,
-      vendor_id: product.vendor_id
+      total_price: total_price
     }
   end
 
-  # Calculate processing fees based on vendor totals
-  vendor_totals.each do |vendor_id, vendor_total|
-    processing_fee = calculate_mpesa_fee(vendor_total) + (0.02 * vendor_total) # 2% product charge
-    total_processing_fee += processing_fee
-  end
+  # Calculate grand total
+  grand_total = sub_total + total_processing_fee + delivery_fee
 
-  # Delivery fee can be defined or set to a default value, e.g., $10
-  delivery_fee = 10.0
+  # Output for verification
+  puts "Subtotal: #{sub_total}, Processing Fee: #{total_processing_fee}, Delivery Fee: #{delivery_fee}, Grand Total: #{grand_total}"
 
-  # Calculate final total amount
-  product_total_sum = vendor_totals.values.sum # Sum of all product totals
-  total_amount = product_total_sum + total_processing_fee + delivery_fee
-
-  # Ensure the total is computed correctly
-  puts "Product Total Sum: #{product_total_sum}, Processing Fee: #{total_processing_fee}, Delivery Fee: #{delivery_fee}, Grand Total: #{total_amount}" # Debugging output
-
+  # Generate M-Pesa transaction code
   def generate_mpesa_transaction_code
-    alpha_part = Faker::Alphanumeric.unique.alpha(number: 7).upcase # Generate 7 alphabetic characters
-    random_digits = Faker::Number.number(digits: 3) # Generate 3 random digits
-    unique_part = Faker::Alphanumeric.unique.alpha(number: 3).upcase # Generate 3 more alphabetic characters
-
-    # Combine parts: insert random_digits after the second character
+    alpha_part = Faker::Alphanumeric.unique.alpha(number: 7).upcase
+    random_digits = Faker::Number.number(digits: 3)
+    unique_part = Faker::Alphanumeric.unique.alpha(number: 3).upcase
     "#{alpha_part[0..1]}#{random_digits}#{alpha_part[2..-1]}#{unique_part}"
   end
 
@@ -726,10 +716,11 @@ order_data = 500.times.map do
   date_range = date_ranges[selected_month]
   created_at = Faker::Date.between(from: date_range.begin, to: date_range.end)
 
+  # Build the order hash
   {
     purchaser_id: purchaser.id,
     status: status,
-    total_amount: total_amount,
+    total_amount: grand_total,
     processing_fee: total_processing_fee,
     delivery_fee: delivery_fee,
     mpesa_transaction_code: mpesa_transaction_code,
@@ -738,6 +729,7 @@ order_data = 500.times.map do
     order_items: order_items
   }
 end
+
 
 
 
