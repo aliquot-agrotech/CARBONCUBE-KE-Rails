@@ -696,7 +696,6 @@ order_data = 500.times.map do
   {
     purchaser_id: purchaser.id,
     status: status,
-    subtotal: subtotal,
     processing_fee: processing_fee,
     delivery_fee: DELIVERY_FEE,
     total_amount: total_amount,
@@ -716,7 +715,6 @@ sorted_order_data.each do |data|
   order = Order.create!(
     purchaser_id: data[:purchaser_id],
     status: data[:status],
-    subtotal: data[:subtotal],
     processing_fee: data[:processing_fee],
     delivery_fee: data[:delivery_fee],
     total_amount: data[:total_amount],
