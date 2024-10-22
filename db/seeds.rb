@@ -629,7 +629,6 @@ date_ranges = {
   August: (Date.new(2024, 8, 1)..Date.today) # Up to the current date
 }
 
-# Assuming calculate_mpesa_fee is defined within the same file or module
 def calculate_mpesa_fee(amount)
   case amount
   when 1..49
@@ -702,10 +701,14 @@ order_data = 500.times.map do
   end
 
   # Delivery fee can be defined or set to a default value, e.g., $10
-  delivery_fee = 150
+  delivery_fee = 10.0
 
   # Calculate final total amount
-  total_amount = vendor_totals.values.sum + total_processing_fee + delivery_fee
+  product_total_sum = vendor_totals.values.sum # Sum of all product totals
+  total_amount = product_total_sum + total_processing_fee + delivery_fee
+
+  # Ensure the total is computed correctly
+  puts "Product Total Sum: #{product_total_sum}, Processing Fee: #{total_processing_fee}, Delivery Fee: #{delivery_fee}, Grand Total: #{total_amount}" # Debugging output
 
   def generate_mpesa_transaction_code
     alpha_part = Faker::Alphanumeric.unique.alpha(number: 7).upcase # Generate 7 alphabetic characters
@@ -733,6 +736,7 @@ order_data = 500.times.map do
     order_items: order_items
   }
 end
+
 
 
 # Sort the order data by created_at date
