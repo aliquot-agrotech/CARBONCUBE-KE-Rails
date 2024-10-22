@@ -734,7 +734,6 @@ sorted_order_data.each do |data|
       quantity: item_data[:quantity],
       price: item_data[:price],
       total_price: item_data[:total_price],
-      vendor_id: item_data[:vendor_id],
       created_at: data[:created_at],
       updated_at: data[:updated_at]
     )
@@ -748,6 +747,88 @@ sorted_order_data.each do |data|
     OrderVendor.create!(
       order_id: order.id,
       vendor_id: vendor_id,
+      created_at: data[:created_at],
+      updated_at: data[:updated_at]
+    )
+  end
+end
+
+
+# Generate 500 order data hashes
+order_data = 500.times.map do
+  purchaser = Purchaser.all.sample
+  status = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned'].sample
+  total_amount = Faker::Commerce.price(range: 50..500)
+  def generate_mpesa_transaction_code
+    alpha_part = Faker::Alphanumeric.unique.alpha(number: 7).upcase # Generate 7 alphabetic characters
+    random_digits = Faker::Number.number(digits: 3) # Generate 3 random digits
+    unique_part = Faker::Alphanumeric.unique.alpha(number: 3).upcase # Generate 3 more alphabetic characters
+  
+    # Combine parts: insert random_digits after the second character
+    "#{alpha_part[0..1]}#{random_digits}#{alpha_part[2..-1]}#{unique_part}"
+  end
+  
+  mpesa_transaction_code = generate_mpesa_transaction_code
+
+  # Randomly select a month and date range
+  selected_month = date_ranges.keys.sample
+  date_range = date_ranges[selected_month]
+  created_at = Faker::Date.between(from: date_range.begin, to: date_range.end)
+
+  {
+    purchaser_id: purchaser.id,
+    status: status,
+    total_amount: total_amount,
+    mpesa_transaction_code: mpesa_transaction_code,
+    created_at: created_at,
+    updated_at: created_at,
+    order_items: rand(1..5).times.map do
+      product = Product.all.sample
+      quantity = Faker::Number.between(from: 1, to: 10)
+      price = product.price
+      total_price = price * quantity
+
+      {
+        product_id: product.id,
+        quantity: quantity,
+        price: price,
+        total_price: total_price,
+        vendor_id: product.vendor_id
+      }
+    end
+  }
+end
+
+# Sort the order data by created_at date
+sorted_order_data = order_data.sort_by { |data| data[:created_at] }
+
+# Create orders in sorted order
+sorted_order_data.each do |data|
+  order = Order.create!(
+    purchaser_id: data[:purchaser_id],
+    status: data[:status],
+    total_amount: data[:total_amount],
+    mpesa_transaction_code: data[:mpesa_transaction_code],
+    created_at: data[:created_at],
+    updated_at: data[:updated_at]
+  )
+
+  # Create order items
+  data[:order_items].each do |item_data|
+    OrderItem.create!(
+      order_id: order.id,
+      product_id: item_data[:product_id],
+      quantity: item_data[:quantity],
+      price: item_data[:price],
+      total_price: item_data[:total_price],
+      created_at: data[:created_at],
+      updated_at: data[:updated_at]
+    )
+
+    # Associate the order with a vendor
+    OrderVendor.create!(
+      order_id: order.id,
+      vendor_id: item_data[:vendor_id],
       created_at: data[:created_at],
       updated_at: data[:updated_at]
     )
