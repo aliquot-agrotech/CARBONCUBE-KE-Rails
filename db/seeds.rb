@@ -630,72 +630,45 @@ date_ranges = {
 }
 
 
-def mpesa_transaction_fee(amount)
+# MPesa tariff calculation
+def calculate_transaction_fee(amount)
   case amount
-  when 1..49
-    0
-  when 50..100
-    0
-  when 101..500
-    7
-  when 501..1000
-    13
-  when 1001..1500
-    23
-  when 1501..2500
-    33
-  when 2501..3500
-    53
-  when 3501..5000
-    57
-  when 5001..7500
-    78
-  when 7501..10000
-    90
-  when 10001..15000
-    100
-  when 15001..20000
-    105
-  when 20001..35000
-    108
-  when 35001..50000
-    108
-  when 50001..250000
-    108
-  else
-    0
+  when 1..49 then 0
+  when 50..100 then 0
+  when 101..500 then 7
+  when 501..1000 then 13
+  when 1001..1500 then 23
+  when 1501..2500 then 33
+  when 2501..3500 then 53
+  when 3501..5000 then 57
+  when 5001..7500 then 78
+  when 7501..10000 then 90
+  when 10001..15000 then 100
+  when 15001..20000 then 105
+  when 20001..250000 then 108
+  else 0
   end
 end
 
+def generate_mpesa_transaction_code
+  alpha_part = Faker::Alphanumeric.unique.alpha(number: 7).upcase
+  random_digits = Faker::Number.number(digits: 3)
+  unique_part = Faker::Alphanumeric.unique.alpha(number: 3).upcase
+  "#{alpha_part[0..1]}#{random_digits}#{alpha_part[2..-1]}#{unique_part}"
+end
 
-delivery_fee = 150
+DELIVERY_FEE = 150
 
 order_data = 500.times.map do
   purchaser = Purchaser.all.sample
   status = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned'].sample
-  order_total_amount = 0
-  total_processing_fee = 0
-
-  # Random Mpesa transaction code
-  mpesa_transaction_code = generate_mpesa_transaction_code
-
-  # Randomly select a month and date range
-  selected_month = date_ranges.keys.sample
-  date_range = date_ranges[selected_month]
-  created_at = Faker::Date.between(from: date_range.begin, to: date_range.end)
-
-  # Calculate the total order price and processing fee from order items
+  
+  # Create order items first to calculate fees
   order_items = rand(1..5).times.map do
     product = Product.all.sample
     quantity = Faker::Number.between(from: 1, to: 10)
     price = product.price
     total_price = price * quantity
-    order_total_amount += total_price
-
-    # Calculate the transaction fee based on the total price
-    product_processing_fee = mpesa_transaction_fee(total_price) * 2
-    total_processing_fee += product_processing_fee
-
     {
       product_id: product.id,
       quantity: quantity,
@@ -705,20 +678,42 @@ order_data = 500.times.map do
     }
   end
 
-  # Calculate the final total amount (sum of order items, processing fee, and delivery fee)
-  total_amount = order_total_amount + total_processing_fee + delivery_fee
-
+  # Calculate subtotal from order items
+  subtotal = order_items.sum { |item| item[:total_price] }
+  
+  # Calculate processing fee based on transaction fee
+  transaction_fee = calculate_transaction_fee(subtotal)
+  processing_fee = transaction_fee * 2
+  
+  # Calculate total amount including all fees
+  total_amount = subtotal + processing_fee + DELIVERY_FEE
+  
+  selected_month = date_ranges.keys.sample
+  date_range = date_ranges[selected_month]
+  created_at = Faker::Date.between(from: date_range.begin, to: date_range.end)
+  
   {
     purchaser_id: purchaser.id,
     status: status,
+    processing_fee: processing_fee,
+    delivery_fee: DELIVERY_FEE,
     total_amount: total_amount,
-    processing_fee: total_processing_fee,
-    delivery_fee: delivery_fee,
-    mpesa_transaction_code: mpesa_transaction_code,
+    mpesa_transaction_code: generate_mpesa_transaction_code,
     created_at: created_at,
     updated_at: created_at,
     order_items: order_items
   }
+end
+
+# Create orders with the calculated data
+orders = Order.create!(order_data)
+
+# Create order items for each order
+orders.each_with_index do |order, index|
+  order_items_data = order_data[index][:order_items]
+  order_items_data.each do |item_data|
+    OrderItem.create!(item_data.merge(order_id: order.id))
+  end
 end
 
 
