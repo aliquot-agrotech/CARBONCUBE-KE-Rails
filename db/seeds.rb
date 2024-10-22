@@ -659,6 +659,7 @@ end
 
 DELIVERY_FEE = 150
 
+# Generate order data
 order_data = 500.times.map do
   purchaser = Purchaser.all.sample
   status = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned'].sample
@@ -695,6 +696,7 @@ order_data = 500.times.map do
   {
     purchaser_id: purchaser.id,
     status: status,
+    subtotal: subtotal,
     processing_fee: processing_fee,
     delivery_fee: DELIVERY_FEE,
     total_amount: total_amount,
@@ -705,33 +707,28 @@ order_data = 500.times.map do
   }
 end
 
-# Create orders with the calculated data
-orders = Order.create!(order_data)
-
-# Create order items for each order
-orders.each_with_index do |order, index|
-  order_items_data = order_data[index][:order_items]
-  order_items_data.each do |item_data|
-    OrderItem.create!(item_data.merge(order_id: order.id))
-  end
-end
-
-
-# Sort the order data by created_at date
+# Sort order data by created_at date
 sorted_order_data = order_data.sort_by { |data| data[:created_at] }
 
-# Create orders in sorted order
+# Create orders in sorted order with all associations
 sorted_order_data.each do |data|
+  # Create the order with all fees
   order = Order.create!(
     purchaser_id: data[:purchaser_id],
     status: data[:status],
+    subtotal: data[:subtotal],
+    processing_fee: data[:processing_fee],
+    delivery_fee: data[:delivery_fee],
     total_amount: data[:total_amount],
     mpesa_transaction_code: data[:mpesa_transaction_code],
     created_at: data[:created_at],
     updated_at: data[:updated_at]
   )
 
-  # Create order items
+  # Track unique vendors for this order
+  order_vendors = Set.new
+
+  # Create order items and collect unique vendors
   data[:order_items].each do |item_data|
     OrderItem.create!(
       order_id: order.id,
@@ -739,14 +736,20 @@ sorted_order_data.each do |data|
       quantity: item_data[:quantity],
       price: item_data[:price],
       total_price: item_data[:total_price],
+      vendor_id: item_data[:vendor_id],
       created_at: data[:created_at],
       updated_at: data[:updated_at]
     )
 
-    # Associate the order with a vendor
+    # Add vendor to set of unique vendors
+    order_vendors.add(item_data[:vendor_id])
+  end
+
+  # Create OrderVendor associations for unique vendors only
+  order_vendors.each do |vendor_id|
     OrderVendor.create!(
       order_id: order.id,
-      vendor_id: item_data[:vendor_id],
+      vendor_id: vendor_id,
       created_at: data[:created_at],
       updated_at: data[:updated_at]
     )
