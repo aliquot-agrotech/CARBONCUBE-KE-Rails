@@ -629,86 +629,20 @@ date_ranges = {
   August: (Date.new(2024, 8, 1)..Date.today) # Up to the current date
 }
 
-def calculate_mpesa_fee(amount)
-  case amount
-  when 1..49
-    0
-  when 50..100
-    0
-  when 101..500
-    7
-  when 501..1000
-    13
-  when 1001..1500
-    23
-  when 1501..2500
-    33
-  when 2501..3500
-    53
-  when 3501..5000
-    57
-  when 5001..7500
-    78
-  when 7501..10000
-    90
-  when 10001..15000
-    100
-  when 15001..20000
-    105
-  when 20001..35000
-    108
-  when 35001..50000
-    108
-  when 50001..250000
-    108
-  else
-    0
-  end
-end
-
 # Generate 500 order data hashes
 order_data = 500.times.map do
   purchaser = Purchaser.all.sample
   status = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned'].sample
-
-  # Initialize totals
-  sub_total = 0.to_d
-  total_processing_fee = 0.to_d
-  delivery_fee = 10.to_d # Set a default delivery fee
-
-  # Generate order items
-  order_items = rand(1..5).times.map do
-    product = Product.all.sample
-    quantity = Faker::Number.between(from: 1, to: 10)
-    price = product.price
-    total_price = (price * quantity).to_d
-
-    # Accumulate totals
-    sub_total += total_price
-    total_processing_fee += calculate_mpesa_fee(total_price).to_d
-
-    {
-      product_id: product.id,
-      quantity: quantity,
-      price: price,
-      total_price: total_price
-    }
-  end
-
-  # Calculate grand total
-  grand_total = sub_total + total_processing_fee + delivery_fee
-
-  # Output for verification
-  puts "Subtotal: #{sub_total}, Processing Fee: #{total_processing_fee}, Delivery Fee: #{delivery_fee}, Grand Total: #{grand_total}"
-
-  # Generate M-Pesa transaction code
+  total_amount = Faker::Commerce.price(range: 50..500)
   def generate_mpesa_transaction_code
-    alpha_part = Faker::Alphanumeric.unique.alpha(number: 7).upcase
-    random_digits = Faker::Number.number(digits: 3)
-    unique_part = Faker::Alphanumeric.unique.alpha(number: 3).upcase
+    alpha_part = Faker::Alphanumeric.unique.alpha(number: 7).upcase # Generate 7 alphabetic characters
+    random_digits = Faker::Number.number(digits: 3) # Generate 3 random digits
+    unique_part = Faker::Alphanumeric.unique.alpha(number: 3).upcase # Generate 3 more alphabetic characters
+  
+    # Combine parts: insert random_digits after the second character
     "#{alpha_part[0..1]}#{random_digits}#{alpha_part[2..-1]}#{unique_part}"
   end
-
+  
   mpesa_transaction_code = generate_mpesa_transaction_code
 
   # Randomly select a month and date range
@@ -716,22 +650,29 @@ order_data = 500.times.map do
   date_range = date_ranges[selected_month]
   created_at = Faker::Date.between(from: date_range.begin, to: date_range.end)
 
-  # Build the order hash
   {
     purchaser_id: purchaser.id,
     status: status,
-    total_amount: grand_total,
-    processing_fee: total_processing_fee,
-    delivery_fee: delivery_fee,
+    total_amount: total_amount,
     mpesa_transaction_code: mpesa_transaction_code,
     created_at: created_at,
     updated_at: created_at,
-    order_items: order_items
+    order_items: rand(1..5).times.map do
+      product = Product.all.sample
+      quantity = Faker::Number.between(from: 1, to: 10)
+      price = product.price
+      total_price = price * quantity
+
+      {
+        product_id: product.id,
+        quantity: quantity,
+        price: price,
+        total_price: total_price,
+        vendor_id: product.vendor_id
+      }
+    end
   }
 end
-
-
-
 
 # Sort the order data by created_at date
 sorted_order_data = order_data.sort_by { |data| data[:created_at] }
