@@ -670,41 +670,46 @@ order_data = 500.times.map do
     quantity = Faker::Number.between(from: 1, to: 10)
     price = product.price
     total_price = price * quantity
+
+    # Calculate the processing fee for each product total
+    product_processing_fee = calculate_transaction_fee(total_price) * 2
+
     {
       product_id: product.id,
       quantity: quantity,
       price: price,
       total_price: total_price,
+      processing_fee: product_processing_fee, # Add processing fee for each product
       vendor_id: product.vendor_id
     }
   end
 
   # Calculate subtotal from order items
   subtotal = order_items.sum { |item| item[:total_price] }
-  
-  # Calculate processing fee based on transaction fee
-  transaction_fee = calculate_transaction_fee(subtotal)
-  processing_fee = transaction_fee * 2
+
+  # Sum all processing fees from individual products
+  total_processing_fee = order_items.sum { |item| item[:processing_fee] }
   
   # Calculate total amount including all fees
-  total_amount = subtotal + processing_fee + DELIVERY_FEE
+  total_amount = subtotal + total_processing_fee + DELIVERY_FEE
   
   selected_month = date_ranges.keys.sample
   date_range = date_ranges[selected_month]
   created_at = Faker::Date.between(from: date_range.begin, to: date_range.end)
-  
+
   {
     purchaser_id: purchaser.id,
     status: status,
-    processing_fee: processing_fee,
-    delivery_fee: DELIVERY_FEE,
     total_amount: total_amount,
+    processing_fee: total_processing_fee, # Store total processing fee for the order
+    delivery_fee: DELIVERY_FEE, # Fixed delivery fee
     mpesa_transaction_code: generate_mpesa_transaction_code,
     created_at: created_at,
     updated_at: created_at,
     order_items: order_items
   }
 end
+
 
 # Sort order data by created_at date
 sorted_order_data = order_data.sort_by { |data| data[:created_at] }
