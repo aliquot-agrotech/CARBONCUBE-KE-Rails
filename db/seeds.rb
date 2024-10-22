@@ -684,15 +684,15 @@ order_data = 500.times.map do
     }
   end
 
-  # Calculate subtotal from order items
+  # Calculate subtotal from order items (sum of all product prices)
   subtotal = order_items.sum { |item| item[:total_price] }
 
   # Sum all processing fees from individual products
   total_processing_fee = order_items.sum { |item| item[:processing_fee] }
   
-  # Calculate total amount including all fees
+  # Calculate total amount including all fees (subtotal + processing + delivery fee)
   total_amount = subtotal + total_processing_fee + DELIVERY_FEE
-  
+
   selected_month = date_ranges.keys.sample
   date_range = date_ranges[selected_month]
   created_at = Faker::Date.between(from: date_range.begin, to: date_range.end)
@@ -700,15 +700,14 @@ order_data = 500.times.map do
   {
     purchaser_id: purchaser.id,
     status: status,
-    total_amount: total_amount,
-    processing_fee: total_processing_fee, # Store total processing fee for the order
-    delivery_fee: DELIVERY_FEE, # Fixed delivery fee
+    total_amount: total_amount, # Make sure this stores the correct total amount
     mpesa_transaction_code: generate_mpesa_transaction_code,
     created_at: created_at,
     updated_at: created_at,
     order_items: order_items
   }
 end
+
 
 
 # Sort order data by created_at date
