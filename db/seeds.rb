@@ -842,7 +842,7 @@ end
 
 # Generate 10 reviews for each product
 Product.all.each do |product|
-  5.times do
+  20.times do
     purchaser = Purchaser.all.sample
     rating = Faker::Number.between(from: 1, to: 5)
     review_text = Faker::Lorem.sentence(word_count: Faker::Number.between(from: 5, to: 15))
