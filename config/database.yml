@@ -9,6 +9,6 @@ default: &default
 production:
   <<: *default
   url: <%= ENV['DATABASE_URL'] %>
-  database: carboncube_ke_fori
-  username: carboncube_ke_user
+  database: carboncube_ke_db
+  username: carboncube_ke_owner
   password: <%= ENV['DATABASE_PASSWORD'] %>
