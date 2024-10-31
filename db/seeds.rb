@@ -660,7 +660,7 @@ end
 DELIVERY_FEE = 150
 
 # Generate order data
-order_data = 500.times.map do
+order_data = 200.times.map do
   purchaser = Purchaser.all.sample
   status = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned'].sample
   
@@ -842,7 +842,7 @@ end
 
 # Generate 10 reviews for each product
 Product.all.each do |product|
-  20.times do
+  5.times do
     purchaser = Purchaser.all.sample
     rating = Faker::Number.between(from: 1, to: 5)
     review_text = Faker::Lorem.sentence(word_count: Faker::Number.between(from: 5, to: 15))
@@ -906,7 +906,7 @@ end
 
 # Generate unique messages for each conversation
 def create_messages(conversation, sender, receiver)
-  10.times do |i|
+  5.times do |i|
     Message.create!(
       conversation: conversation,
       sender: sender,
@@ -953,7 +953,7 @@ def generate_coupon_code(discount_percentage)
 end
 
 # Create 10 promotions with random data
-10.times do
+5.times do
   discount_percentage = rand(1..14)  # Random percentage between 1 and 100
   Promotion.create!(
     title: Faker::Commerce.product_name,
