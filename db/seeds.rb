@@ -629,7 +629,6 @@ date_ranges = {
   August: (Date.new(2024, 8, 1)..Date.today) # Up to the current date
 }
 
-
 # MPesa tariff calculation
 def calculate_transaction_fee(amount)
   case amount
@@ -670,8 +669,8 @@ order_data = 200.times.map do
     quantity = Faker::Number.between(from: 1, to: 10)
     price = product.price
     total_price = price * quantity
-
-    # Calculate the processing fee for each product total
+    
+    # Calculate processing fee for this specific product's total
     product_processing_fee = calculate_transaction_fee(total_price) * 2
 
     {
@@ -679,18 +678,18 @@ order_data = 200.times.map do
       quantity: quantity,
       price: price,
       total_price: total_price,
-      processing_fee: product_processing_fee, # Add processing fee for each product
+      processing_fee: product_processing_fee,  # Store processing fee per product
       vendor_id: product.vendor_id
     }
   end
 
-  # Calculate subtotal from order items (sum of all product prices)
+  # Calculate subtotal from order items
   subtotal = order_items.sum { |item| item[:total_price] }
-
+  
   # Sum all processing fees from individual products
   total_processing_fee = order_items.sum { |item| item[:processing_fee] }
   
-  # Calculate total amount including all fees (subtotal + processing + delivery fee)
+  # Calculate total amount including all fees
   total_amount = subtotal + total_processing_fee + DELIVERY_FEE
 
   selected_month = date_ranges.keys.sample
@@ -700,15 +699,15 @@ order_data = 200.times.map do
   {
     purchaser_id: purchaser.id,
     status: status,
-    total_amount: total_amount, # Make sure this stores the correct total amount
+    processing_fee: total_processing_fee,     # Sum of all product processing fees
+    delivery_fee: DELIVERY_FEE,              # Fixed delivery fee
+    total_amount: total_amount,
     mpesa_transaction_code: generate_mpesa_transaction_code,
     created_at: created_at,
     updated_at: created_at,
     order_items: order_items
   }
 end
-
-
 
 # Sort order data by created_at date
 sorted_order_data = order_data.sort_by { |data| data[:created_at] }
@@ -719,8 +718,8 @@ sorted_order_data.each do |data|
   order = Order.create!(
     purchaser_id: data[:purchaser_id],
     status: data[:status],
-    processing_fee: data[:processing_fee],
-    delivery_fee: data[:delivery_fee],
+    processing_fee: data[:processing_fee],    # Total processing fee from all products
+    delivery_fee: data[:delivery_fee],        # Fixed delivery fee
     total_amount: data[:total_amount],
     mpesa_transaction_code: data[:mpesa_transaction_code],
     created_at: data[:created_at],
