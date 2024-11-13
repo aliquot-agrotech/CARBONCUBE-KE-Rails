@@ -6,6 +6,14 @@ default: &default
   sslmode: require
 
 
+development: 
+  <<: *default
+  database: carboncube_ke_db
+  username: carboncube_ke_db_owner
+  password: <%= ENV['DATABASE_PASSWORD'] %>
+  host: localhost
+
+
 production:
   <<: *default
   url: <%= ENV['DATABASE_URL'] %>
