@@ -125,6 +125,7 @@ end
     rider.vehicle_type = "Motorbike"
     rider.license_plate = generate_motorbike_license_plate
     rider.password = 'rider@123'
+    rider.physical_address = Faker::Address.full_address
 
     # Next of Kin details
     rider.next_of_kin_full_name = Faker::Name.name

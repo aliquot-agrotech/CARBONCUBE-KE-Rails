@@ -9,6 +9,7 @@ class CreateRiders < ActiveRecord::Migration[7.1]
       t.string :driving_license
       t.string :vehicle_type
       t.string :license_plate
+      t.string :physical_address
       t.string :password_digest
       t.string :next_of_kin_full_name
       t.string :relationship

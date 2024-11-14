@@ -43,6 +43,6 @@ class Rider::RidersController < ApplicationController
   end
 
   def rider_params
-    params.require(:rider).permit(:full_name, :phone_number, :date_of_birth, :email, :id_number, :driving_license, :vehicle_type, :license_plate, :password, :next_of_kin_full_name, :relationship, :emergency_contact_phone_number)
+    params.require(:rider).permit(:full_name, :phone_number, :date_of_birth, :email, :id_number, :driving_license, :physical_address,:vehicle_type, :license_plate, :password, :next_of_kin_full_name, :relationship, :emergency_contact_phone_number)
   end
 end
