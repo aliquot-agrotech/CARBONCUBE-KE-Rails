@@ -90,6 +90,42 @@ def generate_custom_phone_number(used_phone_numbers)
   end
 end
 
+# Vehicle types
+vehicle_types = ["Motorbike", "Tuk-Tuk", "Car", "Pick-Up", "Van"]
+
+vehicle_types.each do |type|
+  VehicleType.find_or_create_by(name: type)
+end
+
+# Load Vehicle Types for Sampling
+vehicle_types = VehicleType.all.pluck(:name)
+
+# Seed 50 Riders
+50.times do
+  Rider.find_or_create_by(email: nil) do |rider|
+    full_name = Faker::Name.name
+    username = full_name.downcase.gsub(/\s+/, "") # remove spaces and lowercase
+    email = "#{username}@example.com"
+
+    rider.full_name = full_name
+    rider.phone_number = generate_custom_phone_number(used_phone_numbers)
+    used_phone_numbers.add(rider.phone_number)
+    rider.date_of_birth = Faker::Date.birthday(min_age: 21, max_age: 50)
+    rider.email = email
+    rider.id_number = Faker::Number.number(digits: 8).to_s
+    rider.driving_license = Faker::DrivingLicence.british_driving_licence
+    rider.vehicle_type = vehicle_types.sample
+    rider.license_plate = Faker::Vehicle.license_plate
+    rider.password = 'password123'
+
+    # Next of Kin details
+    rider.next_of_kin_full_name = Faker::Name.name
+    rider.relationship = %w[Spouse Parent Sibling Friend Other].sample
+    rider.emergency_contact_phone_number = generate_custom_phone_number(used_phone_numbers)
+    used_phone_numbers.add(rider.emergency_contact_phone_number)
+  end
+end
+
 # Seed purchasers data
 50.times do
   Purchaser.find_or_create_by(email: nil) do |purchaser|
@@ -964,33 +1000,6 @@ end
   )
 end
 
-# Vehicle types
-vehicle_types = ["Motorbike", "Tuk-Tuk", "Car", "Pick-Up", "Van"]
-
-vehicle_types.each do |type|
-  VehicleType.find_or_create_by(name: type)
-end
-
-# Load Vehicle Types
-vehicle_types = VehicleType.all.pluck(:name)
-
-# Generate 50 Riders
-50.times do
-  Rider.create(
-    full_name: Faker::Name.name,
-    phone_number: Faker::PhoneNumber.cell_phone_in_e164,
-    date_of_birth: Faker::Date.birthday(min_age: 21, max_age: 50),
-    email: Faker::Internet.email,
-    id_number: Faker::Number.number(digits: 8).to_s,
-    driving_license: Faker::DrivingLicence.british_driving_licence,
-    vehicle_type: vehicle_types.sample,
-    license_plate: Faker::Vehicle.license_plate,
-    password: "password123",
-    next_of_kin_full_name: Faker::Name.name,
-    relationship: %w[Spouse Parent Sibling Friend Other].sample,
-    emergency_contact_phone_number: Faker::PhoneNumber.cell_phone_in_e164
-  )
-end
 
 
 puts 'Congratulations!! Seed data created successfully!'
