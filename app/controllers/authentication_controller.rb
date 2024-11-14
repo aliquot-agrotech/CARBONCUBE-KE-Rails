@@ -2,26 +2,15 @@ class AuthenticationController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
 
   def login
-    if params[:email].present?
-      # Check for email login for all user types
-      @user = Purchaser.find_by(email: params[:email]) ||
-              Vendor.find_by(email: params[:email]) ||
-              Admin.find_by(email: params[:email]) ||
-              Rider.find_by(email: params[:email])
-    elsif params[:phone_number].present? || params[:id_number].present?
-      # Check for phone number or ID number login for riders only
-      @user = Rider.find_by(phone_number: params[:phone_number]) ||
-              Rider.find_by(id_number: params[:id_number])
-    end
+    identifier = params[:identifier]  # Use unified identifier param
+    @user = find_user_by_identifier(identifier)
 
-    # Authenticate user and return token if valid
     if @user&.authenticate(params[:password])
       user_response = {
         id: @user.id,
         email: @user.email,
         role: determine_role(@user)
       }
-      # Add phone_number and id_number for riders
       user_response[:phone_number] = @user.phone_number if @user.is_a?(Rider)
       user_response[:id_number] = @user.id_number if @user.is_a?(Rider)
 
@@ -33,6 +22,22 @@ class AuthenticationController < ApplicationController
   end
 
   private
+
+  def find_user_by_identifier(identifier)
+    if identifier.include?('@')
+      # Assume it's an email if it contains '@'
+      Purchaser.find_by(email: identifier) ||
+      Vendor.find_by(email: identifier) ||
+      Admin.find_by(email: identifier) ||
+      Rider.find_by(email: identifier)
+    elsif identifier.match?(/\A\d{10}\z/)
+      # Assume phone number if it’s 10 digits
+      Rider.find_by(phone_number: identifier)
+    else
+      # Otherwise, assume it’s an ID number
+      Rider.find_by(id_number: identifier)
+    end
+  end
 
   def determine_role(user)
     case user
