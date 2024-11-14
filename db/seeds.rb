@@ -659,7 +659,7 @@ end
 DELIVERY_FEE = 150
 
 # Generate order data
-order_data = 200.times.map do
+order_data = 1000.times.map do
   purchaser = Purchaser.all.sample
   status = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned'].sample
   
@@ -841,7 +841,7 @@ end
 
 # Generate 10 reviews for each product
 Product.all.each do |product|
-  5.times do
+  15.times do
     purchaser = Purchaser.all.sample
     rating = Faker::Number.between(from: 1, to: 5)
     review_text = Faker::Lorem.sentence(word_count: Faker::Number.between(from: 5, to: 15))
@@ -905,7 +905,7 @@ end
 
 # Generate unique messages for each conversation
 def create_messages(conversation, sender, receiver)
-  5.times do |i|
+  20.times do |i|
     Message.create!(
       conversation: conversation,
       sender: sender,
@@ -952,7 +952,7 @@ def generate_coupon_code(discount_percentage)
 end
 
 # Create 10 promotions with random data
-5.times do
+10.times do
   discount_percentage = rand(1..14)  # Random percentage between 1 and 100
   Promotion.create!(
     title: Faker::Commerce.product_name,
@@ -961,6 +961,34 @@ end
     coupon_code: generate_coupon_code(discount_percentage),
     start_date: Faker::Date.backward(days: 0),
     end_date: Faker::Date.forward(days: rand(10..20))
+  )
+end
+
+# Vehicle types
+vehicle_types = ["Motorbike", "Tuk-Tuk", "Car", "Pick-Up", "Van"]
+
+vehicle_types.each do |type|
+  VehicleType.find_or_create_by(name: type)
+end
+
+# Load Vehicle Types
+vehicle_types = VehicleType.all.pluck(:name)
+
+# Generate 50 Riders
+50.times do
+  Rider.create(
+    full_name: Faker::Name.name,
+    phone_number: Faker::PhoneNumber.cell_phone_in_e164,
+    date_of_birth: Faker::Date.birthday(min_age: 21, max_age: 50),
+    email: Faker::Internet.email,
+    id_number: Faker::Number.number(digits: 8).to_s,
+    driving_license: Faker::DrivingLicence.british_driving_licence,
+    vehicle_type: vehicle_types.sample,
+    license_plate: Faker::Vehicle.license_plate,
+    password: "password123",
+    next_of_kin_full_name: Faker::Name.name,
+    relationship: %w[Spouse Parent Sibling Friend Other].sample,
+    emergency_contact_phone_number: Faker::PhoneNumber.cell_phone_in_e164
   )
 end
 

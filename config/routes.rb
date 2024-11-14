@@ -144,5 +144,10 @@ Rails.application.routes.draw do
 
     get 'identify', to: 'purchasers#identify'
   end
+
+  namespace :rider do
+    resources :riders
+    resources :orders
+  end
   mount ActionCable.server => '/cable'
 end
