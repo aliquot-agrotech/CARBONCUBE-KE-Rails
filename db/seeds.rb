@@ -8,6 +8,9 @@
 
 require 'faker'
 require 'set'
+
+
+puts "Starts seeding..."
 # Create categories with descriptions
 categories = [
   { name: 'Automotive Parts & Accessories', description: 'Spare parts for automobiles' },
@@ -70,7 +73,7 @@ categories.each do |category_data|
   end
 end
 
-
+puts "Starts seeding Admin"
 
 # Seed admin data
 Admin.find_or_create_by(email: 'admin@example.com') do |admin|
@@ -78,6 +81,8 @@ Admin.find_or_create_by(email: 'admin@example.com') do |admin|
   admin.username = 'admin'
   admin.password = 'adminpassword'
 end
+
+puts "Starts seeding Vendors, Riders and Purchasers"
 
 # Set to keep track of used phone numbers
 used_phone_numbers = Set.new
@@ -90,21 +95,24 @@ def generate_custom_phone_number(used_phone_numbers)
   end
 end
 
-# Vehicle types
+# Method to generate a valid Kenyan motorbike license plate
+def generate_motorbike_license_plate
+  letters = ('A'..'Z').to_a - %w[I O]  # Exclude "I" and "O"
+  "#{['KM', letters.sample, letters.sample].join}-#{rand(1..999).to_s.rjust(3, '0')}#{letters.sample}"
+end
+
+# Seed Vehicle Types if not already added
 vehicle_types = ["Motorbike", "Tuk-Tuk", "Car", "Pick-Up", "Van"]
 
 vehicle_types.each do |type|
   VehicleType.find_or_create_by(name: type)
 end
 
-# Load Vehicle Types for Sampling
-vehicle_types = VehicleType.all.pluck(:name)
-
-# Seed 50 Riders
+# Seed 50 Riders with 'Motorbike' as Vehicle Type
 50.times do
   Rider.find_or_create_by(email: nil) do |rider|
     full_name = Faker::Name.name
-    username = full_name.downcase.gsub(/\s+/, "") # remove spaces and lowercase
+    username = full_name.downcase.gsub(/\s+/, "")
     email = "#{username}@example.com"
 
     rider.full_name = full_name
@@ -114,9 +122,9 @@ vehicle_types = VehicleType.all.pluck(:name)
     rider.email = email
     rider.id_number = Faker::Number.number(digits: 8).to_s
     rider.driving_license = Faker::DrivingLicence.british_driving_licence
-    rider.vehicle_type = vehicle_types.sample
-    rider.license_plate = Faker::Vehicle.license_plate
-    rider.password = 'password123'
+    rider.vehicle_type = "Motorbike"
+    rider.license_plate = generate_motorbike_license_plate
+    rider.password = 'rider@123'
 
     # Next of Kin details
     rider.next_of_kin_full_name = Faker::Name.name
@@ -125,6 +133,7 @@ vehicle_types = VehicleType.all.pluck(:name)
     used_phone_numbers.add(rider.emergency_contact_phone_number)
   end
 end
+
 
 # Seed purchasers data
 50.times do
@@ -177,6 +186,8 @@ end
     vendor.profilepicture = Faker::Avatar.image
   end
 end
+
+puts "Starts seeding the products of the categories..."
 
 
 category_products = {
@@ -649,20 +660,16 @@ category_products.each do |category_name, products|
   end
 end
 
-# Define the date range for each month
-date_ranges = {
-  May: (Date.new(2024, 5, 1)..Date.new(2024, 5, 31)),
-  June: (Date.new(2024, 6, 1)..Date.new(2024, 6, 30)),
-  July: (Date.new(2024, 7, 1)..Date.new(2024, 7, 31)),
-  August: (Date.new(2024, 8, 1)..Date.today) # Up to the current date
-}
+puts "Starts seeding the orders"
+
+
 
 # Define the date range for each month
 date_ranges = {
-  May: (Date.new(2024, 5, 1)..Date.new(2024, 5, 31)),
-  June: (Date.new(2024, 6, 1)..Date.new(2024, 6, 30)),
-  July: (Date.new(2024, 7, 1)..Date.new(2024, 7, 31)),
-  August: (Date.new(2024, 8, 1)..Date.today) # Up to the current date
+  August: (Date.new(2024, 8, 1)..Date.new(2024, 8, 31)),
+  September: (Date.new(2024, 9, 1)..Date.new(2024, 9, 30)),
+  October: (Date.new(2024, 10, 1)..Date.new(2024, 10, 31)),
+  November: (Date.new(2024, 11, 1)..Date.today) # Up to the current date
 }
 
 # MPesa tariff calculation
@@ -874,6 +881,7 @@ end
 #   end
 # end
 
+puts "Starts seeding for the product reviews"
 
 # Generate 10 reviews for each product
 Product.all.each do |product|
@@ -891,6 +899,7 @@ Product.all.each do |product|
   end
 end
 
+puts "Starts seeding for the FAQs"
 
 # Clear existing records
 Faq.delete_all
@@ -903,6 +912,7 @@ Faq.delete_all
   )
 end
 
+puts "Starts seeding for the About"
 
 # Clear existing records
 About.delete_all
@@ -916,6 +926,8 @@ About.create!(
   why_choose_us: Faker::Lorem.paragraph(sentence_count: 2),
   image_url: Faker::LoremFlickr.image(size: "600x400", search_terms: ['business'])
 )
+
+puts "Starts seeding for the Conversations"
 
 # Seed data for Conversations
 admin = Admin.find_by(email: 'admin@example.com')
@@ -980,6 +992,7 @@ additional_conversations.each do |conv_data|
   end
 end
 
+puts "Starts seeding for the Promotions"
 
 # Function to generate a random coupon code with the discount percentage
 def generate_coupon_code(discount_percentage)
