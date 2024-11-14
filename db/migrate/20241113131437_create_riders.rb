@@ -13,9 +13,9 @@ class CreateRiders < ActiveRecord::Migration[7.1]
       t.string :gender, default: 'Male'
       t.boolean :blocked, default: false
       t.string :password_digest
-      t.string :next_of_kin_full_name
-      t.string :relationship
-      t.string :emergency_contact_phone_number
+      t.string :kin_full_name
+      t.string :kin_relationship
+      t.string :kin_phone_number
 
       t.timestamps
     end

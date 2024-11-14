@@ -129,10 +129,10 @@ end
     rider.gender = ['Male', 'Female'].sample
 
     # Next of Kin details
-    rider.next_of_kin_full_name = Faker::Name.name
-    rider.relationship = %w[Spouse Parent Sibling Friend Other].sample
-    rider.emergency_contact_phone_number = generate_custom_phone_number(used_phone_numbers)
-    used_phone_numbers.add(rider.emergency_contact_phone_number)
+    rider.kin_full_name = Faker::Name.name
+    rider.kin_relationship = %w[Spouse Parent Sibling Friend Other].sample
+    rider.kin_phone_number = generate_custom_phone_number(used_phone_numbers)
+    used_phone_numbers.add(rider.kin_phone_number)
   end
 end
 
