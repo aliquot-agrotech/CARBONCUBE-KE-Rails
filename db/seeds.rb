@@ -704,7 +704,7 @@ end
 DELIVERY_FEE = 150
 
 # Generate order data
-order_data = 1000.times.map do
+order_data = 500.times.map do
   purchaser = Purchaser.all.sample
   status = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned'].sample
   
@@ -887,7 +887,7 @@ puts "Starts seeding for the product reviews"
 
 # Generate 10 reviews for each product
 Product.all.each do |product|
-  15.times do
+  10.times do
     purchaser = Purchaser.all.sample
     rating = Faker::Number.between(from: 1, to: 5)
     review_text = Faker::Lorem.sentence(word_count: Faker::Number.between(from: 5, to: 15))
