@@ -130,7 +130,7 @@ end
 
     # Next of Kin details
     rider.kin_full_name = Faker::Name.name
-    rider.kin_relationship = %w[Spouse Parent Sibling Friend Other].sample
+    rider.kin_relationship = %w[Spouse Cousin Parent Sibling Friend Colleague Other].sample
     rider.kin_phone_number = generate_custom_phone_number(used_phone_numbers)
     used_phone_numbers.add(rider.kin_phone_number)
   end
