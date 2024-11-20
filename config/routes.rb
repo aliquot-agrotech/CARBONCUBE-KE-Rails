@@ -148,6 +148,7 @@ Rails.application.routes.draw do
   namespace :rider do
     resources :riders
     resources :orders
+    post 'signup', to: 'riders#create'
   end
   mount ActionCable.server => '/cable'
 end
