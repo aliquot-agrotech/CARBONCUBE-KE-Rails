@@ -21,7 +21,8 @@ module CARBONCUBE_KE_Rails
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    config.time_zone = "Africa/Nairobi"
+    config.time_zone = 'Africa/Nairobi' # Example for EAT time zone
+    config.active_record.default_timezone = :local
     # config.eager_load_paths << Rails.root.join("extras")
 
     # CORS configuration
