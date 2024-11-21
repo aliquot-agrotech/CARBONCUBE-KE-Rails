@@ -22,6 +22,31 @@ class Admin::RidersController < ApplicationController
     end
   end
 
+
+  def block
+    if @rider
+      if @rider.update(blocked: true)
+        render json: @rider.as_json(only: [:id, :full_name, :email, :physical_address, :blocked]), status: :ok
+      else
+        render json: @rider.errors, status: :unprocessable_entity
+      end
+    else
+      render json: { error: 'rider not found' }, status: :not_found
+    end
+  end
+
+  def unblock
+    if @rider
+      if @rider.update(blocked: false)
+        render json: @rider.as_json(only: [:id, :full_name, :email, :physical_address, :blocked]), status: :ok
+      else
+        render json: @rider.errors, status: :unprocessable_entity
+      end
+    else
+      render json: { error: 'rider not found' }, status: :not_found
+    end
+  end
+
   # DELETE /admin/riders/:id
   def destroy
     @rider.destroy
