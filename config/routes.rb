@@ -25,6 +25,11 @@ Rails.application.routes.draw do
       get ':purchaser_id/orders', to: 'orders#index_for_purchaser'
     end
 
+    namespace :rider do
+      get ':rider_id/profile', to: 'profiles#show'
+      get ':rider_id/orders', to: 'orders#index_for_rider'
+    end
+
     resources :orders, only: [:index, :show, :destroy] do
       member do
         put 'update-status', to: 'orders#update_status'
@@ -59,6 +64,16 @@ Rails.application.routes.draw do
       member do
         put 'block'
         put 'unblock'
+      end
+    end
+
+    resources :riders do 
+      member do
+        put 'block'
+        put 'unblock'
+        put 'assign'
+        put 'analytics'
+        get 'orders', to: 'riders#orders'
       end
     end
 
