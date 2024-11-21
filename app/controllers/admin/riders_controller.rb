@@ -1,6 +1,6 @@
 class Admin::RidersController < ApplicationController
   before_action :authenticate_admin
-  before_action :set_rider , only: [:show, :update, :destroy]
+  before_action :set_rider , only: [:show, :update, :destroy, :block, :unblock]
 
   # GET /admin/riders
   def index
@@ -22,30 +22,32 @@ class Admin::RidersController < ApplicationController
     end
   end
 
-
   def block
-    if @rider
+    @rider = Rider.find_by(id: params[:id])
+    if @rider.present?
       if @rider.update(blocked: true)
         render json: @rider.as_json(only: [:id, :full_name, :email, :physical_address, :blocked]), status: :ok
       else
-        render json: @rider.errors, status: :unprocessable_entity
+        render json: { errors: @rider.errors.full_messages }, status: :unprocessable_entity
       end
     else
-      render json: { error: 'rider not found' }, status: :not_found
+      render json: { error: 'Rider not found' }, status: :not_found
     end
   end
-
+  
   def unblock
-    if @rider
+    @rider = Rider.find_by(id: params[:id])
+    if @rider.present?
       if @rider.update(blocked: false)
         render json: @rider.as_json(only: [:id, :full_name, :email, :physical_address, :blocked]), status: :ok
       else
-        render json: @rider.errors, status: :unprocessable_entity
+        render json: { errors: @rider.errors.full_messages }, status: :unprocessable_entity
       end
     else
-      render json: { error: 'rider not found' }, status: :not_found
+      render json: { error: 'Rider not found' }, status: :not_found
     end
   end
+  
 
   # DELETE /admin/riders/:id
   def destroy
@@ -59,7 +61,7 @@ class Admin::RidersController < ApplicationController
   end
 
   def rider_params
-    params.require(:rider).permit(:full_name, :phone_number, :date_of_birth, :email, :id_number, :driving_license, :physical_address,:vehicle_type, :license_plate, :password, :kin_full_name, :kin_relationship, :kin_phone_number)
+    params.require(:rider).permit(:full_name, :phone_number, :date_of_birth, :email, :id_number, :driving_license, :physical_address, :vehicle_type, :license_plate, :password, :kin_full_name, :kin_relationship, :kin_phone_number)
   end
 
   def authenticate_admin
