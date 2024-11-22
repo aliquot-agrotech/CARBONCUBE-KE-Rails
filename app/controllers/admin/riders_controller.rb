@@ -61,7 +61,7 @@ class Admin::RidersController < ApplicationController
   end
 
   def rider_params
-    params.require(:rider).permit(:full_name, :phone_number, :date_of_birth, :email, :id_number, :driving_license, :physical_address, :vehicle_type, :license_plate, :password, :kin_full_name, :kin_relationship, :kin_phone_number)
+    params.require(:rider).permit(:full_name, :phone_number, :gender, :date_of_birth, :email, :id_number, :driving_license, :physical_address, :vehicle_type, :license_plate, :password, :kin_full_name, :kin_relationship, :kin_phone_number)
   end
 
   def authenticate_admin
