@@ -5,25 +5,25 @@ class Admin::OrdersController < ApplicationController
   # GET /admin/orders
   def index
     if params[:search_query].present?
-      @orders = Order.joins(:purchaser)
+      @orders = Order.joins(order_items: :product, purchaser: {})
                      .where("vendors.phone_number = :query OR purchasers.phone_number = :query OR orders.id = :query", query: params[:search_query])
                      .includes(:purchaser, order_items: { product: :vendor })
     else
       @orders = Order.includes(:purchaser, order_items: { product: :vendor }).all
     end
 
-    render json: @orders, each_serializer: OrderSerializer
+    render json: @orders.map { |order| serialized_order(order) }
   end
 
   # GET /admin/orders/:id
   def show
-    render json: @order, serializer: OrderSerializer
+    render json: serialized_order(@order)
   end
 
   # PUT /admin/orders/:id/update-status
   def update_status
     if @order.update(status: params[:status])
-      render json: @order, serializer: OrderSerializer
+      render json: serialized_order(@order)
     else
       render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
     end
@@ -54,5 +54,40 @@ class Admin::OrdersController < ApplicationController
 
   def current_admin
     @current_user
+  end
+
+  def serialized_order(order)
+    {
+      id: order.id,
+      purchaser: {
+        id: order.purchaser.id,
+        fullname: order.purchaser.fullname,
+        email: order.purchaser.email
+      },
+      order_items: order.order_items.map do |item|
+        {
+          id: item.id,
+          quantity: item.quantity,
+          product: {
+            id: item.product.id,
+            title: item.product.title,
+            price: item.product.price
+          },
+          vendor: {
+            id: item.product.vendor.id,
+            fullname: item.product.vendor.fullname,
+            phone_number: item.product.vendor.phone_number
+          }
+        }
+      end,
+      status: order.status,
+      total_price: order.order_items.sum { |item| item.quantity * item.product.price },
+      processing_fee: order.processing_fee,
+      delivery_fee: order.delivery_fee,
+      mpesa_transaction_code: order.mpesa_transaction_code,
+      order_date: order.created_at.strftime('%Y-%m-%d'),
+      created_at: order.created_at,
+      updated_at: order.updated_at
+    }
   end
 end
