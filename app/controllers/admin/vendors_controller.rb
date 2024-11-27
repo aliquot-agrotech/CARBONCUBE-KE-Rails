@@ -110,6 +110,9 @@ class Admin::VendorsController < ApplicationController
       {
         id: order.id,
         status: order.status,
+        total_amount: order.total_amount,
+        processing_fee: order.processing_fee,
+        delivery_fee: order.delivery_fee,
         created_at: order.created_at,
         updated_at: order.updated_at,
         mpesa_transaction_code: order.mpesa_transaction_code,
@@ -119,13 +122,18 @@ class Admin::VendorsController < ApplicationController
           email: order.purchaser.email,
           phone_number: order.purchaser.phone_number
         },
-        order_items: order.order_items.select { |item| @vendor.products.exists?(item.product_id) }.map do |item|
+        order_items: order.order_items
+                          .select { |item| @vendor.products.exists?(item.product_id) }
+                          .map do |item|
           {
             id: item.id,
             quantity: item.quantity,
+            price: item.price,
+            total_price: item.total_price,
             product: {
               id: item.product.id,
               title: item.product.title,
+              vendor_id: item.product.vendor_id,
               price: item.product.price
             }
           }
@@ -139,8 +147,8 @@ class Admin::VendorsController < ApplicationController
       Rails.logger.info "Order ID: #{order[:id]} has #{order[:order_items].size} items"
     end
   
-    render json: filtered_orders
-  end 
+    render json: filtered_orders, status: :ok
+  end
 
   private
 
