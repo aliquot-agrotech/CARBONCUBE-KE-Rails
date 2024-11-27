@@ -6,14 +6,14 @@ class OrderItemSerializer < ActiveModel::Serializer
   belongs_to :product, serializer: ProductSerializer
 
   def product_name
-    object.product.title
+    object.product&.title || 'Unknown Product'
   end
 
   def price
-    object.product.price
+    object.product&.price || 0
   end
 
   def vendor_name
-    object.product.vendor.fullname
+    object.product&.vendor&.fullname || 'Unknown Vendor'
   end
 end
