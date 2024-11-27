@@ -100,8 +100,9 @@ class Admin::VendorsController < ApplicationController
     #                     .where(order_items: { product_id: @vendor.products.pluck(:id) }).to_sql
     # # Rails.logger.info "SQL Query: #{sql_query}"
   
-    # orders = @vendor.orders.includes(order_items: :product, purchaser: :orders)
-    #                   .where(order_items: { product_id: @vendor.products.pluck(:id) })
+    orders = @vendor.orders.includes(order_items: [:product, :order], purchaser: :orders)
+                          .where(order_items: { product_id: @vendor.products.pluck(:id) })
+
   
     # Log the count of orders fetched
     # Rails.logger.info "Fetched #{orders.size} orders for vendor #{@vendor.id}"
