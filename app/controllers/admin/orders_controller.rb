@@ -5,7 +5,7 @@ class Admin::OrdersController < ApplicationController
   # GET /admin/orders
   def index
     if params[:search_query].present?
-      @orders = Order.joins(order_items: :product, purchaser: {})
+      @orders = Order.joins(order_items: { product: :vendor }, purchaser: {})
                      .where("vendors.phone_number = :query OR purchasers.phone_number = :query OR orders.id = :query", query: params[:search_query])
                      .includes(:purchaser, order_items: { product: :vendor })
     else
@@ -52,17 +52,13 @@ class Admin::OrdersController < ApplicationController
     end
   end
 
-  def current_admin
-    @current_user
-  end
-
   def serialized_order(order)
     {
       id: order.id,
       purchaser: {
         id: order.purchaser.id,
         fullname: order.purchaser.fullname,
-        email: order.purchaser.email
+        phone_number: order.purchaser.phone_number
       },
       order_items: order.order_items.map do |item|
         {
@@ -75,13 +71,12 @@ class Admin::OrdersController < ApplicationController
           },
           vendor: {
             id: item.product.vendor.id,
-            fullname: item.product.vendor.fullname,
-            phone_number: item.product.vendor.phone_number
+            fullname: item.product.vendor.fullname
           }
         }
       end,
       status: order.status,
-      total_price: order.order_items.sum { |item| item.quantity * item.product.price },
+      total_amount: order.order_items.sum { |item| item.quantity * item.product.price },
       processing_fee: order.processing_fee,
       delivery_fee: order.delivery_fee,
       mpesa_transaction_code: order.mpesa_transaction_code,
