@@ -29,7 +29,7 @@ class Admin::AnalyticsController < ApplicationController
                                      .distinct
                                      .count
 
-    # Top 5 Purchasers Insights
+    # Top 10 Purchasers Insights
     purchasers_insights = Purchaser.joins(:orders)
                                    .select('purchasers.fullname, COUNT(orders.id) AS total_orders')
                                    .group('purchasers.id')
