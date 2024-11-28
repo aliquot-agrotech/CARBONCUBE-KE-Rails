@@ -27,7 +27,7 @@ class Admin::ProductsController < ApplicationController
                       .find(params[:id])
                       .tap do |product|
                         product.define_singleton_method(:quantity_sold) do
-                          OrderItem.where(product_id: id).count
+                          OrderItem.where(product_id: id).sum(:quantity)
                         end
                         product.define_singleton_method(:mean_rating) do
                           reviews = Review.where(product_id: id)
