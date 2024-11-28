@@ -4,7 +4,7 @@ class Admin::ProductsController < ApplicationController
   # GET /admin/products
   def index
     @products = Product.joins(:vendor, :category, :subcategory)
-                       .where(vendors: { blocked: false })
+                      .where(vendors: { blocked: false })
     
     if params[:category_id].present?
       @products = @products.where(category_id: params[:category_id])

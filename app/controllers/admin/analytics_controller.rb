@@ -26,15 +26,15 @@ class Admin::AnalyticsController < ApplicationController
 
     # Total Products Sold Out
     total_products_sold_out = Product.joins(:order_items)
-                                     .distinct
-                                     .count
+                                    .distinct
+                                    .count
 
     # Top 10 Purchasers Insights
     purchasers_insights = Purchaser.joins(:orders)
-                                   .select('purchasers.fullname, COUNT(orders.id) AS total_orders')
-                                   .group('purchasers.id')
-                                   .order('total_orders DESC')
-                                   .limit(10)
+                                  .select('purchasers.fullname, COUNT(orders.id) AS total_orders')
+                                  .group('purchasers.id')
+                                  .order('total_orders DESC')
+                                  .limit(10)
 
     # Total Revenue
     total_revenue = Order.joins(:order_items).sum('order_items.price * order_items.quantity')
@@ -45,10 +45,10 @@ class Admin::AnalyticsController < ApplicationController
     three_months_ago = 2.months.ago.beginning_of_month
   
     sales_performance = Order.joins(:order_items)
-                             .where(created_at: three_months_ago..current_month.end_of_month)
-                             .group("DATE_TRUNC('month', orders.created_at)")
-                             .sum('order_items.price * order_items.quantity')
-                             .transform_keys { |k| k.strftime("%B %Y") }
+                            .where(created_at: three_months_ago..current_month.end_of_month)
+                            .group("DATE_TRUNC('month', orders.created_at)")
+                            .sum('order_items.price * order_items.quantity')
+                            .transform_keys { |k| k.strftime("%B %Y") }
 
     # Best Selling Categories Analytics
     best_selling_categories = Category.joins(products: :order_items)
