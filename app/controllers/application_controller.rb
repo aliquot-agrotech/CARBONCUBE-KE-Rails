@@ -6,6 +6,11 @@ class ApplicationController < ActionController::Base
 
   attr_reader :current_user
 
+  # New home action to handle root path request
+  def home
+    render json: { message: "API is up and running" }, status: :ok
+  end
+
   private
 
   def authenticate_request
@@ -13,3 +18,4 @@ class ApplicationController < ActionController::Base
     render json: { error: 'Not Authorized' }, status: 401 unless @current_user
   end
 end
+z
