@@ -18,4 +18,3 @@ class ApplicationController < ActionController::Base
     render json: { error: 'Not Authorized' }, status: 401 unless @current_user
   end
 end
-z
