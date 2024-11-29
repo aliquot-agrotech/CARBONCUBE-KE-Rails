@@ -1,14 +1,14 @@
 # app/controllers/application_controller.rb
-class ApplicationController < ActionController::Base
-  skip_before_action :verify_authenticity_token, raise: false
+class ApplicationController < ActionController::Base  
+  skip_before_action :verify_authenticity_token, raise: false # Skip CSRF protection for APIs
+
+  # before_action :authenticate_request # Example authentication check
 
   attr_reader :current_user
 
+  # New home action to handle root path request
   def home
-    respond_to do |format|
-      format.json { render json: { message: "API is up and running" }, status: :ok }
-      # You can add other formats here if needed, but for API, we usually focus on `json`.
-    end
+    render json: { message: "API is up and running" }, status: :ok
   end
 
   private
