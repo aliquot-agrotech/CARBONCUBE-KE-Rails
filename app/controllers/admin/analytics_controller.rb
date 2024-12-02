@@ -36,6 +36,21 @@ class Admin::AnalyticsController < ApplicationController
                                   .order('total_orders DESC')
                                   .limit(10)
 
+    # Top 10 Vendors Insights based on filtering of Total Orders, Total Revenue and Average Rating
+    vendors_insights = Vendor.joins(orders: :order_items)
+                              .joins("INNER JOIN products ON products.vendor_id = vendors.id")
+                              .select(
+                                'vendors.fullname',
+                                'COUNT(DISTINCT orders.id) AS total_orders',
+                                'SUM(order_items.quantity * order_items.price) AS total_revenue',
+                                'AVG(reviews.rating) AS mean_rating'
+                              )
+                              .left_joins(products: :reviews)
+                              .group('vendors.id')
+                              .order('total_orders DESC')
+                              .limit(10)
+
+
     # Total Revenue
     total_revenue = Order.joins(:order_items).sum('order_items.price * order_items.quantity')
 
@@ -67,6 +82,7 @@ class Admin::AnalyticsController < ApplicationController
       best_selling_products: best_selling_products,
       total_products_sold_out: total_products_sold_out,
       purchasers_insights: purchasers_insights,
+      vendors_insights: vendors_insights,
       total_revenue: total_revenue,
       sales_performance: sales_performance,
       best_selling_categories: best_selling_categories
