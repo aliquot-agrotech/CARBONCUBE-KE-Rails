@@ -52,15 +52,17 @@ class Admin::AnalyticsController < ApplicationController
 
 
     # Calculate average rating# Calculate total revenue for each vendor
-    vendors_by_revenue = Vendor.joins(products: :order_items)
-                                .select(
-                                  'vendors.id AS vendor_id',
-                                  'vendors.fullname',
-                                  'SUM(order_items.quantity * order_items.price) AS total_revenue'
-                                )
-                                .where(order_items: { product_id: Vendor.select(:id).where(vendor_id: 'vendors.id') })
-                                .group('vendors.id')
-                                .order('total_revenue DESC')
+    # Calculate total revenue for each vendor and sort them from highest to lowest
+vendors_by_revenue = Vendor.joins(products: :order_items)
+.select(
+  'vendors.id AS vendor_id',
+  'vendors.fullname',
+  'SUM(order_items.quantity * order_items.price) AS total_revenue'
+)
+.joins('INNER JOIN products ON products.vendor_id = vendors.id')  # Proper join with products table
+.group('vendors.id')
+.order('total_revenue DESC')
+
 
     vendors_by_rating = Vendor.joins(products: :reviews)
                               .select(
