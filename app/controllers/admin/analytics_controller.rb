@@ -10,24 +10,24 @@ class Admin::AnalyticsController < ApplicationController
 
     # Top 6 Best Selling Products Overall
     best_selling_products = Product.joins(:order_items)
-                                .select('products.id AS product_id, products.title AS product_title, products.price AS product_price, SUM(order_items.quantity) AS total_sold, products.media AS media')
-                                .group('products.id')
-                                .order('total_sold DESC')
-                                .limit(6)
-                                .map { |record| 
-                                  {
-                                    product_id: record.product_id,
-                                    product_title: record.product_title,
-                                    product_price: record.product_price,
-                                    total_sold: record.total_sold,
-                                    media: record.media # Add media here
-                                  }
-                                }
+                                   .select('products.id AS product_id, products.title AS product_title, products.price AS product_price, SUM(order_items.quantity) AS total_sold, products.media AS media')
+                                   .group('products.id')
+                                   .order('total_sold DESC')
+                                   .limit(6)
+                                   .map { |record| 
+                                     {
+                                       product_id: record.product_id,
+                                       product_title: record.product_title,
+                                       product_price: record.product_price,
+                                       total_sold: record.total_sold,
+                                       media: record.media
+                                     }
+                                   }
 
     # Total Products Sold Out
     total_products_sold_out = Product.joins(:order_items)
-                                    .distinct
-                                    .count
+                                     .distinct
+                                     .count
 
     # Top 10 Purchasers Insights
     purchasers_insights = Purchaser.joins(:orders)
@@ -36,20 +36,34 @@ class Admin::AnalyticsController < ApplicationController
                                   .order('total_orders DESC')
                                   .limit(10)
 
-    # Top 10 Vendors Insights based on filtering of Total Orders, Total Revenue and Average Rating
-    vendors_insights = Vendor.joins(orders: :order_items)
-                              .joins("INNER JOIN products ON products.vendor_id = vendors.id")
-                              .select(
-                                'vendors.fullname',
-                                'COUNT(DISTINCT orders.id) AS total_orders',
-                                'SUM(order_items.quantity * order_items.price) AS total_revenue',
-                                'AVG(reviews.rating) AS mean_rating'
-                              )
-                              .left_joins(products: :reviews)
-                              .group('vendors.id')
-                              .order('total_orders DESC')
-                              .limit(10)
+    # Get selected metric from query parameter, default to 'Total Orders' if none provided
+    selected_metric = params[:metric] || 'Total Orders'
 
+    # Top 10 Vendors Insights based on filtering of Total Orders, Total Revenue, and Average Rating
+    vendors_insights = Vendor.joins(orders: :order_items)
+                             .joins("INNER JOIN products ON products.vendor_id = vendors.id")
+                             .select(
+                               'vendors.fullname',
+                               'COUNT(DISTINCT orders.id) AS total_orders',
+                               'SUM(order_items.quantity * order_items.price) AS total_revenue',
+                               'AVG(reviews.rating) AS mean_rating'
+                             )
+                             .left_joins(products: :reviews)
+                             .group('vendors.id')
+
+    # Dynamically adjust the order by clause based on selected metric
+    case selected_metric
+    when 'Total Orders'
+      vendors_insights = vendors_insights.order('total_orders DESC')
+    when 'Total Revenue'
+      vendors_insights = vendors_insights.order('total_revenue DESC')
+    when 'Average Rating'
+      vendors_insights = vendors_insights.order('mean_rating DESC')
+    else
+      vendors_insights = vendors_insights.order('total_orders DESC') # Default to Total Orders
+    end
+
+    vendors_insights = vendors_insights.limit(10)
 
     # Total Revenue
     total_revenue = Order.joins(:order_items).sum('order_items.price * order_items.quantity')
@@ -60,10 +74,10 @@ class Admin::AnalyticsController < ApplicationController
     three_months_ago = 2.months.ago.beginning_of_month
   
     sales_performance = Order.joins(:order_items)
-                            .where(created_at: three_months_ago..current_month.end_of_month)
-                            .group("DATE_TRUNC('month', orders.created_at)")
-                            .sum('order_items.price * order_items.quantity')
-                            .transform_keys { |k| k.strftime("%B %Y") }
+                             .where(created_at: three_months_ago..current_month.end_of_month)
+                             .group("DATE_TRUNC('month', orders.created_at)")
+                             .sum('order_items.price * order_items.quantity')
+                             .transform_keys { |k| k.strftime("%B %Y") }
 
     # Best Selling Categories Analytics
     best_selling_categories = Category.joins(products: :order_items)
