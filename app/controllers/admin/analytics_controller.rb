@@ -39,32 +39,51 @@ class Admin::AnalyticsController < ApplicationController
     # Get selected metric from query parameter, default to 'Total Orders' if none provided
     selected_metric = params[:metric] || 'Total Orders'
 
-    # Top 10 Vendors Insights based on filtering of Total Orders, Total Revenue, and Average Rating
-vendors_insights = Vendor.joins(products: :order_items)
-.select(
-  'vendors.id',
-  'vendors.fullname',
-  'COUNT(DISTINCT orders.id) AS total_orders',
-  'SUM(order_items.quantity * order_items.price) AS total_revenue',
-  'AVG(COALESCE(reviews.rating, 0)) AS mean_rating'
-)
-.joins('LEFT JOIN orders ON orders.id IN (SELECT order_id FROM order_items WHERE order_items.product_id IN (SELECT id FROM products WHERE products.vendor_id = vendors.id))')
-.left_joins(products: :reviews)
-.group('vendors.id', 'vendors.fullname')
+    # Calculate total orders
+    vendors_by_orders = Vendor.joins(orders: :order_items)
+                              .select(
+                                'vendors.id AS vendor_id',
+                                'vendors.fullname',
+                                'COUNT(DISTINCT orders.id) AS total_orders'
+                              )
+                              .group('vendors.id')
+                              .order('total_orders DESC')
 
-# Dynamically adjust the order by clause based on selected metric
-case selected_metric
-when 'Total Orders'
-vendors_insights = vendors_insights.order('total_orders DESC')
-when 'Total Revenue'
-vendors_insights = vendors_insights.order('total_revenue DESC')
-when 'Average Rating'
-vendors_insights = vendors_insights.order('mean_rating DESC')
-else
-vendors_insights = vendors_insights.order('total_orders DESC') # Default to Total Orders
-end
+    # Calculate total revenue
+    vendors_by_revenue = Vendor.joins(orders: :order_items)
+                               .joins(products: :order_items)
+                               .select(
+                                 'vendors.id AS vendor_id',
+                                 'vendors.fullname',
+                                 'SUM(order_items.quantity * order_items.price) AS total_revenue'
+                               )
+                               .group('vendors.id')
+                               .order('total_revenue DESC')
 
-vendors_insights = vendors_insights.limit(10)
+    # Calculate average rating
+    vendors_by_rating = Vendor.joins(products: :reviews)
+                              .select(
+                                'vendors.id AS vendor_id',
+                                'vendors.fullname',
+                                'AVG(COALESCE(reviews.rating, 0)) AS mean_rating'
+                              )
+                              .group('vendors.id')
+                              .order('mean_rating DESC')
+
+    # Dynamically select the vendors' insights based on the metric
+    case selected_metric
+    when 'Total Orders'
+      vendors_insights = vendors_by_orders
+    when 'Total Revenue'
+      vendors_insights = vendors_by_revenue
+    when 'Average Rating'
+      vendors_insights = vendors_by_rating
+    else
+      vendors_insights = vendors_by_orders # Default to Total Orders
+    end
+
+    # Limit the results to the top 10
+    vendors_insights = vendors_insights.limit(10)
 
     # Total Revenue
     total_revenue = Order.joins(:order_items).sum('order_items.price * order_items.quantity')
@@ -73,7 +92,7 @@ vendors_insights = vendors_insights.limit(10)
     # Sales Performance for the last 3 months
     current_month = Date.current.beginning_of_month
     three_months_ago = 2.months.ago.beginning_of_month
-  
+
     sales_performance = Order.joins(:order_items)
                              .where(created_at: three_months_ago..current_month.end_of_month)
                              .group("DATE_TRUNC('month', orders.created_at)")
