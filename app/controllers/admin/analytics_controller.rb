@@ -49,6 +49,7 @@ class Admin::AnalyticsController < ApplicationController
                               .group('vendors.id')
                               .order('total_orders DESC')
 
+    # Calculate total revenue
     vendors_by_revenue = Vendor.joins(orders: :order_items)
                               .joins(products: :order_items)
                               .select(
@@ -59,7 +60,7 @@ class Admin::AnalyticsController < ApplicationController
                               .group('vendors.id')
                               .order('total_revenue DESC')
 
-    # Calculate average rating
+    # Calculate mean rating
     vendors_by_rating = Vendor.joins(products: :reviews)
                               .select(
                                 'vendors.id AS vendor_id',
@@ -75,7 +76,7 @@ class Admin::AnalyticsController < ApplicationController
       vendors_insights = vendors_by_revenue
     when 'Total Orders'
       vendors_insights = vendors_by_orders
-    when 'Average Rating'
+    when 'Rating'
       vendors_insights = vendors_by_rating
     else
       vendors_insights = vendors_by_revenue # Default to Total Orders
