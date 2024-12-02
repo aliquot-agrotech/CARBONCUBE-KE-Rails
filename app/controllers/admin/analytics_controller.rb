@@ -37,7 +37,7 @@ class Admin::AnalyticsController < ApplicationController
                                   .limit(10)
 
     # Get selected metric from query parameter, default to 'Total Orders' if none provided
-    selected_metric = params[:metric] || 'Total Orders'
+    selected_metric = params[:metric] || 'Total Revenue'
 
     # Calculate total orders
     vendors_by_orders = Vendor.joins(orders: :order_items)
@@ -71,14 +71,14 @@ class Admin::AnalyticsController < ApplicationController
 
     # Dynamically select the vendors' insights based on the metric
     case selected_metric
-    when 'Total Orders'
-      vendors_insights = vendors_by_orders
     when 'Total Revenue'
       vendors_insights = vendors_by_revenue
+    when 'Total Orders'
+      vendors_insights = vendors_by_orders
     when 'Average Rating'
       vendors_insights = vendors_by_rating
     else
-      vendors_insights = vendors_by_orders # Default to Total Orders
+      vendors_insights = vendors_by_revenue # Default to Total Orders
     end
 
     # Limit the results to the top 10
