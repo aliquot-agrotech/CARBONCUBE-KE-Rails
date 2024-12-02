@@ -40,30 +40,32 @@ class Admin::AnalyticsController < ApplicationController
     selected_metric = params[:metric] || 'Total Orders'
 
     # Top 10 Vendors Insights based on filtering of Total Orders, Total Revenue, and Average Rating
-    vendors_insights = Vendor.joins(orders: :order_items)
-                             .joins("INNER JOIN products ON products.vendor_id = vendors.id")
-                             .select(
-                               'vendors.fullname',
-                               'COUNT(DISTINCT orders.id) AS total_orders',
-                               'SUM(order_items.quantity * order_items.price) AS total_revenue',
-                               'AVG(reviews.rating) AS mean_rating'
-                             )
-                             .left_joins(products: :reviews)
-                             .group('vendors.id')
+    # Top 10 Vendors Insights based on filtering of Total Orders, Total Revenue, and Average Rating
+      vendors_insights = Vendor.joins(orders: :order_items)
+      .joins(:products)
+      .select(
+        'vendors.fullname',
+        'COUNT(DISTINCT orders.id) AS total_orders',
+        'SUM(order_items.quantity * order_items.price) AS total_revenue',
+        'AVG(COALESCE(reviews.rating, 0)) AS mean_rating'
+      )
+      .left_joins(products: :reviews)
+      .group('vendors.id')
 
-    # Dynamically adjust the order by clause based on selected metric
-    case selected_metric
-    when 'Total Orders'
+      # Dynamically adjust the order by clause based on selected metric
+      case selected_metric
+      when 'Total Orders'
       vendors_insights = vendors_insights.order('total_orders DESC')
-    when 'Total Revenue'
+      when 'Total Revenue'
       vendors_insights = vendors_insights.order('total_revenue DESC')
-    when 'Average Rating'
+      when 'Average Rating'
       vendors_insights = vendors_insights.order('mean_rating DESC')
-    else
+      else
       vendors_insights = vendors_insights.order('total_orders DESC') # Default to Total Orders
-    end
+      end
 
-    vendors_insights = vendors_insights.limit(10)
+      vendors_insights = vendors_insights.limit(10)
+
 
     # Total Revenue
     total_revenue = Order.joins(:order_items).sum('order_items.price * order_items.quantity')
