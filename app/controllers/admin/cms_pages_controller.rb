@@ -53,5 +53,5 @@ class Admin::CmsPagesController < ApplicationController
     def current_admin
       @current_user
     end
-  end
+end
   

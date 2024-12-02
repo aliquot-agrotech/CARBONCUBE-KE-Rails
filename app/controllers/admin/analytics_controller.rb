@@ -49,17 +49,19 @@ class Admin::AnalyticsController < ApplicationController
                               .group('vendors.id')
                               .order('total_orders DESC')
 
-    vendors_by_revenue = Vendor.joins(orders: :order_items)
-                              .joins(products: :order_items)
-                              .select(
-                                'vendors.id AS vendor_id',
-                                'vendors.fullname',
-                                'SUM(order_items.quantity * order_items.price) AS total_revenue'
-                              )
-                              .group('vendors.id')
-                              .order('total_revenue DESC')
 
-    # Calculate average rating
+
+    # Calculate average rating# Calculate total revenue for each vendor
+    vendors_by_revenue = Vendor.joins(products: :order_items)
+                                .select(
+                                  'vendors.id AS vendor_id',
+                                  'vendors.fullname',
+                                  'SUM(order_items.quantity * order_items.price) AS total_revenue'
+                                )
+                                .where(order_items: { product_id: Vendor.select(:id).where(vendor_id: 'vendors.id') })
+                                .group('vendors.id')
+                                .order('total_revenue DESC')
+
     vendors_by_rating = Vendor.joins(products: :reviews)
                               .select(
                                 'vendors.id AS vendor_id',
