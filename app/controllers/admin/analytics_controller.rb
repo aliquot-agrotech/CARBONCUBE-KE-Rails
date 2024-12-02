@@ -37,7 +37,7 @@ class Admin::AnalyticsController < ApplicationController
                                   .limit(10)
 
     # Get selected metric from query parameter, default to 'Total Orders' if none provided
-    selected_metric = params[:metric] || 'Total Revenue'
+    selected_metric = params[:metric] || 'Total Orders'
 
     # Calculate total orders
     vendors_by_orders = Vendor.joins(orders: :order_items)
@@ -49,21 +49,17 @@ class Admin::AnalyticsController < ApplicationController
                               .group('vendors.id')
                               .order('total_orders DESC')
 
+    vendors_by_revenue = Vendor.joins(orders: :order_items)
+                              .joins(products: :order_items)
+                              .select(
+                                'vendors.id AS vendor_id',
+                                'vendors.fullname',
+                                'SUM(order_items.quantity * order_items.price) AS total_revenue'
+                              )
+                              .group('vendors.id')
+                              .order('total_revenue DESC')
 
-
-    # Calculate average rating# Calculate total revenue for each vendor
-    # Calculate total revenue for each vendor and sort them from highest to lowest
-vendors_by_revenue = Vendor.joins(products: :order_items)
-.select(
-  'vendors.id AS vendor_id',
-  'vendors.fullname',
-  'SUM(order_items.quantity * order_items.price) AS total_revenue'
-)
-.joins('INNER JOIN products ON products.vendor_id = vendors.id')  # Proper join with products table
-.group('vendors.id')
-.order('total_revenue DESC')
-
-
+    # Calculate average rating
     vendors_by_rating = Vendor.joins(products: :reviews)
                               .select(
                                 'vendors.id AS vendor_id',
