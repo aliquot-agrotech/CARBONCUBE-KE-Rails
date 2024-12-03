@@ -10,24 +10,24 @@ class Admin::AnalyticsController < ApplicationController
 
     # Top 6 Best Selling Products Overall
     best_selling_products = Product.joins(:order_items)
-                                   .select('products.id AS product_id, products.title AS product_title, products.price AS product_price, SUM(order_items.quantity) AS total_sold, products.media AS media')
-                                   .group('products.id')
-                                   .order('total_sold DESC')
-                                   .limit(6)
-                                   .map { |record| 
-                                     {
-                                       product_id: record.product_id,
-                                       product_title: record.product_title,
-                                       product_price: record.product_price,
-                                       total_sold: record.total_sold,
-                                       media: record.media
-                                     }
-                                   }
+                                  .select('products.id AS product_id, products.title AS product_title, products.price AS product_price, SUM(order_items.quantity) AS total_sold, products.media AS media')
+                                  .group('products.id')
+                                  .order('total_sold DESC')
+                                  .limit(6)
+                                  .map { |record| 
+                                    {
+                                      product_id: record.product_id,
+                                      product_title: record.product_title,
+                                      product_price: record.product_price,
+                                      total_sold: record.total_sold,
+                                      media: record.media
+                                    }
+                                  }
 
     # Total Products Sold Out
     total_products_sold_out = Product.joins(:order_items)
-                                     .distinct
-                                     .count
+                                    .distinct
+                                    .count
 
     # Top 10 Purchasers Insights
     purchasers_insights = Purchaser.joins(:orders)
@@ -72,14 +72,14 @@ class Admin::AnalyticsController < ApplicationController
 
     # Dynamically select the vendors' insights based on the metric
     case selected_metric
-    when 'Total Revenue'
-      vendors_insights = vendors_by_revenue
-    when 'Total Orders'
-      vendors_insights = vendors_by_orders
-    when 'Rating'
-      vendors_insights = vendors_by_rating
-    else
-      vendors_insights = vendors_by_revenue # Default to Total Orders
+      when 'Total Revenue'
+        vendors_insights = vendors_by_revenue
+      when 'Total Orders'
+        vendors_insights = vendors_by_orders
+      when 'Rating'
+        vendors_insights = vendors_by_rating
+      else
+        vendors_insights = vendors_by_revenue # Default to Total Orders
     end
 
     # Limit the results to the top 10
