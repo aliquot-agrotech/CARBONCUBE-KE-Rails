@@ -61,7 +61,7 @@ class Admin::AnalyticsController < ApplicationController
     #                           .order('total_revenue DESC')
 
     vendors_by_revenue = Vendor.joins(products: :order_items)
-    .select('vendors.id, vendors.name, SUM(order_items.total_price) AS total_revenue')
+    .select('vendors.id, vendors.fullname, SUM(order_items.total_price) AS total_revenue')
     .group('vendors.id')
     .order('total_revenue DESC')
 
