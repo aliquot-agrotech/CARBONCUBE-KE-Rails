@@ -29,29 +29,52 @@ class Admin::AnalyticsController < ApplicationController
                               .distinct
                               .count
 
-    # Top 10 Purchasers Insights
-    purchasers_insights = Purchaser.joins(:orders)
-                          .select('purchasers.fullname, COUNT(orders.id) AS total_orders')
-                          .group('purchasers.id')
-                          .order('total_orders DESC')
-                          .limit(10)
+
 
     # Get selected metric from query parameter, default to 'Total Orders' if none provided
     selected_metric = params[:metric] || 'Total Orders'
 
-    # Calculate total orders
+    # Calculate purchaser total orders
+    purchasers_by_orders = Purchaser.joins(:orders)
+                          .select('purchasers.fullname, COUNT(orders.id) AS total_orders')
+                          .group('purchasers.id')
+                          .order('total_orders DESC')
+
+    # Calculate purchaser total expenditure
+    purchasers_by_expenditure = Purchaser.joins(:orders)
+                                .select('purchasers.id AS purchaser_id, purchasers.fullname, SUM(orders.total_amount) AS total_expenditure')
+                                .group('purchasers.id')
+                                .order('total_expenditure DESC')
+
+    # Dynamically select the purchasers' insights based on the metric
+    case selected_metric 
+      when 'Total Orders'
+        purchasers_insights = purchasers_by_orders
+      when 'Total Expenditure'
+        purchasers_insights = purchasers_by_expenditure
+      else
+        purchasers_insights = purchasers_by_orders
+    end
+
+
+    purchasers_insights = purchasers_insights.limit(10)
+
+    # Get selected metric from query parameter, default to 'Total Orders' if none provided
+    selected_metric = params[:metric] || 'Total Orders'
+
+    # Calculate vendor total orders
     vendors_by_orders = Vendor.joins(orders: :order_items)
                         .select( 'vendors.id AS vendor_id, vendors.fullname, COUNT(DISTINCT orders.id) AS total_orders') 
                         .group('vendors.id')
                         .order('total_orders DESC')
 
-    # Calculate total revenue
+    # Calculate vendor total revenue
     vendors_by_revenue = Vendor.joins(products: :order_items)
                         .select('vendors.id, vendors.fullname, SUM(order_items.total_price) AS total_revenue')
                         .group('vendors.id')
                         .order('total_revenue DESC')
 
-    # Calculate mean rating
+    # Calculate vendor mean rating
     vendors_by_rating = Vendor.joins(products: :reviews)
                         .select('vendors.id, vendors.fullname, COALESCE(AVG(reviews.rating), 0) AS mean_rating')
                         .group('vendors.id')
