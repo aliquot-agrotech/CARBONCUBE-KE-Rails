@@ -64,7 +64,11 @@ class Admin::AnalyticsController < ApplicationController
       when 'Total Revenue'
         vendors_insights = vendors_by_revenue
       when 'Rating'
-        vendors_insights = vendors_by_rating
+        vendors_insights = vendors_by_rating.map do |vendor|
+          # Format mean_rating to always show two decimal places
+          vendor.mean_rating = sprintf('%.2f', vendor.mean_rating)
+          vendor
+        end
       else
         vendors_insights = vendors_by_revenue # Default to Total Orders
     end
