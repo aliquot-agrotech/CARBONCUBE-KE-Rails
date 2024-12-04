@@ -45,16 +45,15 @@ class Admin::AnalyticsController < ApplicationController
                         .group('vendors.id')
                         .order('total_orders DESC')
 
-
+    # Calculate total revenue
     vendors_by_revenue = Vendor.joins(products: :order_items)
                         .select('vendors.id, vendors.fullname, SUM(order_items.total_price) AS total_revenue')
                         .group('vendors.id')
                         .order('total_revenue DESC')
 
-
     # Calculate mean rating
     vendors_by_rating = Vendor.joins(products: :reviews)
-                        .select('vendors.id, vendors.fullname, AVG(reviews.rating) AS mean_rating')
+                        .select('vendors.id, vendors.fullname, COALESCE(AVG(reviews.rating), 0) AS mean_rating')
                         .group('vendors.id')
                         .order('mean_rating DESC')
 
