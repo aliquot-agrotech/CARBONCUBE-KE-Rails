@@ -72,10 +72,10 @@ class Admin::AnalyticsController < ApplicationController
 
     # Dynamically select the vendors' insights based on the metric
     case selected_metric
-      when 'Total Revenue'
-        vendors_insights = vendors_by_revenue
       when 'Total Orders'
         vendors_insights = vendors_by_orders
+      when 'Total Revenue'
+        vendors_insights = vendors_by_revenue
       when 'Rating'
         vendors_insights = vendors_by_rating
       else
@@ -94,10 +94,10 @@ class Admin::AnalyticsController < ApplicationController
     three_months_ago = 2.months.ago.beginning_of_month
 
     sales_performance = Order.joins(:order_items)
-                             .where(created_at: three_months_ago..current_month.end_of_month)
-                             .group("DATE_TRUNC('month', orders.created_at)")
-                             .sum('order_items.price * order_items.quantity')
-                             .transform_keys { |k| k.strftime("%B %Y") }
+                            .where(created_at: three_months_ago..current_month.end_of_month)
+                            .group("DATE_TRUNC('month', orders.created_at)")
+                            .sum('order_items.price * order_items.quantity')
+                            .transform_keys { |k| k.strftime("%B %Y") }
 
     # Best Selling Categories Analytics
     best_selling_categories = Category.joins(products: :order_items)
