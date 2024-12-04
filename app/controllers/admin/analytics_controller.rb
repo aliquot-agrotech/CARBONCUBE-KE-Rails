@@ -54,9 +54,9 @@ class Admin::AnalyticsController < ApplicationController
 
     # Calculate mean rating
     vendors_by_rating = Vendor.joins(products: :reviews)
-                        .select('vendors.id, vendors.fullname, AVG(reviews.rating) AS average_rating')
+                        .select('vendors.id, vendors.fullname, AVG(reviews.rating) AS mean_rating')
                         .group('vendors.id')
-                        .order('average_rating DESC')
+                        .order('mean_rating DESC')
 
     # Dynamically select the vendors' insights based on the metric
     case selected_metric
