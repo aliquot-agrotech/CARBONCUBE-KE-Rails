@@ -53,7 +53,7 @@ class Admin::AnalyticsController < ApplicationController
 
     # Calculate mean rating
     vendors_by_rating = Vendor.joins(products: :reviews)
-                        .select('vendors.id, vendors.fullname, ROUND(COALESCE(AVG(reviews.rating), 0), 2) AS mean_rating')
+                        .select('vendors.id, vendors.fullname, COALESCE(AVG(reviews.rating), 0) AS mean_rating')
                         .group('vendors.id')
                         .order('mean_rating DESC')
 
@@ -64,11 +64,7 @@ class Admin::AnalyticsController < ApplicationController
       when 'Total Revenue'
         vendors_insights = vendors_by_revenue
       when 'Rating'
-        vendors_insights = vendors_by_rating.map do |vendor|
-          # Format mean_rating to always show two decimal places
-          vendor.mean_rating = sprintf('%.2f', vendor.mean_rating)
-          vendor
-        end
+        vendors_insights = vendors_by_rating
       else
         vendors_insights = vendors_by_revenue # Default to Total Orders
     end
