@@ -28,7 +28,7 @@ module CARBONCUBE_KE_Rails
     # CORS configuration
     config.middleware.insert_before 0, Rack::Cors do
       allow do
-        origins 'https://carboncube-ke.vercel.app', 'http://localhost:3001' # Adjust the origin as needed
+        origins 'https://carboncube-ke.vercel.app', 'http://localhost:3000' # Adjust the origin as needed
         resource '*',
           headers: :any,
           methods: [:get, :post, :put, :patch, :delete, :options, :head],
