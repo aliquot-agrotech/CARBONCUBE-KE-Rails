@@ -36,7 +36,7 @@ class Admin::AnalyticsController < ApplicationController
 
     # Calculate purchaser total orders
     purchasers_by_orders = Purchaser.joins(:orders)
-                          .select('purchasers.fullname, COUNT(orders.id) AS total_orders')
+                          .select('purchasers.id AS purchaser_id, purchasers.fullname, COUNT(orders.id) AS total_orders')
                           .group('purchasers.id')
                           .order('total_orders DESC')
 
