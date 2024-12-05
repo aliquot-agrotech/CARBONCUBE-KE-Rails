@@ -79,7 +79,7 @@ puts "Starts seeding Admin"
 Admin.find_or_create_by(email: 'admin@example.com') do |admin|
   admin.fullname = 'Admin Name'
   admin.username = 'admin'
-  admin.password = 'adminpassword'
+  admin.password = '@admin#password123'
 end
 
 puts "Starts seeding Vendors, Riders and Purchasers"
@@ -700,7 +700,6 @@ def generate_mpesa_transaction_code
   unique_part = Faker::Alphanumeric.unique.alpha(number: 3).upcase
   "#{alpha_part[0..1]}#{random_digits}#{alpha_part[2..-1]}#{unique_part}"
 end
-
 DELIVERY_FEE = 150
 
 # Generate order data
@@ -714,16 +713,16 @@ order_data = 500.times.map do
     quantity = Faker::Number.between(from: 1, to: 10)
     price = product.price
     total_price = price * quantity
-    
+
     # Calculate processing fee for this specific product's total
-    product_processing_fee = calculate_transaction_fee(total_price) * 2
+    product_processing_fee = calculate_transaction_fee(total_price).round(2) * 2
 
     {
       product_id: product.id,
       quantity: quantity,
-      price: price,
-      total_price: total_price,
-      processing_fee: product_processing_fee,  # Store processing fee per product
+      price: price.round(2),                     # Round price to two decimal places
+      total_price: total_price.round(2),         # Round total price to two decimal places
+      processing_fee: product_processing_fee,    # Store processing fee per product
       vendor_id: product.vendor_id
     }
   end
@@ -735,24 +734,27 @@ order_data = 500.times.map do
   total_processing_fee = order_items.sum { |item| item[:processing_fee] }
   
   # Calculate total amount including all fees
-  total_amount = subtotal + total_processing_fee + DELIVERY_FEE
+  total_amount = (subtotal + total_processing_fee + DELIVERY_FEE).round(2) # Ensure two decimal precision
 
+  # Generate random created_at date
   selected_month = date_ranges.keys.sample
   date_range = date_ranges[selected_month]
   created_at = Faker::Date.between(from: date_range.begin, to: date_range.end)
 
+  # Return the order data
   {
     purchaser_id: purchaser.id,
     status: status,
-    processing_fee: total_processing_fee,     # Sum of all product processing fees
-    delivery_fee: DELIVERY_FEE,              # Fixed delivery fee
-    total_amount: total_amount,
+    processing_fee: total_processing_fee.round(2),  # Round total processing fee
+    delivery_fee: DELIVERY_FEE,                    # Fixed delivery fee
+    total_amount: total_amount,                    # Total amount including all fees
     mpesa_transaction_code: generate_mpesa_transaction_code,
     created_at: created_at,
     updated_at: created_at,
     order_items: order_items
   }
 end
+
 
 # Sort order data by created_at date
 sorted_order_data = order_data.sort_by { |data| data[:created_at] }
