@@ -106,7 +106,7 @@ class Admin::AnalyticsController < ApplicationController
                               .map { |record| { category_name: record.category_name, total_sold: record.total_sold } }
 
     # Total number of orders by status
-    @orders_by_status = Order.group(:status).count
+    orders_by_status = Order.group(:status).count
 
     render json: {
       total_vendors: @total_vendors,
@@ -121,7 +121,7 @@ class Admin::AnalyticsController < ApplicationController
       total_revenue: total_revenue,
       sales_performance: sales_performance,
       best_selling_categories: best_selling_categories,
-      orders_by_status: @orders_by_status
+      orders_by_status: orders_by_status
     }
   end
 
