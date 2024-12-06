@@ -2,11 +2,12 @@ class Admin::OrdersController < ApplicationController
   before_action :authenticate_admin
   before_action :set_order, only: [:show, :update_status, :destroy]
 
+  # app/controllers/admin/orders_controller.rb
   def index
     if params[:search_query].present?
-      @orders = Order.joins(order_items: { product: :vendor }).joins(:purchaser)
-                     .where("vendors.phone_number = :query OR purchasers.phone_number = :query OR orders.id = :query", query: params[:search_query])
-                     .includes(:purchaser, order_items: { product: :vendor })
+      @orders = Order.joins(:purchaser)
+                    .where("vendors.phone_number = :query OR purchasers.phone_number = :query OR orders.id = :query", query: params[:search_query])
+                    .includes(:purchaser, order_items: { product: :vendor })
     else
       @orders = Order.includes(:purchaser, order_items: { product: :vendor }).all
     end
@@ -17,17 +18,15 @@ class Admin::OrdersController < ApplicationController
         order_items: {
           include: {
             product: {
-              include: { vendor: { only: [:fullname, :phone_number] } },
-              only: [:name, :price]
+              include: { vendor: { only: [:fullname] } }
             }
-          },
-          only: [:quantity, :total_price]
+          }
         }
       },
       methods: [:order_date, :total_price]
     )
   end
-
+  
   def show
     render json: @order.as_json(
       include: {
@@ -44,11 +43,8 @@ class Admin::OrdersController < ApplicationController
     )
   end
 
+  # PUT /admin/orders/:id/update-status
   def update_status
-    unless Order.statuses.keys.include?(params[:status])
-      return render json: { error: 'Invalid status' }, status: :unprocessable_entity
-    end
-
     if @order.update(status: params[:status])
       render json: @order.as_json(
         include: {
@@ -76,11 +72,11 @@ class Admin::OrdersController < ApplicationController
   private
 
   def set_order
-    @order = Order.includes(:purchaser, order_items: { product: :vendor }).find(params[:id])
+    @order = Order.find(params[:id])
   end
 
   def order_params
-    params.require(:order).permit(:purchaser_id, :status, :total_amount, :processing_fee, :delivery_fee, :mpesa_transaction_code)
+    params.require(:order).permit(:purchaser_id, :status, :total_amount)
   end
   
   def authenticate_admin
