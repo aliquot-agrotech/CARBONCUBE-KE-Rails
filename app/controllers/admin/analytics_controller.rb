@@ -47,17 +47,11 @@ class Admin::AnalyticsController < ApplicationController
                                 .order('total_expenditure DESC')
 
     # Dynamically select the purchasers' insights based on the metric
-    case selected_metric 
-      when 'Total Orders'
-        purchasers_insights = purchasers_by_orders
-      when 'Total Expenditure'
-        purchasers_insights = purchasers_by_expenditure
-      else
-        purchasers_insights = purchasers_by_orders
-    end
-
-
-    purchasers_insights = purchasers_insights.limit(10)
+    purchasers_insights = case selected_metric
+      when 'Total Orders' then purchasers_by_orders
+      when 'Total Expenditure' then purchasers_by_expenditure
+      else purchasers_by_orders
+    end.limit(10)
 
     # Get selected metric from query parameter, default to 'Total Orders' if none provided
     selected_metric = params[:metric] || 'Total Orders'
@@ -81,19 +75,13 @@ class Admin::AnalyticsController < ApplicationController
                         .order('mean_rating DESC')
 
     # Dynamically select the vendors' insights based on the metric
-    case selected_metric
-      when 'Total Orders'
-        vendors_insights = vendors_by_orders
-      when 'Total Revenue'
-        vendors_insights = vendors_by_revenue
-      when 'Rating'
-        vendors_insights = vendors_by_rating
-      else
-        vendors_insights = vendors_by_revenue # Default to Total Orders
-    end
+    vendors_insights = case selected_metric
+      when 'Total Orders' then vendors_by_orders
+      when 'Total Revenue' then vendors_by_revenue
+      when 'Rating' then vendors_by_rating
+      else vendors_by_revenue
+    end.limit(10)
 
-    # Limit the results to the top 10
-    vendors_insights = vendors_insights.limit(10)
 
     # Total Revenue
     total_revenue = Order.joins(:order_items).sum('order_items.price * order_items.quantity')
@@ -117,6 +105,9 @@ class Admin::AnalyticsController < ApplicationController
                               .limit(4)
                               .map { |record| { category_name: record.category_name, total_sold: record.total_sold } }
 
+    # Total number of orders by status
+    @orders_by_status = Order.group(:status).count
+
     render json: {
       total_vendors: @total_vendors,
       total_purchasers: @total_purchasers,
@@ -129,7 +120,8 @@ class Admin::AnalyticsController < ApplicationController
       vendors_insights: vendors_insights,
       total_revenue: total_revenue,
       sales_performance: sales_performance,
-      best_selling_categories: best_selling_categories
+      best_selling_categories: best_selling_categories,
+      orders_by_status: @orders_by_status
     }
   end
 
