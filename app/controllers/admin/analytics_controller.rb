@@ -25,11 +25,7 @@ class Admin::AnalyticsController < ApplicationController
                             }
 
     # Total Products Sold Out
-    total_products_sold_out = Product.joins(:order_items)
-                              .distinct
-                              .count
-
-
+    total_products_sold_out = OrderItem.sum(:quantity)
 
     # Get selected metric from query parameter, default to 'Total Orders' if none provided
     selected_metric = params[:metric] || 'Total Orders'
@@ -84,7 +80,7 @@ class Admin::AnalyticsController < ApplicationController
 
 
     # Total Revenue
-    total_revenue = Order.joins(:order_items).sum('order_items.price * order_items.quantity')
+    total_revenue = Order.sum(:total_amount)
 
     # Sales Performance (example: revenue by month)
     # Sales Performance for the last 3 months
