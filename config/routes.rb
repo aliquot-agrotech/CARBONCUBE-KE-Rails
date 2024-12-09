@@ -124,7 +124,7 @@ Rails.application.routes.draw do
     resource :profile, only: [:show, :update] do
       post 'change-password', to: 'profiles#change_password'
     end
-    resources :bookmarks, only: [:index, :create, :destroy] do
+    resources :wish_lists, only: [:index, :create, :destroy] do
       member do
         post 'add_to_cart' # This route adds the product to the cart
       end
