@@ -17,7 +17,7 @@ class Product < ApplicationRecord
   has_many :orders, through: :order_items
   has_many :reviews, dependent: :destroy
   has_many :cart_items, dependent: :destroy
-  has_many :bookmarks, dependent: :destroy
+  has_many :wish_lists, dependent: :destroy
   has_many :purchasers, through: :bookmarks
 
   accepts_nested_attributes_for :category
