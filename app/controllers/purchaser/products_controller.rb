@@ -58,6 +58,16 @@ class Purchaser::ProductsController < ApplicationController
     render json: related_products
   end
 
+  # GET /purchaser/products/:id/vendor
+  def vendor
+    @vendor = @product.vendor
+    if @vendor
+      render json: @vendor, serializer: VendorSerializer
+    else
+      render json: { error: 'Vendor not found' }, status: :not_found
+    end
+  end
+
   private
 
   def set_product
