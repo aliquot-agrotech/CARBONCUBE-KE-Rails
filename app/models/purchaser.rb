@@ -27,16 +27,16 @@ class Purchaser < ApplicationRecord
   attribute :cart_total_price, :decimal, default: 0
 
 
-  def bookmark_product(product)
-    bookmarks.create(product: product) unless bookmarked?(product)
+  def wish_list_product(product)
+    wish_lists.create(product: product) unless wish_listed?(product)
   end
 
-  def unbookmark_product(product)
-    bookmarks.find_by(product: product)&.destroy
+  def unwish_list_product(product)
+    wish_lists.find_by(product: product)&.destroy
   end
 
-  def bookmarked?(product)
-    bookmarked_products.include?(product)
+  def wish_listed?(product)
+    wish_listed_products.include?(product)
   end
 
   def password_required?
