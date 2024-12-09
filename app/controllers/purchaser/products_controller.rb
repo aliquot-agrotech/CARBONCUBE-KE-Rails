@@ -1,6 +1,6 @@
 # app/controllers/purchaser/products_controller.rb
 class Purchaser::ProductsController < ApplicationController
-  before_action :set_product, only: [:show]
+  before_action :set_product, only: [:show, :vendor, :related]
 
   # GET /purchaser/products
   def index
