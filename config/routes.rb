@@ -140,6 +140,12 @@ Rails.application.routes.draw do
         post :checkout
       end
     end
+
+    resources :buy_for_me_order_cart_items, only: [:index, :create, :destroy, :update] do
+      collection do
+        post :checkout
+      end
+    end
     
     post 'validate_coupon', to: 'promotions#validate_coupon'
 
@@ -149,6 +155,7 @@ Rails.application.routes.draw do
       end
       member do
         post 'add_to_cart'
+        post 'add_to_buy_for_me_order_cart'
         get 'related', to: 'products#related'
         get 'vendor', to: 'products#vendor'
       end
@@ -159,6 +166,8 @@ Rails.application.routes.draw do
         put  :update_status_to_delivered
       end
     end
+
+    resources :buy_for_me_orders, only: [:index, :show, :create]
 
     get 'identify', to: 'purchasers#identify'
   end
