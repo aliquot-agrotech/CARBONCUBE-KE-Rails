@@ -65,7 +65,7 @@ gem 'active_model_serializers'
 gem 'dotenv-rails'
 
 # Search on postgresql
-# gem 'pg_search'
+gem 'pg_search'
 
 # Date grouping gem
 gem 'groupdate'
