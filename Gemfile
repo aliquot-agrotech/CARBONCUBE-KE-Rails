@@ -1,9 +1,9 @@
 source "https://rubygems.org"
 
-ruby "3.3.4"
+ruby "3.3.6"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 7.1.3", ">= 7.1.3.4"
+gem "rails"
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
@@ -65,7 +65,7 @@ gem 'active_model_serializers'
 gem 'dotenv-rails'
 
 # Search on postgresql
-gem 'pg_search'
+# gem 'pg_search'
 
 # Date grouping gem
 gem 'groupdate'

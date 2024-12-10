@@ -8,8 +8,8 @@ This repository contains a Ruby on Rails application designed for an eCommerce p
 
 Before getting started, ensure you have the following installed on your system:
 
-- Ruby (version 3.3.4)
-- Ruby on Rails (version 7.1.3.4)
+- Ruby (version 3.3.6)
+- Ruby on Rails (version 8.0)
 - PostgreSQL
 
 ## Getting Started
