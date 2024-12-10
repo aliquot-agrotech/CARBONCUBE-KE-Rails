@@ -10,6 +10,7 @@ class Vendor < ApplicationRecord
   has_many :sent_messages, as: :sender, class_name: 'Message'
   has_many :conversations
   has_many :notifications, as: :notifiable
+  has_many :buy_for_me_order_vendors
 
   validates :fullname, presence: true
   validates :phone_number, presence: true

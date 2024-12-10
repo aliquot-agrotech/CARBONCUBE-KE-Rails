@@ -11,6 +11,7 @@ class Purchaser < ApplicationRecord
   has_many :sent_messages, as: :sender, class_name: 'Message'
   has_many :conversations
   has_many :notifications, as: :notifiable
+  has_many :buy_for_me_orders
 
 
   validates :fullname, presence: true
