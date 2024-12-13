@@ -1017,10 +1017,6 @@ end
   )
 end
 
-# Clear existing data
-TierFeature.delete_all
-TierPricing.delete_all
-Tier.delete_all
 
 # Seed Tiers
 free_tier = Tier.create!(name: "Free", ads_limit: 5)
