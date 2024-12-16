@@ -12,6 +12,6 @@ class ProductSearchesController < ApplicationController
   private
 
   def product_search_params
-    params.permit(:search_term, :user_id)
+    params.permit(:search_term, :purchaser_id)
   end
 end

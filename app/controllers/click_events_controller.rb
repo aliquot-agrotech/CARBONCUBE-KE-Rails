@@ -12,6 +12,6 @@ class ClickEventsController < ApplicationController
   private
 
   def click_event_params
-    params.permit(:event_type, :product_id, :user_id, metadata: {})
+    params.permit(:event_type, :product_id, :purchaser_id, metadata: {})
   end
 end
