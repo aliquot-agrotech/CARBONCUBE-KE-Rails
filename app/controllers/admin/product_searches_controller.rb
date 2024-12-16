@@ -5,16 +5,17 @@ class Admin::ProductSearchesController < ApplicationController
   def index
     @product_searches = ProductSearch.all
 
-    # Optional: Filtering by search term or user_id
+    # Optional: Filtering by search_term or purchaser_id
     @product_searches = @product_searches.where("search_term ILIKE ?", "%#{params[:search_term]}%") if params[:search_term].present?
     @product_searches = @product_searches.where(purchaser_id: params[:purchaser_id]) if params[:purchaser_id].present?
 
-    render json: @product_searches
+    # Use ActiveModelSerializers for rendering
+    render json: @product_searches, each_serializer: ProductSearchSerializer, status: :ok
   end
 
   # GET /admin/product_searches/:id
   def show
-    render json: @product_search
+    render json: @product_search, serializer: ProductSearchSerializer, status: :ok
   end
 
   # DELETE /admin/product_searches/:id
