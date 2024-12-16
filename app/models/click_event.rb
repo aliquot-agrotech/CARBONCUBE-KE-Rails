@@ -2,10 +2,10 @@ class ClickEvent < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :product, optional: true
 
-  EVENT_TYPES = %w[product_click reveal_vendor add_to_cart add_to_wish_list].freeze
+  EVENT_TYPES = %w[Product-Click Reveal-Vendor-Details Add-to-Cart Add-to-Wish-List].freeze
 
   validates :event_type, presence: true, inclusion: { in: EVENT_TYPES }
-  validates :metadata, presence: true, if: -> { event_type == 'reveal_vendor' } # Example: require metadata for certain event types
+  validates :metadata, presence: true, if: -> { event_type == 'Reveal-Vendor-Details' } # Example: require metadata for certain event types
 
   # Scope to find the most common click types
   scope :popular_events, ->(limit = 10) {
