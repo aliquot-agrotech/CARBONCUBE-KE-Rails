@@ -11,6 +11,12 @@ Rails.application.routes.draw do
   resources :products, only: [] do
     get 'reviews', to: 'reviews#index', on: :member
   end
+
+  # Routes for logging product searches
+  resources :product_searches, only: [:create]
+
+  # Routes for logging click events
+  resources :click_events, only: [:create]
   
 
   # Admin namespace for admin-specific functionality
