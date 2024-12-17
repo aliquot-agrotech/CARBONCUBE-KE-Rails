@@ -1,11 +1,11 @@
 class ClickEventsController < ApplicationController
-  before_action :authenticate_purchaser, only: [:create]
+  before_action :attempt_authenticate_purchaser, only: [:create]
 
   def create
-    # Create click event with purchaser_id set to nil if authentication fails
+    # Create click event with all available parameters
     click_event = ClickEvent.new(click_event_params)
     
-    # Assign purchaser_id only if @current_user is present
+    # Set purchaser_id to nil if authentication failed
     click_event.purchaser_id = @current_user&.id
 
     if click_event.save
@@ -17,19 +17,23 @@ class ClickEventsController < ApplicationController
 
   private
 
-  def authenticate_purchaser
-    @current_user = PurchaserAuthorizeApiRequest.new(request.headers).result
-  rescue ExceptionHandler::InvalidToken
-    # When authentication fails, @current_user remains nil
-    @current_user = nil
-  ensure
-    # If @current_user is not a Purchaser, render unauthorized
+  def attempt_authenticate_purchaser
+    begin
+      @current_user = PurchaserAuthorizeApiRequest.new(request.headers).result
+    rescue ExceptionHandler::InvalidToken
+      @current_user = nil
+    end
+
+    # Only render unauthorized if you specifically want to prevent further processing
+    # If you want to continue and just log the event, you can remove or comment out this block
     unless @current_user.is_a?(Purchaser)
       render json: { error: 'Not Authorized' }, status: :unauthorized
+      return false
     end
+    true
   end
 
   def click_event_params
-    params.permit(:event_type, :product_id, metadata: {})
+    params.require(:click_event).permit(:event_type, :product_id, metadata: {})
   end
 end
