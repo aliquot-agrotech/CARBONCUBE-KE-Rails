@@ -5,7 +5,7 @@ class ProductSearchesController < ApplicationController
     product_search = ProductSearch.new(product_search_params)
 
     # Assign purchaser_id only if @current_user is present
-    product_search.purchaser_id = @current_user.id if @current_user
+    product_search.purchaser_id = @current_user&.id
 
     if product_search.save
       render json: { message: 'Search logged successfully' }, status: :created
@@ -16,11 +16,11 @@ class ProductSearchesController < ApplicationController
 
   private
 
+  # Attempt to authenticate the purchaser, but do not halt the request
   def authenticate_purchaser
     @current_user = PurchaserAuthorizeApiRequest.new(request.headers).result
-    unless @current_user && @current_user.is_a?(Purchaser)
-      render json: { error: 'Not Authorized' }, status: :unauthorized
-    end
+  rescue ExceptionHandler::InvalidToken
+    @current_user = nil
   end
 
   def product_search_params
