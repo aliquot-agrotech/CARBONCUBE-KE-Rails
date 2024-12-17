@@ -1,5 +1,5 @@
 class ProductSearch < ApplicationRecord
-  belongs_to :user, optional: true
+  belongs_to :purchaser, optional: true
 
   validates :search_term, presence: true
 

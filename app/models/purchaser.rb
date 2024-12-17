@@ -12,6 +12,8 @@ class Purchaser < ApplicationRecord
   has_many :conversations
   has_many :notifications, as: :notifiable
   has_many :buy_for_me_orders
+  has_many :click_events
+  has_many :product_searches
 
 
   validates :fullname, presence: true
