@@ -1,9 +1,11 @@
 class ClickEventsController < ApplicationController
-  before_action :set_purchaser_from_token
+  before_action :authenticate_purchaser, only: [:create] # Ensure the user is authenticated
 
   def create
     click_event = ClickEvent.new(click_event_params)
-    click_event.purchaser_id ||= @current_purchaser&.id # Assign purchaser_id if not already in params
+
+    # Assign purchaser_id only if @current_user is present
+    click_event.purchaser_id = @current_user.id if @current_user
 
     if click_event.save
       render json: { message: 'Click logged successfully' }, status: :created
@@ -14,21 +16,14 @@ class ClickEventsController < ApplicationController
 
   private
 
-  # Extracts purchaser_id from token if Authorization header exists
-  def set_purchaser_from_token
-    token = request.headers['Authorization']&.split(' ')&.last
-    return unless token
-
-    begin
-      decoded = JWT.decode(token, Rails.application.secrets.secret_key_base)[0]
-      @current_purchaser = Purchaser.find_by(id: decoded['purchaser_id'])
-    rescue JWT::DecodeError, ActiveRecord::RecordNotFound
-      @current_purchaser = nil
+  def authenticate_purchaser
+    @current_user = PurchaserAuthorizeApiRequest.new(request.headers).result
+    unless @current_user && @current_user.is_a?(Purchaser)
+      render json: { error: 'Not Authorized' }, status: :unauthorized
     end
   end
 
-  # Strong parameters
   def click_event_params
-    params.permit(:event_type, :product_id, :purchaser_id, metadata: {})
+    params.permit(:event_type, :product_id, metadata: {})
   end
 end
