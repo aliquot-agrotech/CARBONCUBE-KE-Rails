@@ -20,6 +20,8 @@ class Product < ApplicationRecord
   has_many :wish_lists, dependent: :destroy
   has_many :purchasers, through: :bookmarks
   has_many :buy_for_me_orders
+  has_many :click_events
+  
 
   accepts_nested_attributes_for :category
   accepts_nested_attributes_for :reviews
