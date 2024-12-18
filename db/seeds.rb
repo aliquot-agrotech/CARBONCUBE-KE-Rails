@@ -165,7 +165,7 @@ end
 free_tier = Tier.create!(name: "Free", ads_limit: 2)
 basic_tier = Tier.create!(name: "Basic", ads_limit: 10)
 standard_tier = Tier.create!(name: "Standard", ads_limit: 50)
-premium_tier = Tier.create!(name: "Premium", ads_limit: -1) # Unlimited ads
+premium_tier = Tier.create!(name: "Premium", ads_limit: nil) # Unlimited ads
 
 # Seed Features
 free_features = [
