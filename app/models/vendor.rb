@@ -19,7 +19,7 @@ class Vendor < ApplicationRecord
   validates :enterprise_name, presence: true
   validates :location, presence: true
   validates :business_registration_number, presence: true
-  validates :tier, inclusion: { in: %w[Free Basic Standard Premium] }
+  # validates :tier, inclusion: { in: %w[Free Basic Standard Premium] }
 
   def calculate_mean_rating
     reviews.average(:rating).to_f

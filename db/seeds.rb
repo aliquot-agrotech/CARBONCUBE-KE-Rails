@@ -218,15 +218,12 @@ end
   end
 end
 
-
-
-# Seed vendors data
 50.times do
-  Vendor.find_or_create_by(email: nil) do |vendor|
-    fullname = Faker::Name.name
-    username = fullname.downcase.gsub(/\s+/, "") # remove spaces and lowercase the name
-    email = "#{username}@example.com"
+  fullname = Faker::Name.name
+  username = fullname.downcase.gsub(/\s+/, "") # remove spaces and lowercase the name
+  email = "#{username}@example.com"
 
+  vendor = Vendor.find_or_create_by(email: email) do |vendor|
     vendor.fullname = fullname
     vendor.username = username
     vendor.email = email
@@ -237,15 +234,29 @@ end
     vendor.location = Faker::Address.full_address
     vendor.password = 'password'
     vendor.business_registration_number = "BN/#{Faker::Number.number(digits: 4)}/#{Faker::Number.number(digits: 6)}"
-    vendor.category_ids = [Category.all.sample.id]
+
+    # Check if categories and tiers exist
+    if Category.any? && Tier.any?
+      vendor.category_ids = [Category.all.sample.id]
+      vendor.tier_id = Tier.all.sample.id
+    else
+      puts "No categories or tiers found for vendor."
+    end
+
     vendor.birthdate = Faker::Date.birthday(min_age: 18, max_age: 65)
     vendor.zipcode = Faker::Address.zip_code
     vendor.city = Faker::Address.city
     vendor.gender = ['Male', 'Female'].sample
     vendor.profilepicture = Faker::Avatar.image
-    vendor.tier_id = Tier.all.sample.id
+  end
+
+  if vendor.valid?
+    puts "Vendor created: #{vendor.email}"
+  else
+    puts "Vendor validation failed for: #{vendor.email}, Errors: #{vendor.errors.full_messages}"
   end
 end
+
 
 puts "Starts seeding the products of the categories..."
 
