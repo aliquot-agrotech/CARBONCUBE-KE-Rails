@@ -11,6 +11,7 @@ class Vendor < ApplicationRecord
   has_many :conversations
   has_many :notifications, as: :notifiable
   has_many :buy_for_me_order_vendors
+  belongs_to :tier
 
   validates :fullname, presence: true
   validates :phone_number, presence: true
@@ -18,6 +19,7 @@ class Vendor < ApplicationRecord
   validates :enterprise_name, presence: true
   validates :location, presence: true
   validates :business_registration_number, presence: true
+  validates :tier, inclusion: { in: %w[Free Basic Standard Premium] }
 
   def calculate_mean_rating
     reviews.average(:rating).to_f

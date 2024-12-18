@@ -161,7 +161,62 @@ end
   end
 end
 
+# Seed Tiers
+free_tier = Tier.create!(name: "Free", ads_limit: 2)
+basic_tier = Tier.create!(name: "Basic", ads_limit: 10)
+standard_tier = Tier.create!(name: "Standard", ads_limit: 50)
+premium_tier = Tier.create!(name: "Premium", ads_limit: -1) # Unlimited ads
 
+# Seed Features
+free_features = [
+  "Basic listing visibility",
+  "Limited access to marketplace analytics",
+  "No dedicated customer services",
+  "No promotional tools"
+]
+basic_features = [
+  "Improved listing visibility",
+  "Marketplace analytics access",
+  "Ability to create limited discount offers (up to 10% off)",
+  "Inclusion in vendor recommendation carousel (rotating)"
+]
+standard_features = [
+  "Priority listing in category searches",
+  "Marketplace analytics access",
+  "Ability to create discount offers (up to 20% off)",
+  "Featured in newsletter promotions",
+  "Access to buyer review management tools (respond to reviews)"
+]
+premium_features = [
+  "Featured listing options",
+  "Marketplace analytics access",
+  "Ability to create discount offers (up to 30% off)",
+  "Advanced promotional tools (banner ads on category pages)",
+  "Access to wishlist chat option",
+  "Access to competitor stats"
+]
+
+# Associate features with tiers
+{ free_tier => free_features, basic_tier => basic_features, standard_tier => standard_features, premium_tier => premium_features }.each do |tier, features|
+  features.each do |feature|
+    TierFeature.create!(tier: tier, feature_name: feature)
+  end
+end
+
+# Seed Pricing
+pricing_data = {
+  free_tier => { 1 => 0.00, 3 => 0.00, 6 => 0.00, 12 => 0.00 },
+  basic_tier => { 1 => 3000.00, 3 => 8550.00, 6 => 16200.00, 12 => 30600.00 },
+  standard_tier => { 1 => 10000.00, 3 => 28500.00, 6 => 54000.00, 12 => 102000.00 },
+  premium_tier => { 1 => 20000.00, 3 => 57000.00, 6 => 108000.00, 12 => 204000.00 }
+}
+
+# Associate pricing with tiers
+pricing_data.each do |tier, prices|
+  prices.each do |duration, price|
+    TierPricing.create!(tier: tier, duration_months: duration, price: price)
+  end
+end
 
 # Seed vendors data
 50.times do
@@ -186,6 +241,7 @@ end
     vendor.city = Faker::Address.city
     vendor.gender = ['Male', 'Female'].sample
     vendor.profilepicture = Faker::Avatar.image
+    vendor.tier_id = Tier.all.sample.id
   end
 end
 
@@ -1018,82 +1074,5 @@ end
 end
 
 
-# Seed Tiers
-free_tier = Tier.create!(name: "Free", ads_limit: 5)
-basic_tier = Tier.create!(name: "Basic", ads_limit: 25)
-standard_tier = Tier.create!(name: "Standard", ads_limit: 50)
-business_tier = Tier.create!(name: "Business", ads_limit: 100)
-enterprise_tier = Tier.create!(name: "Enterprise", ads_limit: 200)
-
-# Seed Features
-free_features = [
-  "Basic listing visibility",
-  "Limited access to marketplace analytics",
-  "Community support (forums or guides)",
-  "No promotional tools"
-]
-basic_features = [
-  "Improved listing visibility",
-  "Marketplace analytics access",
-  "Email support",
-  "Ability to create limited discount offers (up to 10% off)",
-  "Inclusion in vendor recommendation carousel (rotating)"
-]
-standard_features = [
-  "Priority listing in category searches",
-  "Marketplace analytics access",
-  "Email and chat support",
-  "Ability to create discount offers (up to 20% off)",
-  "Featured in newsletter promotions",
-  "Access to buyer review management tools (respond to reviews)"
-]
-business_features = [
-  "Featured listing options",
-  "Marketplace analytics access",
-  "Email, chat, and phone support",
-  "Ability to create discount offers (up to 30% off)",
-  "Advanced promotional tools (banner ads on category pages)",
-  "Access to customer feedback tools (survey distribution)"
-]
-enterprise_features = [
-  "Top-level listing priority",
-  "Marketplace analytics access",
-  "Dedicated account manager",
-  "Email, chat, and phone support",
-  "Unlimited discount offers",
-  "Full promotional tools (banner ads, social media promotions)",
-  "Access to priority dispute resolution",
-  "Customized training sessions for vendors",
-  "VIP access to platform events and webinars"
-]
-
-# Associate features with tiers
-{ free_tier => free_features, basic_tier => basic_features, 
-  standard_tier => standard_features, business_tier => business_features, 
-  enterprise_tier => enterprise_features }.each do |tier, features|
-  features.each do |feature|
-    TierFeature.create!(tier: tier, feature_name: feature)
-  end
-end
-
-# Seed Pricing
-pricing_data = {
-  free_tier => { 1 => 0.00, 3 => 0.00, 6 => 0.00, 12 => 0.00 },
-  basic_tier => { 1 => 500.00, 3 => 1350.00, 6 => 2500.00, 12 => 4500.00 },
-  standard_tier => { 1 => 1000.00, 3 => 2700.00, 6 => 5000.00, 12 => 9000.00 },
-  business_tier => { 1 => 2000.00, 3 => 5400.00, 6 => 10200.00, 12 => 18000.00 },
-  enterprise_tier => { 1 => 5000.00, 3 => 13500.00, 6 => 25500.00, 12 => 45000.00 }
-}
-
-# Associate pricing with tiers
-pricing_data.each do |tier, prices|
-  prices.each do |duration, price|
-    TierPricing.create!(tier: tier, duration_months: duration, price: price)
-  end
-end
-
-puts "Seeded tiers, features, and pricing successfully!"
-
 
 puts 'Congratulations!! Seed data created successfully!'
-
