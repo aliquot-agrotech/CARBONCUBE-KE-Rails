@@ -3,13 +3,16 @@ class Vendor::TiersController < ApplicationController
 
   def index
     @tiers = Tier.includes(:tier_features, :tier_pricings).all
-    render json: @tiers.to_json(include: [:tier_features, :tier_pricings])
+    render json: @tiers, each_serializer: TierSerializer
   end
 
-
   def update_tier
-    @vendor = Vendor.find(params[:id])
-    if @vendor.update(tier_id: params[:tier_id])
+    tier = Tier.find_by(id: params[:tier_id])
+    unless tier
+      return render json: { error: 'Invalid tier selected' }, status: :not_found
+    end
+  
+    if @vendor.update(tier_id: tier.id)
       render json: { message: 'Tier updated successfully' }, status: :ok
     else
       render json: { error: 'Tier update failed' }, status: :unprocessable_entity
