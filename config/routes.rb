@@ -123,6 +123,7 @@ Rails.application.routes.draw do
     resources :messages
     get 'identify', to: 'vendors#identify'
     resources :notifications
+    resources :tiers
   end
 
   # Purchaser namespace for purchaser-specific functionality
