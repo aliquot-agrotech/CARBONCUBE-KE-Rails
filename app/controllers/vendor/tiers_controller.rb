@@ -4,7 +4,14 @@ class Vendor::TiersController < ApplicationController
   def index
     @tiers = Tier.includes(:tier_features, :tier_pricings).all
     render json: @tiers, each_serializer: TierSerializer
+  rescue ActiveRecord::RecordNotFound => e
+    Rails.logger.error "Record not found: #{e.message}"
+    render json: { error: 'No tiers found' }, status: :not_found
+  rescue => e
+    Rails.logger.error "Unexpected error: #{e.message}"
+    render json: { error: 'Internal Server Error' }, status: :internal_server_error
   end
+  
 
   def update_tier
     tier = Tier.find_by(id: params[:tier_id])
