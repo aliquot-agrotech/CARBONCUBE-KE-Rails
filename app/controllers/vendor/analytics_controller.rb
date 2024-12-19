@@ -7,24 +7,25 @@ class Vendor::AnalyticsController < ApplicationController
 
     # Prepare the response based on the vendor's tier
     response_data = {
+      tier_id: tier_id, # Include tier_id in the response
       total_orders: calculate_total_orders,
       total_products: calculate_total_products
     }
 
     # Add more data based on the vendor's tier
     case tier_id
-    when 1 # Free tier
-      # No revenue, reviews, etc.
-      response_data.merge!(calculate_free_tier_data)
-    when 2 # Basic tier
-      response_data.merge!(calculate_basic_tier_data)
-    when 3 # Standard tier
-      response_data.merge!(calculate_standard_tier_data)
-    when 4 # Premium tier
-      response_data.merge!(calculate_premium_tier_data)
-    else
-      # Handle case for unknown tier (optional)
-      render json: { error: 'Invalid tier' }, status: 400
+      when 1 # Free tier
+        # No revenue, reviews, etc.
+        response_data.merge!(calculate_free_tier_data)
+      when 2 # Basic tier
+        response_data.merge!(calculate_basic_tier_data)
+      when 3 # Standard tier
+        response_data.merge!(calculate_standard_tier_data)
+      when 4 # Premium tier
+        response_data.merge!(calculate_premium_tier_data)
+      else
+        # Handle case for unknown tier (optional)
+        render json: { error: 'Invalid tier' }, status: 400
       return
     end
 
