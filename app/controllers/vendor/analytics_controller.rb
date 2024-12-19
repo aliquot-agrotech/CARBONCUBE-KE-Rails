@@ -38,7 +38,8 @@ class Vendor::AnalyticsController < ApplicationController
   def calculate_free_tier_data
     {
       total_orders: calculate_total_orders,
-      total_products: calculate_total_products
+      total_products: calculate_total_products,
+      average_rating: calculate_average_rating,
     }
   end
 
@@ -53,7 +54,6 @@ class Vendor::AnalyticsController < ApplicationController
   def calculate_standard_tier_data
     {
       total_revenue: calculate_total_revenue,
-      average_rating: calculate_average_rating,
       total_reviews: calculate_total_reviews,
       sales_performance: calculate_sales_performance,
       best_selling_products: fetch_best_selling_products
