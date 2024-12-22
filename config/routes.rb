@@ -103,6 +103,7 @@ Rails.application.routes.draw do
   # Vendor namespace for vendor-specific functionality
   namespace :vendor do
     post 'signup', to: 'vendors#create'
+    # patch 'update_tier', on: :member
     resources :products
     resources :orders do
       member do
@@ -123,7 +124,9 @@ Rails.application.routes.draw do
     resources :messages
     get 'identify', to: 'vendors#identify'
     resources :notifications
-    resources :tiers
+    resources :tiers do
+      patch 'update_tier', on: :collection
+    end
   end
 
   # Purchaser namespace for purchaser-specific functionality

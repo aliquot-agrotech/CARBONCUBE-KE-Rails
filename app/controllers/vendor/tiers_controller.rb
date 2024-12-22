@@ -14,12 +14,14 @@ class Vendor::TiersController < ApplicationController
   
 
   def update_tier
-    tier = Tier.find_by(id: params[:tier_id])
+    vendor = @current_vendor # Authenticated vendor
+    tier = Tier.find_by(id: params[:id]) # Access tier via the `:id` param
+    
     unless tier
       return render json: { error: 'Invalid tier selected' }, status: :not_found
     end
-  
-    if @vendor.update(tier_id: tier.id)
+
+    if vendor.update(tier_id: tier.id)
       render json: { message: 'Tier updated successfully' }, status: :ok
     else
       render json: { error: 'Tier update failed' }, status: :unprocessable_entity
