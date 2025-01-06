@@ -141,6 +141,9 @@ pricing_data.each do |tier, prices|
   end
 end
 
+# Define valid tier durations
+tier_durations = ['1 month', '3 months', '6 months', '12 months']
+
 # Set to keep track of used phone numbers
 used_phone_numbers = Set.new
 
@@ -218,6 +221,9 @@ end
   end
 end
 
+
+# Seed vendor data
+
 50.times do
   fullname = Faker::Name.name
   username = fullname.downcase.gsub(/\s+/, "") # remove spaces and lowercase the name
@@ -243,6 +249,7 @@ end
       puts "No categories or tiers found for vendor."
     end
 
+    vendor.tier_duration = tier_durations.sample # Assign random tier duration
     vendor.birthdate = Faker::Date.birthday(min_age: 18, max_age: 65)
     vendor.zipcode = Faker::Address.zip_code
     vendor.city = Faker::Address.city
@@ -251,7 +258,7 @@ end
   end
 
   if vendor.valid?
-    puts "Vendor created: #{vendor.email}"
+    puts "Vendor created: #{vendor.email}, Tier Duration: #{vendor.tier_duration}"
   else
     puts "Vendor validation failed for: #{vendor.email}, Errors: #{vendor.errors.full_messages}"
   end
