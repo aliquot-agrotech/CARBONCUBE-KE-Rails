@@ -98,6 +98,7 @@ Rails.application.routes.draw do
     resources :notifications, only: [:index, :create]
     resources :product_searches, only: [:index, :show, :destroy]
     resources :click_events, only: [:index, :show, :destroy]
+    resources :tiers, only: [:index, :show, :create, :update, :destroy]
   end
 
   # Vendor namespace for vendor-specific functionality
