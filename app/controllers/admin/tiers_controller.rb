@@ -42,7 +42,7 @@ class Admin::TiersController < ApplicationController
     end
   
     if @tier.update(tier_params)
-      render json: @tier.to_json(include: [:tier_pricings, :tier_features])
+      render json: @tier, serializer: TierSerializer  # Use the TierSerializer here
     else
       Rails.logger.error(@tier.errors.full_messages)
       render json: @tier.errors, status: :unprocessable_entity
