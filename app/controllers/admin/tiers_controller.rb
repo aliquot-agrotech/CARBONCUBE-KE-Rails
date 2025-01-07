@@ -12,13 +12,24 @@ class Admin::TiersController < ApplicationController
   end
 
   def create
+    # Remap features and pricings to nested attributes
+    if params[:features]
+      params[:tier][:tier_features_attributes] = params.delete(:features)
+    end
+    
+    if params[:pricings]
+      params[:tier][:tier_pricings_attributes] = params.delete(:pricings)
+    end
+  
     @tier = Tier.new(tier_params)
+  
     if @tier.save
       render json: @tier.to_json(include: [:tier_pricings, :tier_features]), status: :created
     else
       render json: @tier.errors, status: :unprocessable_entity
     end
   end
+  
 
   def update
     # Remap features and pricings to nested attributes
