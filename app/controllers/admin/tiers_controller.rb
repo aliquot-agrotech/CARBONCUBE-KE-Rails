@@ -62,14 +62,13 @@ class Admin::TiersController < ApplicationController
   end
 
   def tier_params
-    params.permit(
+    params.require(:tier).permit(
       :name,
       :ads_limit,
-      tier_pricings_attributes: [:id, :duration_months, :price, :_destroy],
-      tier_features_attributes: [:id, :feature_name, :_destroy]
+      tier_pricings_attributes: [:id, :tier_id, :duration_months, :price, :_destroy],
+      tier_features_attributes: [:id, :tier_id, :feature_name, :_destroy]
     )
   end
-  
 
   def authenticate_admin
     @current_user = AdminAuthorizeApiRequest.new(request.headers).result
