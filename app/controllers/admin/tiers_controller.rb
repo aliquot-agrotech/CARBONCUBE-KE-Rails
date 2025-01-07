@@ -21,16 +21,21 @@ class Admin::TiersController < ApplicationController
   end
 
   def update
-    ActiveRecord::Base.transaction do
-      if @tier.update(tier_params)
-        render json: @tier.to_json(include: [:tier_pricings, :tier_features])
-      else
-        raise ActiveRecord::Rollback
-      end
+    # Remap features and pricings to nested attributes
+    if params[:features]
+      params[:tier][:tier_features_attributes] = params.delete(:features)
     end
-  rescue => e
-    Rails.logger.error(e.message)
-    render json: { error: 'Update failed' }, status: :unprocessable_entity
+  
+    if params[:pricings]
+      params[:tier][:tier_pricings_attributes] = params.delete(:pricings)
+    end
+  
+    if @tier.update(tier_params)
+      render json: @tier.to_json(include: [:tier_pricings, :tier_features])
+    else
+      Rails.logger.error(@tier.errors.full_messages)
+      render json: @tier.errors, status: :unprocessable_entity
+    end
   end
   
 
