@@ -21,12 +21,18 @@ class Admin::TiersController < ApplicationController
   end
 
   def update
-    if @tier.update(tier_params)
-      render json: @tier.to_json(include: [:tier_pricings, :tier_features])
-    else
-      render json: @tier.errors, status: :unprocessable_entity
+    ActiveRecord::Base.transaction do
+      if @tier.update(tier_params)
+        render json: @tier.to_json(include: [:tier_pricings, :tier_features])
+      else
+        raise ActiveRecord::Rollback
+      end
     end
+  rescue => e
+    Rails.logger.error(e.message)
+    render json: { error: 'Update failed' }, status: :unprocessable_entity
   end
+  
 
   def destroy
     ActiveRecord::Base.transaction do
@@ -51,8 +57,14 @@ class Admin::TiersController < ApplicationController
   end
 
   def tier_params
-    params.require(:tier).permit(:name, :description, :duration, :price, tier_pricings_attributes: [:id, :amount, :duration, :_destroy], tier_features_attributes: [:id, :feature_name, :_destroy])
+    params.permit(
+      :name,
+      :ads_limit,
+      tier_pricings_attributes: [:id, :duration_months, :price, :_destroy],
+      tier_features_attributes: [:id, :feature_name, :_destroy]
+    )
   end
+  
 
   def authenticate_admin
     @current_user = AdminAuthorizeApiRequest.new(request.headers).result
