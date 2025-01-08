@@ -20,12 +20,16 @@ class Vendor::TiersController < ApplicationController
       return render json: { error: 'Invalid tier selected' }, status: :not_found
     end
   
-    if @current_vendor.update(tier_id: tier.id, tier_duration: params[:tier_duration])
+    # Extract numeric duration from the string (e.g., "6 months" => 6)
+    tier_duration = params[:tier_duration].to_i # Convert the string to an integer (e.g., "6 months" => 6)
+  
+    if @current_vendor.update(tier_id: tier.id, tier_duration: tier_duration)
       render json: { message: 'Tier updated successfully' }, status: :ok
     else
       render json: { error: 'Tier update failed', details: @current_vendor.errors.full_messages }, status: :unprocessable_entity
     end
-  end 
+  end
+  
 
   private 
 
