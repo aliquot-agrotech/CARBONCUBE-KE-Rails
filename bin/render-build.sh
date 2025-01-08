@@ -9,5 +9,5 @@ bundle config set frozen false
 bundle install
 
 # Run migrations and seeds
-# bundle exec rake db:migrate
-# bundle exec rake db:seed  
+bundle exec rake db:migrate
+bundle exec rake db:seed  
