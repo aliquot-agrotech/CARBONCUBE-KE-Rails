@@ -25,8 +25,7 @@ class Vendor::TiersController < ApplicationController
     else
       render json: { error: 'Tier update failed', details: @current_vendor.errors.full_messages }, status: :unprocessable_entity
     end
-  end
-  
+  end 
 
   private 
 
