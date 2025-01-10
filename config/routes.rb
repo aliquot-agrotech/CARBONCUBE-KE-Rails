@@ -8,9 +8,10 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   post 'auth/login', to: 'authentication#login'
   resources :banners, only: [:index]
-  resources :products, only: [] do
+  resources :products, only: [:index, :show] do
     get 'reviews', to: 'reviews#index', on: :member
   end
+  
 
   # Routes for logging product searches
   resources :product_searches, only: [:create]
