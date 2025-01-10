@@ -11,12 +11,9 @@ class ProductSerializer < ActiveModel::Serializer
     object.media
   end
 
-  def media_urls_banner
-    object.media.first
-  end
-
   def first_media_url
-    object[:first_media_url] # This will get the `first_media_url` we added in the controller
+    # Ensure that the object has media and return the first URL, or nil if it doesn't
+    object.media.first.try(:url)
   end
 
   def vendor_name
