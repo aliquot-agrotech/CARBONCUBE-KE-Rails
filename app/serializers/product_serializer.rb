@@ -2,7 +2,7 @@ class ProductSerializer < ActiveModel::Serializer
   attributes :id, :vendor_id, :category_id, :subcategory_id, :category_name, 
   :subcategory_name, :title, :description, :price, :quantity, :brand, 
   :manufacturer, :item_weight, :weight_unit, :item_length, :item_width, 
-  :item_height, :media_urls, :first_media_url, :mean_rating, :review_count, :vendor_tier, :media_urls_banner
+  :item_height, :media_urls, :first_media_url, :mean_rating, :review_count, :vendor_tier
 
   has_one :vendor, serializer: VendorSerializer
   has_many :reviews
