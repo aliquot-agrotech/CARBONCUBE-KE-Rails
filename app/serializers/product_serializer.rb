@@ -1,4 +1,3 @@
-# app/serializers/product_serializer.rb
 class ProductSerializer < ActiveModel::Serializer
   attributes :id, :vendor_id, :category_id, :subcategory_id, :category_name, 
   :subcategory_name, :title, :description, :price, :quantity, :brand, 
@@ -14,6 +13,10 @@ class ProductSerializer < ActiveModel::Serializer
 
   def media_urls_banner
     object.media.first
+  end
+
+  def first_media_url
+    object[:first_media_url] # This will get the `first_media_url` we added in the controller
   end
 
   def vendor_name
@@ -41,4 +44,3 @@ class ProductSerializer < ActiveModel::Serializer
     object.reviews.count
   end
 end
-  

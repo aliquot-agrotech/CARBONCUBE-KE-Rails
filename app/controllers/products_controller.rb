@@ -8,10 +8,9 @@ class ProductsController < ApplicationController
                       .distinct
                       .sample(3) # Select three random products
 
-    # Extract the first media URL for each product
+    # Map over the products and modify the media_urls to include only the first URL
     @products = @products.map do |product|
-      product.media_urls = [product.media_urls.first] if product.media_urls.present?
-      product
+      product.as_json.merge(first_media_url: product.media.first.try(:url)) # Extract the first media URL
     end
 
     render json: @products, each_serializer: ProductSerializer
