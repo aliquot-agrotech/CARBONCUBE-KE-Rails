@@ -1,24 +1,5 @@
 class Admin::ProductsController < ApplicationController
   before_action :authenticate_admin
-
-  # GET /admin/products
-  # def index
-  #   @products = Product.joins(:vendor, :category, :subcategory)
-  #                     .where(vendors: { blocked: false })
-    
-  #   if params[:category_id].present?
-  #     @products = @products.where(category_id: params[:category_id])
-  #   end
-  
-  #   if params[:subcategory_id].present?
-  #     @products = @products.where(subcategory_id: params[:subcategory_id])
-  #   end
-  
-  #   flagged_products = @products.select { |product| product.flagged }
-  #   non_flagged_products = @products.reject { |product| product.flagged }
-    
-  #   render json: { flagged: flagged_products, non_flagged: non_flagged_products }
-  # end
   
   # GET /admin/products
   def index
