@@ -7,9 +7,9 @@ class Admin::BuyForMeOrdersController < ApplicationController
     if params[:search_query].present?
       @buy_for_me_orders = BuyForMeOrder.joins(:purchaser)
                     .where("vendors.phone_number = :query OR purchasers.phone_number = :query OR buy_for_me_orders.id = :query", query: params[:search_query])
-                    .includes(:purchaser, buy_for_me_order_items: { product: :vendor })
+                    .includes(:purchaser, buy_for_me_order_items: { ad: :vendor })
     else
-      @buy_for_me_orders = BuyForMeOrder.includes(:purchaser, buy_for_me_order_items: { product: :vendor }).all
+      @buy_for_me_orders = BuyForMeOrder.includes(:purchaser, buy_for_me_order_items: { ad: :vendor }).all
     end
   
     render json: @buy_for_me_orders.as_json(
@@ -17,7 +17,7 @@ class Admin::BuyForMeOrdersController < ApplicationController
         purchaser: { only: [:fullname] },
         buy_for_me_order_items: {
           include: {
-            product: {
+            ad: {
               include: { vendor: { only: [:fullname] } }
             }
           }
@@ -33,7 +33,7 @@ class Admin::BuyForMeOrdersController < ApplicationController
         purchaser: { only: [:fullname] },
         buy_for_me_order_items: {
           include: {
-            product: {
+            ad: {
               include: { vendor: { only: [:fullname] } }
             }
           }
@@ -51,7 +51,7 @@ class Admin::BuyForMeOrdersController < ApplicationController
           purchaser: { only: [:fullname] },
           buy_for_me_order_items: {
             include: {
-              product: {
+              ad: {
                 include: { vendor: { only: [:fullname] } }
               }
             }

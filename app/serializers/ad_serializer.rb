@@ -1,4 +1,4 @@
-class ProductSerializer < ActiveModel::Serializer
+class AdSerializer < ActiveModel::Serializer
   attributes :id, :vendor_id, :category_id, :subcategory_id, :category_name, 
   :subcategory_name, :title, :description, :price, :quantity, :brand, 
   :manufacturer, :item_weight, :weight_unit, :item_length, :item_width, 

@@ -4,29 +4,29 @@ class Admin::Vendor::AnalyticsController < ApplicationController
 
   # GET /admin/vendors/:vendor_id/analytics
   def show
-    # Calculate total revenue from all orders related to the vendor's products
+    # Calculate total revenue from all orders related to the vendor's ads
     total_revenue = @vendor.orders.joins(:order_items)
-                              .where(order_items: { product_id: @vendor.products.pluck(:id) })
+                              .where(order_items: { ad_id: @vendor.ads.pluck(:id) })
                               .sum('order_items.quantity * order_items.price')
 
-    # Calculate total number of orders related to the vendor's products
+    # Calculate total number of orders related to the vendor's ads
     total_orders = @vendor.orders.joins(:order_items)
-                              .where(order_items: { product_id: @vendor.products.pluck(:id) })
+                              .where(order_items: { ad_id: @vendor.ads.pluck(:id) })
                               .distinct.count
 
-    # Calculate total number of products sold (sum of quantities)
-    total_products_sold = @vendor.orders.joins(:order_items)
-                                  .where(order_items: { product_id: @vendor.products.pluck(:id) })
+    # Calculate total number of ads sold (sum of quantities)
+    total_ads_sold = @vendor.orders.joins(:order_items)
+                                  .where(order_items: { ad_id: @vendor.ads.pluck(:id) })
                                   .sum('order_items.quantity')
 
-    # Calculate average rating (mean of ratings) from reviews related to the vendor's products
-    mean_rating = @vendor.reviews.joins(:product)
-                          .where(products: { id: @vendor.products.pluck(:id) })
+    # Calculate average rating (mean of ratings) from reviews related to the vendor's ads
+    mean_rating = @vendor.reviews.joins(:ad)
+                          .where(ads: { id: @vendor.ads.pluck(:id) })
                           .average(:rating).to_f
 
-    # Count the number of reviews related to the vendor's products and group by rating
-    reviews_by_rating = @vendor.reviews.joins(:product)
-                                  .where(products: { id: @vendor.products.pluck(:id) })
+    # Count the number of reviews related to the vendor's ads and group by rating
+    reviews_by_rating = @vendor.reviews.joins(:ad)
+                                  .where(ads: { id: @vendor.ads.pluck(:id) })
                                   .group(:rating)
                                   .count
 
@@ -39,8 +39,8 @@ class Admin::Vendor::AnalyticsController < ApplicationController
     end
 
     # Fetch detailed reviews with purchaser information
-    reviews_details = @vendor.reviews.joins(:product, :purchaser)
-                              .where(products: { id: @vendor.products.pluck(:id) })
+    reviews_details = @vendor.reviews.joins(:ad, :purchaser)
+                              .where(ads: { id: @vendor.ads.pluck(:id) })
                               .select('reviews.*, purchasers.fullname AS purchaser_name')
                               .as_json(only: [:id, :rating, :review, :created_at],
                                         include: { purchaser: { only: [:fullname] } })
@@ -49,7 +49,7 @@ class Admin::Vendor::AnalyticsController < ApplicationController
     analytics = {
       total_revenue: total_revenue,
       total_orders: total_orders,
-      total_products_sold: total_products_sold,
+      total_ads_sold: total_ads_sold,
       mean_rating: mean_rating,
       total_reviews: reviews_by_rating.values.sum,
       rating_pie_chart: rating_pie_chart,

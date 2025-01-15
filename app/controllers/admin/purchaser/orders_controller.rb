@@ -4,7 +4,7 @@ class Admin::Purchaser::OrdersController < ApplicationController
 
   # GET /admin/purchasers/:purchaser_id/orders
   def index_for_purchaser
-    @orders = @purchaser.orders.includes(order_items: { product: :vendor })
+    @orders = @purchaser.orders.includes(order_items: { ad: :vendor })
 
     # Calculate total amount for each order
     orders_with_totals = @orders.map do |order|
@@ -12,7 +12,7 @@ class Admin::Purchaser::OrdersController < ApplicationController
       order.as_json(include: {
         order_items: {
           include: {
-            product: {
+            ad: {
               only: [:title],
               include: { vendor: { only: [:fullname] } }
             }

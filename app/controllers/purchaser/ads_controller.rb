@@ -1,0 +1,90 @@
+# app/controllers/purchaser/ads_controller.rb
+class Purchaser::AdsController < ApplicationController
+  before_action :set_ad, only: [:show, :vendor, :related]
+
+  # GET /purchaser/ads
+  def index
+    @ads = Ad.joins(:vendor)
+                      .where(vendors: { blocked: false })
+                      .where(flagged: false) # Exclude flagged ads
+    filter_by_category if params[:category_id].present?
+    filter_by_subcategory if params[:subcategory_id].present? # New subcategory filtering
+    render json: @ads, each_serializer: AdSerializer
+  end
+
+  # GET /purchaser/ads/:id
+  def show
+    @ad = Ad.find(params[:id])
+    render json: @ad, serializer: AdSerializer
+  end
+  
+
+  # GET /purchaser/ads/search
+  def search
+    query = params[:query].to_s.strip
+    query_words = query.split(/\s+/)
+
+    @ads = Ad.joins(:vendor, :category, :subcategory)
+                      .where(vendors: { blocked: false })
+                      .where(flagged: false)  # Exclude flagged ads
+                      
+    query_words.each do |word|
+      @ads = @ads.where('ads.title ILIKE :word OR ads.description ILIKE :word OR categories.name ILIKE :word OR subcategories.name ILIKE :word', 
+                                  word: "%#{word}%") # Include subcategory in search
+    end
+
+    filter_by_category if params[:category_id].present?
+    filter_by_subcategory if params[:subcategory_id].present? # Include subcategory filtering in search
+
+    @ads = @ads.distinct
+
+    render json: @ads
+  end
+
+  # GET /purchaser/ads/:id/related
+  def related
+    ad = Ad.find(params[:id])
+    
+    # Find ads from the same subcategory
+    related_ads = Ad.where(subcategory: ad.subcategory)
+
+    # Find ads that share words in the title
+    title_words = ad.title.split(' ')
+    related_by_title = Ad.where('title ILIKE ANY (array[?])', title_words.map { |word| "%#{word}%" })
+
+    # Combine results, excluding the original ad
+    related_ads = related_ads.or(related_by_title).where.not(id: ad.id).distinct
+
+    render json: related_ads
+  end
+
+  # GET /purchaser/ads/:id/vendor
+  def vendor
+    @vendor = @ad.vendor
+    if @vendor
+      render json: @vendor, serializer: VendorSerializer
+    else
+      render json: { error: 'Vendor not found' }, status: :not_found
+    end
+  end
+
+  private
+
+  def set_ad
+    @ad = Ad.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Ad not found' }, status: :not_found
+  end
+
+  def filter_by_category
+    @ads = @ads.where(category_id: params[:category_id])
+  end
+
+  def filter_by_subcategory
+    @ads = @ads.where(subcategory_id: params[:subcategory_id])
+  end
+
+  def ad_params
+    params.require(:ad).permit(:title, :description, { media: [] }, :subcategory_id, :category_id, :vendor_id, :price, :quantity, :brand, :manufacturer, :item_length, :item_width, :item_height, :item_weight, :weight_unit)
+  end
+end

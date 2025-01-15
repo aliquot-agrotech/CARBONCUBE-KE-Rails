@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repository contains a Ruby on Rails application designed for an eCommerce platform. It includes various models and relationships to manage users, vendors, products, orders, and more.
+This repository contains a Ruby on Rails application designed for an eCommerce platform. It includes various models and relationships to manage users, vendors, ads, orders, and more.
 
 ## Prerequisites
 

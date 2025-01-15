@@ -1,16 +1,16 @@
-class ProductSearchesController < ApplicationController
+class AdSearchesController < ApplicationController
   before_action :authenticate_purchaser, only: [:create] # Ensure purchaser authentication
 
   def create
-    product_search = ProductSearch.new(product_search_params)
+    ad_search = AdSearch.new(ad_search_params)
 
     # Assign purchaser_id only if @current_user is present
-    product_search.purchaser_id = @current_user&.id
+    ad_search.purchaser_id = @current_user&.id
 
-    if product_search.save
+    if ad_search.save
       render json: { message: 'Search logged successfully' }, status: :created
     else
-      render json: { errors: product_search.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: ad_search.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -23,7 +23,7 @@ class ProductSearchesController < ApplicationController
     @current_user = nil
   end
 
-  def product_search_params
+  def ad_search_params
     params.permit(:search_term)
   end
 end

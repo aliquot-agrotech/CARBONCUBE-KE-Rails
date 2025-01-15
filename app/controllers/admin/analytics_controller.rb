@@ -5,27 +5,27 @@ class Admin::AnalyticsController < ApplicationController
     @total_vendors = Vendor.count
     @total_purchasers = Purchaser.count
     @total_orders = Order.count
-    @total_products = Product.count
+    @total_ads = Ad.count
     @total_reviews = Review.count
 
-    # Top 6 Best Selling Products Overall
-    best_selling_products = Product.joins(:order_items)
-                            .select('products.id AS product_id, products.title AS product_title, products.price AS product_price, SUM(order_items.quantity) AS total_sold, products.media AS media')
-                            .group('products.id')
+    # Top 6 Best Selling Ads Overall
+    best_selling_ads = Ad.joins(:order_items)
+                            .select('ads.id AS ad_id, ads.title AS ad_title, ads.price AS ad_price, SUM(order_items.quantity) AS total_sold, ads.media AS media')
+                            .group('ads.id')
                             .order('total_sold DESC')
                             .limit(6)
                             .map { |record| 
                               {
-                                product_id: record.product_id,
-                                product_title: record.product_title,
-                                product_price: record.product_price,
+                                ad_id: record.ad_id,
+                                ad_title: record.ad_title,
+                                ad_price: record.ad_price,
                                 total_sold: record.total_sold,
                                 media: record.media
                               }
                             }
 
-    # Total Products Sold Out
-    total_products_sold_out = OrderItem.sum(:quantity)
+    # Total Ads Sold Out
+    total_ads_sold_out = OrderItem.sum(:quantity)
 
     # Get selected metric from query parameter, default to 'Total Orders' if none provided
     selected_metric = params[:metric] || 'Total Orders'
@@ -59,13 +59,13 @@ class Admin::AnalyticsController < ApplicationController
                         .order('total_orders DESC')
 
     # Calculate vendor total revenue
-    vendors_by_revenue = Vendor.joins(products: :order_items)
+    vendors_by_revenue = Vendor.joins(ads: :order_items)
                         .select('vendors.id, vendors.fullname, SUM(order_items.total_price) AS total_revenue')
                         .group('vendors.id')
                         .order('total_revenue DESC')
 
     # Calculate vendor mean rating
-    vendors_by_rating = Vendor.joins(products: :reviews)
+    vendors_by_rating = Vendor.joins(ads: :reviews)
                         .select('vendors.id, vendors.fullname, COALESCE(AVG(reviews.rating), 0) AS mean_rating')
                         .group('vendors.id')
                         .order('mean_rating DESC')
@@ -94,7 +94,7 @@ class Admin::AnalyticsController < ApplicationController
                         .transform_keys { |k| k.strftime("%B %Y") }
 
     # Best Selling Categories Analytics
-    best_selling_categories = Category.joins(products: :order_items)
+    best_selling_categories = Category.joins(ads: :order_items)
                               .select('categories.name AS category_name, SUM(order_items.quantity) AS total_sold')
                               .group('categories.id')
                               .order('total_sold DESC')
@@ -113,10 +113,10 @@ class Admin::AnalyticsController < ApplicationController
       total_vendors: @total_vendors,
       total_purchasers: @total_purchasers,
       total_orders: @total_orders,
-      total_products: @total_products,
+      total_ads: @total_ads,
       total_reviews: @total_reviews,
-      best_selling_products: best_selling_products,
-      total_products_sold_out: total_products_sold_out,
+      best_selling_ads: best_selling_ads,
+      total_ads_sold_out: total_ads_sold_out,
       purchasers_insights: purchasers_insights,
       vendors_insights: vendors_insights,
       total_revenue: total_revenue,

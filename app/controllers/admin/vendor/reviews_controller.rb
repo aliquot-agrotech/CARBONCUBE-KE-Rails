@@ -1,10 +1,10 @@
 class Admin::Vendor::ReviewsController < ApplicationController
   before_action :authenticate_admin
   before_action :set_vendor
-  before_action :set_product
+  before_action :set_ad
 
   def index
-    @reviews = @product.reviews
+    @reviews = @ad.reviews
     render json: @reviews
   end
 
@@ -14,8 +14,8 @@ class Admin::Vendor::ReviewsController < ApplicationController
     @vendor = Vendor.find(params[:vendor_id])
   end
 
-  def set_product
-    @product = @vendor.products.find(params[:product_id])
+  def set_ad
+    @ad = @vendor.ads.find(params[:ad_id])
   end
 
   def authenticate_admin

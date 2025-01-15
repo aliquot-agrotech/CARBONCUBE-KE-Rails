@@ -1,5 +1,5 @@
 class Review < ApplicationRecord
-  belongs_to :product
+  belongs_to :ad
   belongs_to :purchaser
   after_save :check_vendor_rating
 
@@ -10,6 +10,6 @@ class Review < ApplicationRecord
   private
 
   def check_vendor_rating
-    product.vendor.check_and_block
+    ad.vendor.check_and_block
   end
 end

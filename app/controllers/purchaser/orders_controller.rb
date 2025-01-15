@@ -2,12 +2,12 @@ class Purchaser::OrdersController < ApplicationController
   before_action :authenticate_purchaser
 
   def index
-    @orders = current_purchaser.orders.includes(order_items: [product: :vendor])
+    @orders = current_purchaser.orders.includes(order_items: [ad: :vendor])
     render json: @orders, each_serializer: OrderSerializer
   end
 
   def show
-    @order = current_purchaser.orders.includes(order_items: [product: :vendor]).find(params[:id])
+    @order = current_purchaser.orders.includes(order_items: [ad: :vendor]).find(params[:id])
     render json: @order, serializer: OrderSerializer
   end
 
@@ -38,7 +38,7 @@ class Purchaser::OrdersController < ApplicationController
       # Create order items and associate them with the order
       cart_items.each do |cart_item|
         @order.order_items.build(
-          product_id: cart_item.product_id,
+          ad_id: cart_item.ad_id,
           quantity: cart_item.quantity,
           price: cart_item.price,
           total_price: cart_item.price * cart_item.quantity
@@ -46,7 +46,7 @@ class Purchaser::OrdersController < ApplicationController
       end
   
       # Identify vendors and create order_vendor records
-      vendors = cart_items.map { |item| item.product.vendor }.uniq.compact
+      vendors = cart_items.map { |item| item.ad.vendor }.uniq.compact
       vendors.each do |vendor|
         @order.order_vendors.build(vendor: vendor)
       end

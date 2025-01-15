@@ -4,11 +4,11 @@ class VendorOrderSerializer < ActiveModel::Serializer
   has_many :order_items, serializer: VendorOrderItemSerializer
 
   def order_items
-    object.order_items.select { |item| item.product.vendor_id == scope.id }
+    object.order_items.select { |item| item.ad.vendor_id == scope.id }
   end
 
   def total_price
-    object.order_items.sum { |item| item.quantity * (item.product&.price || 0) }
+    object.order_items.sum { |item| item.quantity * (item.ad&.price || 0) }
   end
 
   def order_date

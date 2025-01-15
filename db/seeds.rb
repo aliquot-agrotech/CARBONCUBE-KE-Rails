@@ -1,4 +1,4 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
+# This file should ensure the existence of records required to run the application in every environment (adion,
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
@@ -15,7 +15,7 @@ puts "Starts seeding..."
 categories = [
   { name: 'Automotive Parts & Accessories', description: 'Spare parts for automobiles' },
   { name: 'Computer Parts & Accessories', description: 'Components and accessories for computers' },
-  { name: 'Filtration', description: 'Products related to filtration solutions' },
+  { name: 'Filtration', description: 'Ads related to filtration solutions' },
   { name: 'Hardware Tools', description: 'Various Hardware Tools' }
 ]
 
@@ -265,10 +265,10 @@ end
 end
 
 
-puts "Starts seeding the products of the categories..."
+puts "Starts seeding the ads of the categories..."
 
 
-category_products = {
+category_ads = {
   'Filtration' => [
     { title: 'Water Filter', description: 'High-quality water filter for home use', media: ['https://m.media-amazon.com/images/I/71s7yQg7tjL._AC_SX679_.jpg', 'https://m.media-amazon.com/images/I/716R+NXyn-L._AC_SX679_.jpg'] },
     { title: 'Air Purifier Filter', description: 'Filter for air purifiers', media: ['https://m.media-amazon.com/images/I/91lNyEeYIML.__AC_SX300_SY300_QL70_FMwebp_.jpg', 'https://m.media-amazon.com/images/I/41vu1+gWIVL._AC_US100_.jpg'] },
@@ -690,8 +690,8 @@ category_products = {
 # Define the date range for April
 april_range = (Date.new(2024, 4, 1)..Date.new(2024, 4, 30))
 
-# Seed products
-category_products.each do |category_name, products|
+# Seed ads
+category_ads.each do |category_name, ads|
   # Find the category by name
   category = Category.find_by(name: category_name)
   next unless category
@@ -703,37 +703,37 @@ category_products.each do |category_name, products|
   # Initialize a counter to track subcategory assignment
   subcategory_index = 0
   
-  products.each do |product_data|
+  ads.each do |ad_data|
     # Assign the subcategory in a round-robin manner
     assigned_subcategory = subcategories[subcategory_index]
     
     # Update the index, looping back to the start if necessary
     subcategory_index = (subcategory_index + 1) % subcategory_count
 
-    # Find or create the product
-    product = Product.find_or_initialize_by(title: product_data[:title])
+    # Find or create the ad
+    ad = Ad.find_or_initialize_by(title: ad_data[:title])
     
-    if product.new_record?
+    if ad.new_record?
       # Generate a random date in April
       created_at = Faker::Date.between(from: april_range.begin, to: april_range.end)
       
-      product.description = product_data[:description]
-      product.category_id = category.id
-      product.subcategory_id = assigned_subcategory.id if assigned_subcategory.present?
-      product.vendor_id = Vendor.all.sample.id
-      product.price = Faker::Commerce.price(range: 200..10000)
-      product.quantity = Faker::Number.between(from: 30, to: 100)
-      product.brand = Faker::Company.name
-      product.manufacturer = Faker::Company.name
-      product.item_length = Faker::Number.between(from: 10, to: 50)
-      product.item_width = Faker::Number.between(from: 10, to: 50)
-      product.item_height = Faker::Number.between(from: 10, to: 50)
-      product.item_weight = Faker::Number.decimal(l_digits: 1, r_digits: 2)
-      product.weight_unit = ['Grams', 'Kilograms'].sample
-      product.media = product_data[:media]
-      product.created_at = created_at
-      product.updated_at = created_at
-      product.save!
+      ad.description = ad_data[:description]
+      ad.category_id = category.id
+      ad.subcategory_id = assigned_subcategory.id if assigned_subcategory.present?
+      ad.vendor_id = Vendor.all.sample.id
+      ad.price = Faker::Commerce.price(range: 200..10000)
+      ad.quantity = Faker::Number.between(from: 30, to: 100)
+      ad.brand = Faker::Company.name
+      ad.manufacturer = Faker::Company.name
+      ad.item_length = Faker::Number.between(from: 10, to: 50)
+      ad.item_width = Faker::Number.between(from: 10, to: 50)
+      ad.item_height = Faker::Number.between(from: 10, to: 50)
+      ad.item_weight = Faker::Number.decimal(l_digits: 1, r_digits: 2)
+      ad.weight_unit = ['Grams', 'Kilograms'].sample
+      ad.media = ad_data[:media]
+      ad.created_at = created_at
+      ad.updated_at = created_at
+      ad.save!
     end
   end
 end
@@ -785,28 +785,28 @@ order_data = 500.times.map do
   
   # Create order items first to calculate fees
   order_items = rand(1..5).times.map do
-    product = Product.all.sample
+    ad = Ad.all.sample
     quantity = Faker::Number.between(from: 1, to: 10)
-    price = product.price
+    price = ad.price
     total_price = price * quantity
 
-    # Calculate processing fee for this specific product's total
-    product_processing_fee = calculate_transaction_fee(total_price).round(2) * 2
+    # Calculate processing fee for this specific ad's total
+    ad_processing_fee = calculate_transaction_fee(total_price).round(2) * 2
 
     {
-      product_id: product.id,
+      ad_id: ad.id,
       quantity: quantity,
       price: price.round(2),                     # Round price to two decimal places
       total_price: total_price.round(2),         # Round total price to two decimal places
-      processing_fee: product_processing_fee,    # Store processing fee per product
-      vendor_id: product.vendor_id
+      processing_fee: ad_processing_fee,    # Store processing fee per ad
+      vendor_id: ad.vendor_id
     }
   end
 
   # Calculate subtotal from order items
   subtotal = order_items.sum { |item| item[:total_price] }
   
-  # Sum all processing fees from individual products
+  # Sum all processing fees from individual ads
   total_processing_fee = order_items.sum { |item| item[:processing_fee] }
   
   # Calculate total amount including all fees
@@ -841,7 +841,7 @@ sorted_order_data.each do |data|
   order = Order.create!(
     purchaser_id: data[:purchaser_id],
     status: data[:status],
-    processing_fee: data[:processing_fee],    # Total processing fee from all products
+    processing_fee: data[:processing_fee],    # Total processing fee from all ads
     delivery_fee: data[:delivery_fee],        # Fixed delivery fee
     total_amount: data[:total_amount],
     mpesa_transaction_code: data[:mpesa_transaction_code],
@@ -856,7 +856,7 @@ sorted_order_data.each do |data|
   data[:order_items].each do |item_data|
     OrderItem.create!(
       order_id: order.id,
-      product_id: item_data[:product_id],
+      ad_id: item_data[:ad_id],
       quantity: item_data[:quantity],
       price: item_data[:price],
       total_price: item_data[:total_price],
@@ -909,17 +909,17 @@ end
 #     created_at: created_at,
 #     updated_at: created_at,
 #     order_items: rand(1..5).times.map do
-#       product = Product.all.sample
+#       ad = Ad.all.sample
 #       quantity = Faker::Number.between(from: 1, to: 10)
-#       price = product.price
+#       price = ad.price
 #       total_price = price * quantity
 
 #       {
-#         product_id: product.id,
+#         ad_id: ad.id,
 #         quantity: quantity,
 #         price: price,
 #         total_price: total_price,
-#         vendor_id: product.vendor_id
+#         vendor_id: ad.vendor_id
 #       }
 #     end
 #   }
@@ -943,7 +943,7 @@ end
 #   data[:order_items].each do |item_data|
 #     OrderItem.create!(
 #       order_id: order.id,
-#       product_id: item_data[:product_id],
+#       ad_id: item_data[:ad_id],
 #       quantity: item_data[:quantity],
 #       price: item_data[:price],
 #       total_price: item_data[:total_price],
@@ -961,17 +961,17 @@ end
 #   end
 # end
 
-puts "Starts seeding for the product reviews"
+puts "Starts seeding for the ad reviews"
 
-# Generate 10 reviews for each product
-Product.all.each do |product|
+# Generate 10 reviews for each ad
+Ad.all.each do |ad|
   10.times do
     purchaser = Purchaser.all.sample
     rating = Faker::Number.between(from: 1, to: 5)
     review_text = Faker::Lorem.sentence(word_count: Faker::Number.between(from: 5, to: 15))
 
     Review.create!(
-      product_id: product.id,
+      ad_id: ad.id,
       purchaser_id: purchaser.id,
       rating: rating,
       review: review_text
@@ -1084,7 +1084,7 @@ end
 10.times do
   discount_percentage = rand(1..14)  # Random percentage between 1 and 100
   Promotion.create!(
-    title: Faker::Commerce.product_name,
+    title: Faker::Commerce.ad_name,
     description: Faker::Lorem.sentence,
     discount_percentage: discount_percentage,
     coupon_code: generate_coupon_code(discount_percentage),

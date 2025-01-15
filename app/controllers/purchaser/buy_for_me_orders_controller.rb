@@ -2,12 +2,12 @@ class Purchaser::BuyForMeOrdersController < ApplicationController
   before_action :authenticate_purchaser
 
   def index
-    @buy_for_me_orders = current_purchaser.buy_for_me_orders.includes(buy_for_me_order_items: [product: :vendor])
+    @buy_for_me_orders = current_purchaser.buy_for_me_orders.includes(buy_for_me_order_items: [ad: :vendor])
     render json: @buy_for_me_orders, each_serializer: BuyForMeOrderSerializer
   end
 
   def show
-    @buy_for_me_order = current_purchaser.buy_for_me_orders.includes(buy_for_me_order_items: [product: :vendor]).find(params[:id])
+    @buy_for_me_order = current_purchaser.buy_for_me_orders.includes(buy_for_me_order_items: [ad: :vendor]).find(params[:id])
     render json: @buy_for_me_order, serializer: BuyForMeOrderSerializer
   end
 
@@ -38,7 +38,7 @@ class Purchaser::BuyForMeOrdersController < ApplicationController
       # Create order items and associate them with the order
       buy_for_me_order_cart_items.each do |buy_for_me_order_cart_item|
         @buy_for_me_order.buy_for_me_order_items.build(
-          product_id: buy_for_me_order_cart_item.product_id,
+          ad_id: buy_for_me_order_cart_item.ad_id,
           quantity: buy_for_me_order_cart_item.quantity,
           price: buy_for_me_order_cart_item.price,
           total_price: buy_for_me_order_cart_item.price * buy_for_me_order_cart_item.quantity
@@ -46,7 +46,7 @@ class Purchaser::BuyForMeOrdersController < ApplicationController
       end
   
       # Identify vendors and create order_vendor records
-      vendors = buy_for_me_order_cart_items.map { |item| item.product.vendor }.uniq.compact
+      vendors = buy_for_me_order_cart_items.map { |item| item.ad.vendor }.uniq.compact
       vendors.each do |vendor|
         @buy_for_me_order.buy_for_me_order_vendors.build(vendor: vendor)
       end

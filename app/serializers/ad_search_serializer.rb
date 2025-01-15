@@ -1,4 +1,4 @@
-class ProductSearchSerializer < ActiveModel::Serializer
+class AdSearchSerializer < ActiveModel::Serializer
   attributes :id, :search_term, :purchaser_id, :created_at, :updated_at
 
   # Optional: Include user details if associated

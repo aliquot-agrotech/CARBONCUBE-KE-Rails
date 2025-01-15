@@ -1,6 +1,6 @@
-class CreateProducts < ActiveRecord::Migration[7.1]
+class CreateAds < ActiveRecord::Migration[7.1]
   def change
-    create_table :products do |t|
+    create_table :ads do |t|
       t.references :vendor, null: false, foreign_key: true
       t.references :category, null: false, foreign_key: true
       t.references :subcategory, null: false, foreign_key: true

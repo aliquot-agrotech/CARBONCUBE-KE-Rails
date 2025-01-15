@@ -1,6 +1,6 @@
 class Admin::VendorsController < ApplicationController
   before_action :authenticate_admin
-  before_action :set_vendor, only: [:block, :unblock, :show, :update, :destroy, :analytics, :orders, :products, :reviews]
+  before_action :set_vendor, only: [:block, :unblock, :show, :update, :destroy, :analytics, :orders, :ads, :reviews]
 
   def index
     if params[:search_query].present?
@@ -46,17 +46,17 @@ class Admin::VendorsController < ApplicationController
   end
 
   def reviews
-    reviews = @vendor.reviews.joins(:product, :purchaser)
-                           .where(products: { id: @vendor.products.pluck(:id) })
-                           .select('reviews.*, purchasers.fullname AS purchaser_name, products.title AS product_title')
+    reviews = @vendor.reviews.joins(:ad, :purchaser)
+                           .where(ads: { id: @vendor.ads.pluck(:id) })
+                           .select('reviews.*, purchasers.fullname AS purchaser_name, ads.title AS ad_title')
     render json: reviews.as_json(only: [:id, :rating, :review, :created_at],
-                                 methods: [:purchaser_name, :product_title])
+                                 methods: [:purchaser_name, :ad_title])
   end
   
 
-  def products
-    products = @vendor.products
-    render json: products
+  def ads
+    ads = @vendor.ads
+    render json: ads
   end
 
   def block
@@ -96,8 +96,8 @@ class Admin::VendorsController < ApplicationController
 
   def orders
   
-    orders = @vendor.orders.includes(order_items: [:product, :order], purchaser: :orders)
-                          .where(order_items: { product_id: @vendor.products.pluck(:id) })
+    orders = @vendor.orders.includes(order_items: [:ad, :order], purchaser: :orders)
+                          .where(order_items: { ad_id: @vendor.ads.pluck(:id) })
   
     filtered_orders = orders.map do |order|
       {
@@ -116,18 +116,18 @@ class Admin::VendorsController < ApplicationController
           phone_number: order.purchaser.phone_number
         },
         order_items: order.order_items
-                          .select { |item| @vendor.products.exists?(item.product_id) }
+                          .select { |item| @vendor.ads.exists?(item.ad_id) }
                           .map do |item|
           {
             id: item.id,
             quantity: item.quantity,
             price: item.price,
             total_price: item.total_price,
-            product: {
-              id: item.product.id,
-              title: item.product.title,
-              vendor_id: item.product.vendor_id,
-              price: item.product.price
+            ad: {
+              id: item.ad.id,
+              title: item.ad.title,
+              vendor_id: item.ad.vendor_id,
+              price: item.ad.price
             }
           }
         end
@@ -157,34 +157,34 @@ class Admin::VendorsController < ApplicationController
   def fetch_analytics(vendor)
     {
       total_revenue: vendor.orders.joins(:order_items)
-                              .where(order_items: { product_id: vendor.products.pluck(:id) })
+                              .where(order_items: { ad_id: vendor.ads.pluck(:id) })
                               .sum('order_items.quantity * order_items.price'),
       total_orders: vendor.orders.joins(:order_items)
-                            .where(order_items: { product_id: vendor.products.pluck(:id) })
+                            .where(order_items: { ad_id: vendor.ads.pluck(:id) })
                             .distinct.count,
-      total_products_sold: vendor.orders.joins(:order_items)
-                                  .where(order_items: { product_id: vendor.products.pluck(:id) })
+      total_ads_sold: vendor.orders.joins(:order_items)
+                                  .where(order_items: { ad_id: vendor.ads.pluck(:id) })
                                   .sum('order_items.quantity'),
-      mean_rating: vendor.reviews.joins(:product)
-                                  .where(products: { id: vendor.products.pluck(:id) })
+      mean_rating: vendor.reviews.joins(:ad)
+                                  .where(ads: { id: vendor.ads.pluck(:id) })
                                   .average(:rating).to_f.round(2),
             
-      total_reviews: vendor.reviews.joins(:product)
-                               .where(products: { id: vendor.products.pluck(:id) })
+      total_reviews: vendor.reviews.joins(:ad)
+                               .where(ads: { id: vendor.ads.pluck(:id) })
                                .group(:rating)
                                .count
                                .values.sum,
       rating_pie_chart: (1..5).map do |rating|
         {
           rating: rating,
-          count: vendor.reviews.joins(:product)
-                              .where(products: { id: vendor.products.pluck(:id) })
+          count: vendor.reviews.joins(:ad)
+                              .where(ads: { id: vendor.ads.pluck(:id) })
                               .group(:rating)
                               .count[rating] || 0
         }
       end,
-      reviews: vendor.reviews.joins(:product, :purchaser)
-                      .where(products: { id: vendor.products.pluck(:id) })
+      reviews: vendor.reviews.joins(:ad, :purchaser)
+                      .where(ads: { id: vendor.ads.pluck(:id) })
                       .select('reviews.*, purchasers.fullname AS purchaser_name')
                       .as_json(only: [:id, :rating, :review, :created_at],
                                 include: { purchaser: { only: [:fullname] } })

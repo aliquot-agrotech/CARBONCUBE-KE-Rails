@@ -1,4 +1,4 @@
-class ProductSearch < ApplicationRecord
+class AdSearch < ApplicationRecord
   belongs_to :purchaser, optional: true
 
   validates :search_term, presence: true

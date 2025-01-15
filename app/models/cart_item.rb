@@ -2,7 +2,7 @@
 
 class CartItem < ApplicationRecord
   belongs_to :purchaser
-  belongs_to :product
+  belongs_to :ad
 
   validates :quantity, numericality: { greater_than_or_equal_to: 1 }
   before_save :set_price
@@ -14,6 +14,6 @@ class CartItem < ApplicationRecord
   private
 
   def set_price
-    self.price = product.price
+    self.price = ad.price
   end
 end

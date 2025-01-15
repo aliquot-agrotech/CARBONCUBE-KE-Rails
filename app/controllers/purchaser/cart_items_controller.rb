@@ -5,9 +5,9 @@ class Purchaser::CartItemsController < ApplicationController
 
   # GET /purchaser/cart_items
   def index
-    @cart_items = current_purchaser.cart_items.includes(:product)
+    @cart_items = current_purchaser.cart_items.includes(:ad)
     total_cart_price = @cart_items.sum(&:total_price)
-    render json: { cart_items: @cart_items, total_cart_price: total_cart_price }, include: ['product']
+    render json: { cart_items: @cart_items, total_cart_price: total_cart_price }, include: ['ad']
   end
 
   # POST /purchaser/cart_items
@@ -44,7 +44,7 @@ class Purchaser::CartItemsController < ApplicationController
   private
 
   def cart_item_params
-    params.require(:cart_item).permit(:product_id, :quantity)
+    params.require(:cart_item).permit(:ad_id, :quantity)
   end
 
   def authenticate_purchaser

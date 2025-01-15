@@ -7,9 +7,9 @@ class Admin::OrdersController < ApplicationController
     if params[:search_query].present?
       @orders = Order.joins(:purchaser)
                     .where("vendors.phone_number = :query OR purchasers.phone_number = :query OR orders.id = :query", query: params[:search_query])
-                    .includes(:purchaser, order_items: { product: :vendor })
+                    .includes(:purchaser, order_items: { ad: :vendor })
     else
-      @orders = Order.includes(:purchaser, order_items: { product: :vendor }).all
+      @orders = Order.includes(:purchaser, order_items: { ad: :vendor }).all
     end
   
     render json: @orders.as_json(
@@ -17,7 +17,7 @@ class Admin::OrdersController < ApplicationController
         purchaser: { only: [:fullname] },
         order_items: {
           include: {
-            product: {
+            ad: {
               include: { vendor: { only: [:fullname] } }
             }
           }
@@ -33,7 +33,7 @@ class Admin::OrdersController < ApplicationController
         purchaser: { only: [:fullname] },
         order_items: {
           include: {
-            product: {
+            ad: {
               include: { vendor: { only: [:fullname] } }
             }
           }
@@ -51,7 +51,7 @@ class Admin::OrdersController < ApplicationController
           purchaser: { only: [:fullname] },
           order_items: {
             include: {
-              product: {
+              ad: {
                 include: { vendor: { only: [:fullname] } }
               }
             }

@@ -9,7 +9,7 @@ class Vendor::AnalyticsController < ApplicationController
     response_data = {
       tier_id: tier_id, # Include tier_id in the response
       total_orders: calculate_total_orders,
-      total_products: calculate_total_products
+      total_ads: calculate_total_ads
     }
 
     # Add more data based on the vendor's tier
@@ -38,7 +38,7 @@ class Vendor::AnalyticsController < ApplicationController
   def calculate_free_tier_data
     {
       total_orders: calculate_total_orders,
-      total_products: calculate_total_products,
+      total_ads: calculate_total_ads,
       average_rating: calculate_average_rating,
     }
   end
@@ -56,7 +56,7 @@ class Vendor::AnalyticsController < ApplicationController
       total_revenue: calculate_total_revenue,
       total_reviews: calculate_total_reviews,
       sales_performance: calculate_sales_performance,
-      best_selling_products: fetch_best_selling_products
+      best_selling_ads: fetch_best_selling_ads
     }
   end
 
@@ -67,7 +67,7 @@ class Vendor::AnalyticsController < ApplicationController
       average_rating: calculate_average_rating,
       total_reviews: calculate_total_reviews,
       sales_performance: calculate_sales_performance,
-      best_selling_products: fetch_best_selling_products
+      best_selling_ads: fetch_best_selling_ads
     }
   end
 
@@ -77,15 +77,15 @@ class Vendor::AnalyticsController < ApplicationController
   end
 
   def calculate_total_revenue
-    current_vendor.orders.joins(order_items: :product).sum('order_items.quantity * products.price')
+    current_vendor.orders.joins(order_items: :ad).sum('order_items.quantity * ads.price')
   end
 
-  def calculate_total_products
-    current_vendor.products.count
+  def calculate_total_ads
+    current_vendor.ads.count
   end
 
   def calculate_average_rating
-    current_vendor.products.joins(:reviews).average(:rating).to_f.round(1)
+    current_vendor.ads.joins(:reviews).average(:rating).to_f.round(1)
   end
 
   def calculate_total_reviews
@@ -105,23 +105,23 @@ class Vendor::AnalyticsController < ApplicationController
     sales_performance
   end
 
-  def fetch_best_selling_products
-    best_selling_products = current_vendor.products.joins(:order_items)
-                                  .select('products.id AS product_id, products.title AS product_title, products.price AS product_price, SUM(order_items.quantity) AS total_sold, products.media AS media')
-                                  .group('products.id')
+  def fetch_best_selling_ads
+    best_selling_ads = current_vendor.ads.joins(:order_items)
+                                  .select('ads.id AS ad_id, ads.title AS ad_title, ads.price AS ad_price, SUM(order_items.quantity) AS total_sold, ads.media AS media')
+                                  .group('ads.id')
                                   .order('total_sold DESC')
                                   .limit(3)
                                   .map { |record| 
                                     {
-                                      product_id: record.product_id,
-                                      product_title: record.product_title,
-                                      product_price: record.product_price,
+                                      ad_id: record.ad_id,
+                                      ad_title: record.ad_title,
+                                      ad_price: record.ad_price,
                                       total_sold: record.total_sold,
                                       media: record.media # Add media here
                                     }
                                   }
 
-    best_selling_products
+    best_selling_ads
   end
 
   def authenticate_vendor

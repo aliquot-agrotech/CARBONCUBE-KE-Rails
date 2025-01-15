@@ -48,7 +48,7 @@ class Purchaser::ReviewsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def review_params
-    params.require(:review).permit(:product_id, :rating, :review)
+    params.require(:review).permit(:ad_id, :rating, :review)
   end
 
   def authenticate_purchaser

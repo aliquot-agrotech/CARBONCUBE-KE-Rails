@@ -1,10 +1,10 @@
-class Admin::Vendor::ProductsController < ApplicationController
+class Admin::Vendor::AdsController < ApplicationController
   before_action :authenticate_admin
   before_action :set_vendor
 
   def index
-    @products = @vendor.products
-    render json: @products
+    @ads = @vendor.ads
+    render json: @ads
   end
 
   private

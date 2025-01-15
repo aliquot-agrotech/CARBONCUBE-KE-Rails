@@ -41,23 +41,23 @@ class Admin::ReviewsController < ApplicationController
 
     private
     # Use callbacks to share common setup or constraints between actions.
-        def set_review
-            @review = Review.find(params[:id])
-        end
+    def set_review
+        @review = Review.find(params[:id])
+    end
 
-        # Only allow a list of trusted parameters through.
-        def review_params
-            params.require(:review).permit(:product_id, :purchaser_id, :rating, :review)
-        end
+    # Only allow a list of trusted parameters through.
+    def review_params
+        params.require(:review).permit(:ad_id, :purchaser_id, :rating, :review)
+    end
 
-        def authenticate_admin
-            @current_user = AdminAuthorizeApiRequest.new(request.headers).result
-            unless @current_user && @current_user.is_a?(Admin)
-              render json: { error: 'Not Authorized' }, status: :unauthorized
-            end
-          end
-        
-          def current_admin
-            @current_user
-          end
+    def authenticate_admin
+        @current_user = AdminAuthorizeApiRequest.new(request.headers).result
+        unless @current_user && @current_user.is_a?(Admin)
+            render json: { error: 'Not Authorized' }, status: :unauthorized
+        end
+    end
+
+    def current_admin
+    @current_user
+    end
 end

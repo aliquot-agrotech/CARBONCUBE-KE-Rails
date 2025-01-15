@@ -2,7 +2,7 @@ class Order < ApplicationRecord
   belongs_to :purchaser
   has_many :order_items, dependent: :destroy
   has_many :order_vendors, dependent: :destroy
-  has_many :products, through: :order_items
+  has_many :ads, through: :order_items
   has_many :vendors, through: :order_vendors
 
   before_save :calculate_total_amount
@@ -21,7 +21,7 @@ class Order < ApplicationRecord
 
   def total_price
     order_items.sum do |item|
-      item.product ? item.quantity * item.product.price : 0
+      item.ad ? item.quantity * item.ad.price : 0
     end
   end
 

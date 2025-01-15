@@ -7,13 +7,13 @@ class Purchaser < ApplicationRecord
   has_many :reviews
   has_many :cart_items
   has_many :wish_lists, dependent: :destroy
-  has_many :wish_listed_products, through: :wish_lists, source: :product
+  has_many :wish_listed_ads, through: :wish_lists, source: :ad
   has_many :sent_messages, as: :sender, class_name: 'Message'
   has_many :conversations
   has_many :notifications, as: :notifiable
   has_many :buy_for_me_orders
   has_many :click_events
-  has_many :product_searches
+  has_many :ad_searches
 
 
   validates :fullname, presence: true
@@ -30,16 +30,16 @@ class Purchaser < ApplicationRecord
   attribute :cart_total_price, :decimal, default: 0
 
 
-  def wish_list_product(product)
-    wish_lists.create(product: product) unless wish_listed?(product)
+  def wish_list_ad(ad)
+    wish_lists.create(ad: ad) unless wish_listed?(ad)
   end
 
-  def unwish_list_product(product)
-    wish_lists.find_by(product: product)&.destroy
+  def unwish_list_ad(ad)
+    wish_lists.find_by(ad: ad)&.destroy
   end
 
-  def wish_listed?(product)
-    wish_listed_products.include?(product)
+  def wish_listed?(ad)
+    wish_listed_ads.include?(ad)
   end
 
   def password_required?

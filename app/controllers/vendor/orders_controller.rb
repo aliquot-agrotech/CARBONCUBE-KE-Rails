@@ -5,17 +5,17 @@ class Vendor::OrdersController < ApplicationController
   # GET /vendor/orders
   def index
     @orders = current_vendor.orders
-                            .includes(order_items: :product)
-                            .where(order_items: { product_id: current_vendor.products.ids })
+                            .includes(order_items: :ad)
+                            .where(order_items: { ad_id: current_vendor.ads.ids })
                             .distinct
-    render json: @orders, include: ['order_items.product'], each_serializer: VendorOrderSerializer
+    render json: @orders, include: ['order_items.ad'], each_serializer: VendorOrderSerializer
   end
 
   # GET /vendor/orders/:id
   def show
-    @order = current_vendor.orders.includes(order_items: :product).find_by(id: params[:id])
+    @order = current_vendor.orders.includes(order_items: :ad).find_by(id: params[:id])
     if @order
-      render json: @order, include: ['order_items.product'], serializer: VendorOrderSerializer
+      render json: @order, include: ['order_items.ad'], serializer: VendorOrderSerializer
     else
       render json: { error: 'Order not found' }, status: :not_found
     end
@@ -33,7 +33,7 @@ class Vendor::OrdersController < ApplicationController
 
     if allowed_statuses.include?(params[:status])
         if @order.update(status: params[:status])
-            render json: @order, include: ['order_items.product'], serializer: VendorOrderSerializer
+            render json: @order, include: ['order_items.ad'], serializer: VendorOrderSerializer
         else
             render json: { error: 'Failed to update order status' }, status: :unprocessable_entity
         end
@@ -45,7 +45,7 @@ class Vendor::OrdersController < ApplicationController
   private
 
   def set_order
-    @order = current_vendor.orders.includes(order_items: :product).find_by(id: params[:id])
+    @order = current_vendor.orders.includes(order_items: :ad).find_by(id: params[:id])
     unless @order
       render json: { error: 'Order not found' }, status: :not_found
     end

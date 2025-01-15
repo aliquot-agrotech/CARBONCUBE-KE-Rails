@@ -3,7 +3,7 @@ class Vendor::ReviewsController < ApplicationController
   before_action :current_vendor
 
   def index
-    @reviews = Review.joins(:product).where(products: { vendor_id: @current_vendor.id })
+    @reviews = Review.joins(:ad).where(ads: { vendor_id: @current_vendor.id })
     render json: @reviews
   end
 

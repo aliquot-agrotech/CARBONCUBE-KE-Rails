@@ -36,8 +36,8 @@ class Admin::CategoriesController < ApplicationController
       # Delete associated subcategories
       category.subcategories.destroy_all
 
-      # Alternatively, if you want to delete related products:
-      # category.products.update_all(subcategory_id: nil) # Or handle them as needed
+      # Alternatively, if you want to delete related ads:
+      # category.ads.update_all(subcategory_id: nil) # Or handle them as needed
 
       # Delete the category
       category.destroy!

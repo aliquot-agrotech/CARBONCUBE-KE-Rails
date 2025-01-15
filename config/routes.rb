@@ -8,13 +8,13 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   post 'auth/login', to: 'authentication#login'
   resources :banners, only: [:index]
-  resources :products, only: [:index, :show] do
+  resources :ads, only: [:index, :show] do
     get 'reviews', to: 'reviews#index', on: :member
   end
   
 
-  # Routes for logging product searches
-  resources :product_searches, only: [:create]
+  # Routes for logging ad searches
+  resources :ad_searches, only: [:create]
 
   # Routes for logging click events
   resources :click_events, only: [:create]
@@ -24,8 +24,8 @@ Rails.application.routes.draw do
   namespace :admin do
     namespace :vendor do
       get ':vendor_id/profile', to: 'profiles#show'
-      get ':vendor_id/products', to: 'products#index'
-      get ':vendor_id/products/:product_id/reviews', to: 'reviews#index'
+      get ':vendor_id/ads', to: 'ads#index'
+      get ':vendor_id/ads/:ad_id/reviews', to: 'reviews#index'
       get ':vendor_id/orders', to: 'orders#index_for_vendor'
     end
 
@@ -47,7 +47,7 @@ Rails.application.routes.draw do
     
     resources :categories
     resources :subcategories
-    resources :products do
+    resources :ads do
       collection do
         get 'search'
         get 'flagged'
@@ -64,7 +64,7 @@ Rails.application.routes.draw do
         put 'unblock'
         get 'analytics'
         get 'orders', to: 'vendors#orders'
-        get 'products'
+        get 'ads'
         get 'reviews'
       end
     end
@@ -97,7 +97,7 @@ Rails.application.routes.draw do
     resources :promotions, except: [:new, :edit]
     get 'identify', to: 'admins#identify'
     resources :notifications, only: [:index, :create]
-    resources :product_searches, only: [:index, :show, :destroy]
+    resources :ad_searches, only: [:index, :show, :destroy]
     resources :click_events, only: [:index, :show, :destroy]
     resources :tiers, only: [:index, :show, :create, :update, :destroy]
   end
@@ -106,7 +106,7 @@ Rails.application.routes.draw do
   namespace :vendor do
     post 'signup', to: 'vendors#create'
     # patch 'update_tier', on: :member
-    resources :products
+    resources :ads
     resources :orders do
       member do
         put 'update_status', to: 'orders#update_status' # Custom route for updating order status
@@ -140,7 +140,7 @@ Rails.application.routes.draw do
     end
     resources :wish_lists, only: [:index, :create, :destroy] do
       member do
-        post 'add_to_cart' # This route adds the product to the cart
+        post 'add_to_cart' # This route adds the ad to the cart
       end
     end
     resources :reviews
@@ -163,15 +163,15 @@ Rails.application.routes.draw do
     
     post 'validate_coupon', to: 'promotions#validate_coupon'
 
-    resources :products, only: [:index, :show] do
+    resources :ads, only: [:index, :show] do
       collection do
         get 'search'
       end
       member do
         post 'add_to_cart'
         post 'add_to_buy_for_me_order_cart'
-        get 'related', to: 'products#related'
-        get 'vendor', to: 'products#vendor'
+        get 'related', to: 'ads#related'
+        get 'vendor', to: 'ads#vendor'
       end
     end
     
