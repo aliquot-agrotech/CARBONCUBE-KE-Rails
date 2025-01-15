@@ -1080,11 +1080,25 @@ def generate_coupon_code(discount_percentage)
   "#{random_string}#{discount_percentage.to_s.rjust(2, '0')}"
 end
 
+# Define holiday-related promotion titles in Kenya
+holiday_titles = [
+  "Back to School Bonanza",
+  "Easter Weekend Sale",
+  "Madaraka Day Discounts",
+  "Jamhuri Day Specials",
+  "Christmas Mega Sale",
+  "New Year Offers",
+  "Black Friday Deals",
+  "Cyber Monday Discounts",
+  "Ramadan Kareem Offers",
+  "Mashujaa Day Bargains"
+]
+
 # Create 10 promotions with random data
 10.times do
-  discount_percentage = rand(1..14)  # Random percentage between 1 and 100
+  discount_percentage = rand(1..14) # Random percentage between 1 and 14
   Promotion.create!(
-    title: Faker::Commerce.ad_name,
+    title: holiday_titles.sample,
     description: Faker::Lorem.sentence,
     discount_percentage: discount_percentage,
     coupon_code: generate_coupon_code(discount_percentage),
@@ -1092,7 +1106,5 @@ end
     end_date: Faker::Date.forward(days: rand(10..20))
   )
 end
-
-
 
 puts 'Congratulations!! Seed data created successfully!'
