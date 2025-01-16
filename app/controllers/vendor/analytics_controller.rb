@@ -14,18 +14,21 @@ class Vendor::AnalyticsController < ApplicationController
 
     # Add more data based on the vendor's tier
     case tier_id
-      when 1 # Free tier
-        # No revenue, reviews, etc.
-        response_data.merge!(calculate_free_tier_data)
-      when 2 # Basic tier
-        response_data.merge!(calculate_basic_tier_data)
-      when 3 # Standard tier
-        response_data.merge!(calculate_standard_tier_data)
-      when 4 # Premium tier
-        response_data.merge!(calculate_premium_tier_data)
-      else
-        # Handle case for unknown tier (optional)
-        render json: { error: 'Invalid tier' }, status: 400
+    when 1 # Free tier
+      response_data.merge!(calculate_free_tier_data)
+    when 2 # Basic tier
+      response_data.merge!(calculate_basic_tier_data)
+    when 3 # Standard tier
+      response_data.merge!(calculate_standard_tier_data)
+      response_data.merge!(wishlist_stats: calculate_wishlist_stats)
+    when 4 # Premium tier
+      response_data.merge!(calculate_premium_tier_data)
+      response_data.merge!(
+        wishlist_stats: calculate_wishlist_stats,
+        competitor_stats: calculate_competitor_stats
+      )
+    else
+      render json: { error: 'Invalid tier' }, status: 400
       return
     end
 
@@ -39,7 +42,7 @@ class Vendor::AnalyticsController < ApplicationController
     {
       total_orders: calculate_total_orders,
       total_ads: calculate_total_ads,
-      average_rating: calculate_average_rating,
+      average_rating: calculate_average_rating
     }
   end
 
@@ -71,7 +74,82 @@ class Vendor::AnalyticsController < ApplicationController
     }
   end
 
-  # The rest of the helper methods remain the same
+  # Wishlist Stats
+  def calculate_wishlist_stats
+    {
+      top_wishlisted_products: fetch_top_wishlisted_products,
+      wishlist_conversion_rate: calculate_wishlist_conversion_rate,
+      wishlist_trends: calculate_wishlist_trends
+    }
+  end
+
+  def fetch_top_wishlisted_products
+    WishList.joins(:ad)
+            .where(ads: { vendor_id: current_vendor.id })
+            .group('ads.id')
+            .select('ads.title AS ad_title, COUNT(wish_lists.id) AS wishlist_count')
+            .order('wishlist_count DESC')
+            .limit(3)
+            .map { |record| { ad_title: record.ad_title, wishlist_count: record.wishlist_count } }
+  end
+
+  def calculate_wishlist_conversion_rate
+    current_vendor.ads
+                  .joins("LEFT JOIN wish_lists ON wish_lists.ad_id = ads.id")
+                  .joins("LEFT JOIN order_items ON order_items.ad_id = ads.id")
+                  .select('ads.title AS ad_title, COUNT(wish_lists.id) AS wishlist_count, SUM(order_items.quantity) AS purchase_count')
+                  .map { |ad| { ad_title: ad.ad_title, wishlist_count: ad.wishlist_count, purchase_count: ad.purchase_count || 0 } }
+  end
+
+  def calculate_wishlist_trends
+    WishList.joins(:ad)
+            .where(ads: { vendor_id: current_vendor.id })
+            .group('DATE_TRUNC(\'month\', wish_lists.created_at)', 'ads.title')
+            .count
+            .transform_keys { |k| { month: k[0].strftime("%B %Y"), ad_title: k[1] } }
+  end
+
+  # Competitor Stats
+  def calculate_competitor_stats
+    category_id = current_vendor.ads.select(:category_id).distinct.pluck(:category_id).first
+    return [] unless category_id
+
+    {
+      revenue_share: calculate_revenue_share(category_id),
+      top_competitor_ads: fetch_top_competitor_ads(category_id),
+      competitor_average_price: calculate_competitor_average_price(category_id)
+    }
+  end
+
+  def calculate_revenue_share(category_id)
+    total_category_revenue = Vendor.joins(ads: { order_items: :order })
+                                   .where(ads: { category_id: category_id })
+                                   .sum('order_items.quantity * ads.price')
+    vendor_revenue = calculate_total_revenue
+
+    { vendor_revenue: vendor_revenue, total_category_revenue: total_category_revenue, revenue_share: ((vendor_revenue / total_category_revenue.to_f) * 100).round(2) }
+  end
+
+  def fetch_top_competitor_ads(category_id)
+    Vendor.joins(ads: { order_items: :order })
+          .where(ads: { category_id: category_id })
+          .where.not(id: current_vendor.id)
+          .select('ads.id AS ad_id, ads.title AS ad_title, SUM(order_items.quantity) AS total_sold, ads.price AS ad_price')
+          .group('ads.id')
+          .order('total_sold DESC')
+          .limit(3)
+          .map { |record| { ad_id: record.ad_id, ad_title: record.ad_title, total_sold: record.total_sold, ad_price: record.ad_price } }
+  end
+
+  def calculate_competitor_average_price(category_id)
+    Vendor.joins(ads: :order_items)
+          .where(ads: { category_id: category_id })
+          .where.not(id: current_vendor.id)
+          .average('ads.price')
+          .to_f.round(2)
+  end
+
+  # Helper Methods (unchanged)
   def calculate_total_orders
     current_vendor.orders.count
   end
@@ -106,22 +184,20 @@ class Vendor::AnalyticsController < ApplicationController
   end
 
   def fetch_best_selling_ads
-    best_selling_ads = current_vendor.ads.joins(:order_items)
-                                  .select('ads.id AS ad_id, ads.title AS ad_title, ads.price AS ad_price, SUM(order_items.quantity) AS total_sold, ads.media AS media')
-                                  .group('ads.id')
-                                  .order('total_sold DESC')
-                                  .limit(3)
-                                  .map { |record| 
-                                    {
-                                      ad_id: record.ad_id,
-                                      ad_title: record.ad_title,
-                                      ad_price: record.ad_price,
-                                      total_sold: record.total_sold,
-                                      media: record.media # Add media here
-                                    }
-                                  }
-
-    best_selling_ads
+    current_vendor.ads.joins(:order_items)
+                      .select('ads.id AS ad_id, ads.title AS ad_title, ads.price AS ad_price, SUM(order_items.quantity) AS total_sold, ads.media AS media')
+                      .group('ads.id')
+                      .order('total_sold DESC')
+                      .limit(3)
+                      .map { |record| 
+                        {
+                          ad_id: record.ad_id,
+                          ad_title: record.ad_title,
+                          ad_price: record.ad_price,
+                          total_sold: record.total_sold,
+                          media: record.media
+                        }
+                      }
   end
 
   def authenticate_vendor
