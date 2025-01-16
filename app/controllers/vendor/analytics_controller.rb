@@ -91,7 +91,7 @@ class Vendor::AnalyticsController < ApplicationController
             .order('wishlist_count DESC')
             .limit(3)
             .map { |record| { ad_title: record.ad_title, wishlist_count: record.wishlist_count } }
-  end  
+  end    
 
   def calculate_wishlist_conversion_rate
     current_vendor.ads
@@ -100,7 +100,7 @@ class Vendor::AnalyticsController < ApplicationController
                   .select('ads.title AS ad_title, COUNT(wish_lists.id) AS wishlist_count, SUM(order_items.quantity) AS purchase_count')
                   .group('ads.title')  # Add 'ads.title' to the GROUP BY clause
                   .map { |ad| { ad_title: ad.ad_title, wishlist_count: ad.wishlist_count, purchase_count: ad.purchase_count || 0 } }
-  end  
+  end      
 
   def calculate_wishlist_trends
     WishList.joins(:ad)
@@ -108,7 +108,7 @@ class Vendor::AnalyticsController < ApplicationController
             .group('DATE_TRUNC(\'month\', wish_lists.created_at)', 'ads.title')  # Ensure both fields are grouped
             .count
             .transform_keys { |k| { month: k[0].strftime("%B %Y"), ad_title: k[1] } }
-  end
+  end  
 
   # Competitor Stats
   def calculate_competitor_stats
