@@ -180,7 +180,6 @@ class Vendor::AnalyticsController < ApplicationController
                             .group("DATE_TRUNC('month', orders.created_at)")
                             .sum('order_items.quantity * order_items.price')
                             .transform_keys { |k| k.strftime("%B %Y") }
-
     sales_performance
   end
 
