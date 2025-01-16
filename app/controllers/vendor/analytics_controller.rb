@@ -124,8 +124,8 @@ class Vendor::AnalyticsController < ApplicationController
 
   def calculate_revenue_share(category_id)
     total_category_revenue = Vendor.joins(ads: { order_items: :order })
-                                   .where(ads: { category_id: category_id })
-                                   .sum('order_items.quantity * ads.price')
+                                    .where(ads: { category_id: category_id })
+                                    .sum('order_items.quantity * ads.price')
     vendor_revenue = calculate_total_revenue
 
     { vendor_revenue: vendor_revenue, total_category_revenue: total_category_revenue, revenue_share: ((vendor_revenue / total_category_revenue.to_f) * 100).round(2) }
@@ -176,10 +176,10 @@ class Vendor::AnalyticsController < ApplicationController
     three_months_ago = 3.months.ago.beginning_of_month
 
     sales_performance = current_vendor.orders.joins(:order_items)
-                             .where(created_at: three_months_ago..current_month.end_of_month)
-                             .group("DATE_TRUNC('month', orders.created_at)")
-                             .sum('order_items.quantity * order_items.price')
-                             .transform_keys { |k| k.strftime("%B %Y") }
+                            .where(created_at: three_months_ago..current_month.end_of_month)
+                            .group("DATE_TRUNC('month', orders.created_at)")
+                            .sum('order_items.quantity * order_items.price')
+                            .transform_keys { |k| k.strftime("%B %Y") }
 
     sales_performance
   end
