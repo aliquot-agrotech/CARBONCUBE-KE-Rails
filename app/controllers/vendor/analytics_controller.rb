@@ -93,23 +93,49 @@ class Vendor::AnalyticsController < ApplicationController
             .map { |record| { ad_title: record.ad_title, wishlist_count: record.wishlist_count } }
   end    
 
-  def calculate_top_conversion_ads
-  current_vendor.ads
-                .joins("LEFT JOIN wish_lists ON wish_lists.ad_id = ads.id")
-                .joins("LEFT JOIN order_items ON order_items.ad_id = ads.id")
-                .select('ads.title AS ad_title, COUNT(wish_lists.id) AS wishlist_count, SUM(order_items.quantity) AS purchase_count')
-                .group('ads.title') # Ensure grouping by ad title
-                .map { |ad| 
-                  {
-                    ad_title: ad.ad_title,
-                    wishlist_count: ad.wishlist_count,
-                    purchase_count: ad.purchase_count || 0,
-                    conversion_rate: ad.wishlist_count.to_f > 0 ? (ad.purchase_count.to_f / ad.wishlist_count) * 100 : 0 # Calculate conversion rate
-                  }
-                }
-                .sort_by { |ad| -ad[:conversion_rate] } # Sort by highest conversion rate
-                .take(3) # Limit to top 3
+  # def calculate_wishlist_conversion_rate
+  #   current_vendor.ads
+  #                 .joins("LEFT JOIN wish_lists ON wish_lists.ad_id = ads.id")
+  #                 .joins("LEFT JOIN order_items ON order_items.ad_id = ads.id")
+  #                 .select('ads.title AS ad_title, COUNT(wish_lists.id) AS wishlist_count, SUM(order_items.quantity) AS purchase_count')
+  #                 .group('ads.title')  # Add 'ads.title' to the GROUP BY clause
+  #                 .map { |ad| { ad_title: ad.ad_title, wishlist_count: ad.wishlist_count, purchase_count: ad.purchase_count || 0 } }
+  # end
+  
+  def calculate_wishlist_conversion_rate
+    ads = current_vendor.ads
+                        .joins("LEFT JOIN wish_lists ON wish_lists.ad_id = ads.id")
+                        .joins("LEFT JOIN order_items ON order_items.ad_id = ads.id")
+                        .select('ads.title AS ad_title, 
+                                 COUNT(wish_lists.id) AS wishlist_count, 
+                                 SUM(order_items.quantity) AS purchase_count')
+                        .group('ads.title')
+  
+    # Calculate conversion rates and add fallback logic
+    processed_ads = ads.map do |ad|
+      wishlist_count = ad.wishlist_count.to_i
+      purchase_count = ad.purchase_count.to_i
+      conversion_rate = wishlist_count > 0 ? (purchase_count.to_f / wishlist_count) : 0
+  
+      {
+        ad_title: ad.ad_title,
+        wishlist_count: wishlist_count,
+        purchase_count: purchase_count,
+        conversion_rate: conversion_rate
+      }
+    end
+  
+    # Sort by conversion rate or wishlist count as a fallback
+    sorted_ads = if processed_ads.any? { |ad| ad[:purchase_count] > 0 }
+                   processed_ads.sort_by { |ad| -ad[:conversion_rate] }
+                 else
+                   processed_ads.sort_by { |ad| -ad[:wishlist_count] }
+                 end
+  
+    # Return top 3 ads
+    sorted_ads.first(3)
   end
+  
 
   def calculate_wishlist_trends
     WishList.joins(:ad)
