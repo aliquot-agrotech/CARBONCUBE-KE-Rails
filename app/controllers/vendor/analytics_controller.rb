@@ -135,7 +135,7 @@ class Vendor::AnalyticsController < ApplicationController
     Vendor.joins(ads: { order_items: :order })
           .where(ads: { category_id: category_id })
           .where.not(id: current_vendor.id)
-          .select('ads.id AS ad_id, ads.title AS ad_title, SUM(order_items.quantity) AS total_sold, ads.price AS ad_price, ads.media ASmedia')
+          .select('ads.id AS ad_id, ads.title AS ad_title, SUM(order_items.quantity) AS total_sold, ads.price AS ad_price, ads.media AS media')
           .group('ads.id')
           .order('total_sold DESC')
           .limit(3)
