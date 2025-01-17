@@ -92,7 +92,6 @@ premium_tier = Tier.create!(name: "Premium", ads_limit: 2000) # Unlimited ads
 
 # Seed Features
 free_features = [
-  "Basic listing visibility",
   "Limited access to marketplace analytics",
   "No dedicated customer services",
   "No promotional tools"
@@ -100,23 +99,20 @@ free_features = [
 basic_features = [
   "Improved listing visibility",
   "Marketplace analytics access",
-  "Ability to create limited discount offers (up to 10% off)",
-  "Inclusion in vendor recommendation carousel (rotating)"
+  "Ability to create limited discount offers (up to 10% off)"
 ]
 standard_features = [
   "Priority listing in category searches",
   "Marketplace analytics access",
-  "Ability to create discount offers (up to 20% off)",
-  "Featured in newsletter promotions",
-  "Access to buyer review management tools (respond to reviews)"
+  "Ability to create discount offers (up to 20% off)"
 ]
 premium_features = [
   "Featured listing options",
   "Marketplace analytics access",
   "Ability to create discount offers (up to 30% off)",
   "Advanced promotional tools (banner ads on category pages)",
-  "Access to wishlist chat option",
-  "Access to competitor stats"
+  "Access to Wishlist Statistics",
+  "Access to Competitor Statistics"
 ]
 
 # Associate features with tiers
