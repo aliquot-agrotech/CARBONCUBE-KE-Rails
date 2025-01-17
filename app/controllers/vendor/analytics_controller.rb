@@ -139,8 +139,17 @@ class Vendor::AnalyticsController < ApplicationController
           .group('ads.id')
           .order('total_sold DESC')
           .limit(3)
-          .map { |record| { ad_id: record.ad_id, ad_title: record.ad_title, total_sold: record.total_sold, ad_price: record.ad_price, ad_media: record.ad_media } }
+          .map { |record| 
+            { 
+              ad_id: record.ad_id,
+              ad_title: record.ad_title,
+              total_sold: record.total_sold,
+              ad_price: record.ad_price,
+              ad_media: JSON.parse(record.ad_media || '[]') # Parse the media as an array
+            } 
+          }
   end
+  
 
   def calculate_competitor_average_price(category_id)
     Vendor.joins(ads: :order_items)
