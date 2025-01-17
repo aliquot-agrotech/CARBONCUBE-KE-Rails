@@ -111,7 +111,7 @@ class Vendor::AnalyticsController < ApplicationController
   #                 .take(3) # Limit to top 3
   # end
 
-  def calculate_top_conversion_rate
+  def calculate_top_conversion_ads
     ads = current_vendor.ads
                         .joins("LEFT JOIN wish_lists ON wish_lists.ad_id = ads.id")
                         .joins("LEFT JOIN order_items ON order_items.ad_id = ads.id")
