@@ -9,7 +9,7 @@ class CreateVendors < ActiveRecord::Migration[7.1]
       t.string :business_registration_number
       t.string :enterprise_name
       t.string :email
-      t.string :profilepicture
+      t.string :profile_picture
       t.datetime :birthdate
       t.string :zipcode
       t.string :city
