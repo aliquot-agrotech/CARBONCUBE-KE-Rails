@@ -1,8 +1,9 @@
 class AdSerializer < ActiveModel::Serializer
   attributes :id, :vendor_id, :category_id, :subcategory_id, :category_name, 
-  :subcategory_name, :title, :description, :price, :quantity, :brand, 
-  :manufacturer, :item_weight, :weight_unit, :item_length, :item_width, 
-  :item_height, :media_urls, :first_media_url, :mean_rating, :review_count, :vendor_tier, :tier_name
+             :subcategory_name, :title, :description, :price, :quantity, :brand, 
+             :manufacturer, :item_weight, :weight_unit, :item_length, :item_width, 
+             :item_height, :media_urls, :first_media_url, :mean_rating, :review_count, 
+             :vendor_tier, :tier_name
 
   has_one :vendor, serializer: VendorSerializer
   has_many :reviews
@@ -20,13 +21,20 @@ class AdSerializer < ActiveModel::Serializer
   end
 
   def vendor_tier
-    object.vendor.tier_id
+    # Fetch tier_id from vendor_tiers table via the vendor's association
+    vendor_tier = object.vendor.vendor_tier
+    vendor_tier ? vendor_tier.tier_id : nil
   end
 
   def tier_name
     # Assuming you have a Tier model that stores tier names
-    tier = object.vendor.tier
-    tier ? tier.name : 'Unknown' # Return the name of the tier, or 'Unknown' if no tier exists
+    vendor_tier = object.vendor.vendor_tier
+    if vendor_tier
+      tier = vendor_tier.tier
+      tier ? tier.name : 'Unknown'
+    else
+      'Unknown'
+    end
   end
 
   # Add these methods to fetch the names
