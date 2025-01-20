@@ -3,7 +3,8 @@ class Vendor::AnalyticsController < ApplicationController
 
   def index
     # Get vendor's tier_id
-    tier_id = current_vendor.tier_id
+    tier_id = current_vendor.vendor_tier&.tier_id
+
 
     # Prepare the response based on the vendor's tier
     response_data = {
