@@ -285,7 +285,7 @@ end
     vendor.zipcode = Faker::Address.zip_code
     vendor.city = Faker::Address.city
     vendor.gender = ['Male', 'Female'].sample
-    vendor.profilepicture = Faker::Avatar.image
+    vendor.profile_picture = Faker::Avatar.image
   end
 
   if vendor.valid?
