@@ -219,7 +219,6 @@ end
 
 
 # Seed vendor data
-
 50.times do
   fullname = Faker::Name.name
   username = fullname.downcase.gsub(/\s+/, "") # remove spaces and lowercase the name
@@ -237,11 +236,12 @@ end
     vendor.password = 'password'
     vendor.business_registration_number = "BN/#{Faker::Number.number(digits: 4)}/#{Faker::Number.number(digits: 6)}"
 
-    # Assign random category
+    # Assign random category if available
     if Category.any?
       vendor.category_ids = [Category.all.sample.id]
     else
-      puts "No categories found for vendor."
+      puts "No categories found for vendor #{email}. Skipping vendor."
+      next
     end
 
     vendor.birthdate = Faker::Date.birthday(min_age: 18, max_age: 65)
@@ -262,24 +262,29 @@ end
 tier_durations = [1, 3, 6, 12] # Define valid durations in months
 
 Vendor.all.each do |vendor|
-  next if VendorTier.exists?(vendor_id: vendor.id) # Skip if a VendorTier already exists for the vendor
+  # Skip if a VendorTier already exists for the vendor
+  next if VendorTier.exists?(vendor_id: vendor.id)
 
-  tier = Tier.all.sample # Assign a random tier
-  duration = tier_durations.sample # Assign a random duration
+  # Ensure there are tiers available
+  if Tier.any?
+    tier = Tier.all.sample # Assign a random tier
+    duration = tier_durations.sample # Assign a random duration
 
-  created_at_time = Faker::Time.backward(days: 30) # Randomized creation date within the last 30 days
-  updated_at_time = Faker::Time.between(from: created_at_time, to: Time.now) # Ensure updated_at is after or equal to created_at
+    created_at_time = Faker::Time.backward(days: 30) # Randomized creation date within the last 30 days
+    updated_at_time = Faker::Time.between(from: created_at_time, to: Time.now) # Ensure updated_at is after or equal to created_at
 
-  VendorTier.create!(
-    vendor_id: vendor.id,
-    tier_id: tier.id,
-    duration_months: duration,
-    created_at: created_at_time,
-    updated_at: updated_at_time
-  )
-  puts "VendorTier created for Vendor ID: #{vendor.id}, Tier ID: #{tier.id}, Duration: #{duration} months"
+    VendorTier.create!(
+      vendor_id: vendor.id,
+      tier_id: tier.id,
+      duration_months: duration,
+      created_at: created_at_time,
+      updated_at: updated_at_time
+    )
+    puts "VendorTier created for Vendor ID: #{vendor.id}, Tier ID: #{tier.id}, Duration: #{duration} months"
+  else
+    puts "No tiers found for vendor #{vendor.email}. Skipping tier assignment."
+  end
 end
- 
 
 puts "Starts seeding the ads of the categories..."
 
@@ -720,23 +725,31 @@ category_ads.each do |category_name, ads|
   subcategory_index = 0
   
   ads.each do |ad_data|
+    # Ensure there are vendors to assign to ads
+    vendor = Vendor.all.sample
+  
+    if vendor.nil?
+      puts "No vendors available to assign to this ad: #{ad_data[:title]}. Skipping ad."
+      next
+    end
+  
     # Assign the subcategory in a round-robin manner
     assigned_subcategory = subcategories[subcategory_index]
-    
+  
     # Update the index, looping back to the start if necessary
     subcategory_index = (subcategory_index + 1) % subcategory_count
-
+  
     # Find or create the ad
     ad = Ad.find_or_initialize_by(title: ad_data[:title])
-    
+  
     if ad.new_record?
       # Generate a random date in April
       created_at = Faker::Date.between(from: april_range.begin, to: april_range.end)
-      
+  
       ad.description = ad_data[:description]
       ad.category_id = category.id
       ad.subcategory_id = assigned_subcategory.id if assigned_subcategory.present?
-      ad.vendor_id = Vendor.all.sample.id
+      ad.vendor_id = vendor.id # Assign vendor_id from the existing vendor
       ad.price = Faker::Commerce.price(range: 200..10000)
       ad.quantity = Faker::Number.between(from: 30, to: 100)
       ad.brand = Faker::Company.name
@@ -750,8 +763,12 @@ category_ads.each do |category_name, ads|
       ad.created_at = created_at
       ad.updated_at = created_at
       ad.save!
+      puts "Ad created for Vendor ID: #{vendor.id}, Ad Title: #{ad.title}"
+    else
+      puts "Ad already exists: #{ad.title}. Skipping ad."
     end
   end
+  
 end
 
 puts "Starts seeding the orders"
