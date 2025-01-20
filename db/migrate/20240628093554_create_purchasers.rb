@@ -11,8 +11,12 @@ class CreatePurchasers < ActiveRecord::Migration[7.1]
       t.string :city
       t.string :gender, default: 'Male'
       t.string :location
-      t.string :profilepicture
+      t.string :profile_picture
       t.boolean :blocked, default: false
+      t.references :income, foreign_key: true, null: true
+      t.references :employment, foreign_key: true, null: true
+      t.references :education, foreign_key: true, null: true
+      t.references :sector, foreign_key: true, null: true
 
       t.timestamps
     end

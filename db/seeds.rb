@@ -4,13 +4,43 @@
 
 # db/seeds.rb
 
-# db/seeds.rb
-
 require 'faker'
 require 'set'
 
 
 puts "Starts seeding..."
+
+
+# Income ranges
+income_ranges = ['0-10000', '10000-20000', '20000-50000', '50000-100000', '100000-500000', '500000+']
+income_ranges.each do |range|
+  Income.find_or_create_by(range: range)
+end
+
+# Sectors
+sectors = [
+  'Agriculture', 'Automotive', 'Banking', 'Construction', 'Education', 'Energy',
+  'Entertainment', 'Fashion', 'Finance', 'Food & Beverage', 'Healthcare',
+  'Hospitality', 'Information Technology', 'Manufacturing', 'Media', 'Real Estate',
+  'Retail', 'Telecommunications', 'Transportation', 'Travel', 'NGOs', 'Others'
+]
+sectors.each do |name|
+  Sector.find_or_create_by(name: name)
+end
+
+# Employment statuses
+employment_statuses = ['Student', 'Employed', 'Self-Employed', 'Unemployed', 'Retired']
+employment_statuses.each do |status|
+  Employment.find_or_create_by(status: status)
+end
+
+# Education levels
+education_levels = ['Primary', 'High-School', 'Under-Graduate', 'Post-Graduate']
+education_levels.each do |level|
+  Education.find_or_create_by(level: level)
+end
+
+
 # Create categories with descriptions
 categories = [
   { name: 'Automotive Parts & Accessories', description: 'Spare parts for automobiles' },
@@ -213,9 +243,16 @@ end
     purchaser.zipcode = Faker::Address.zip_code
     purchaser.city = Faker::Address.city
     purchaser.gender = ['Male', 'Female'].sample
-    purchaser.profilepicture = Faker::Avatar.image
+    purchaser.profile_picture = Faker::Avatar.image
+
+    # Assign new attributes
+    purchaser.income_id = Income.all.sample.id
+    purchaser.employment_id = Employment.all.sample.id
+    purchaser.education_id = Education.all.sample.id
+    purchaser.sector_id = Sector.all.sample.id
   end
 end
+
 
 
 # Seed vendor data
