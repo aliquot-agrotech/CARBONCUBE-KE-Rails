@@ -138,8 +138,7 @@ pricing_data.each do |tier, prices|
   end
 end
 
-# Define valid tier durations
-tier_durations = ['1 month', '3 months', '6 months', '12 months']
+
 
 # Set to keep track of used phone numbers
 used_phone_numbers = Set.new
@@ -238,15 +237,13 @@ end
     vendor.password = 'password'
     vendor.business_registration_number = "BN/#{Faker::Number.number(digits: 4)}/#{Faker::Number.number(digits: 6)}"
 
-    # Check if categories and tiers exist
-    if Category.any? && Tier.any?
+    # Assign random category
+    if Category.any?
       vendor.category_ids = [Category.all.sample.id]
-      vendor.tier_id = Tier.all.sample.id
     else
-      puts "No categories or tiers found for vendor."
+      puts "No categories found for vendor."
     end
 
-    vendor.tier_duration = tier_durations.sample # Assign random tier duration
     vendor.birthdate = Faker::Date.birthday(min_age: 18, max_age: 65)
     vendor.zipcode = Faker::Address.zip_code
     vendor.city = Faker::Address.city
@@ -255,12 +252,34 @@ end
   end
 
   if vendor.valid?
-    puts "Vendor created: #{vendor.email}, Tier Duration: #{vendor.tier_duration}"
+    puts "Vendor created: #{vendor.email}"
   else
     puts "Vendor validation failed for: #{vendor.email}, Errors: #{vendor.errors.full_messages}"
   end
 end
 
+# Seed vendor tier data
+tier_durations = [1, 3, 6, 12] # Define valid durations in months
+
+Vendor.all.each do |vendor|
+  next if VendorTier.exists?(vendor_id: vendor.id) # Skip if a VendorTier already exists for the vendor
+
+  tier = Tier.all.sample # Assign a random tier
+  duration = tier_durations.sample # Assign a random duration
+
+  created_at_time = Faker::Time.backward(days: 30) # Randomized creation date within the last 30 days
+  updated_at_time = Faker::Time.between(from: created_at_time, to: Time.now) # Ensure updated_at is after or equal to created_at
+
+  VendorTier.create!(
+    vendor_id: vendor.id,
+    tier_id: tier.id,
+    duration_months: duration,
+    created_at: created_at_time,
+    updated_at: updated_at_time
+  )
+  puts "VendorTier created for Vendor ID: #{vendor.id}, Tier ID: #{tier.id}, Duration: #{duration} months"
+end
+ 
 
 puts "Starts seeding the ads of the categories..."
 

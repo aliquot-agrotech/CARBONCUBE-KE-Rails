@@ -11,27 +11,39 @@ class Vendor::TiersController < ApplicationController
     Rails.logger.error "Unexpected error: #{e.message}"
     render json: { error: 'Internal Server Error' }, status: :internal_server_error
   end
-  
 
   def update_tier
     tier = Tier.find_by(id: params[:tier_id]) # Find the tier by the provided ID
-  
+
     unless tier
       return render json: { error: 'Invalid tier selected' }, status: :not_found
     end
-  
+
     # Extract numeric duration from the string (e.g., "6 months" => 6)
-    tier_duration = params[:tier_duration].to_i # Convert the string to an integer (e.g., "6 months" => 6)
-  
-    if @current_vendor.update(tier_id: tier.id, tier_duration: tier_duration)
-      render json: { message: 'Tier updated successfully' }, status: :ok
+    tier_duration = params[:tier_duration].to_i
+
+    # Check if the vendor already has an entry in the vendor_tiers table
+    vendor_tier = VendorTier.where(vendor_id: @current_vendor.id, tier_id: tier.id).order(updated_at: :desc).first
+
+    if vendor_tier
+      # Update the existing entry
+      if vendor_tier.update(duration_months: tier_duration)
+        render json: vendor_tier, serializer: VendorTierSerializer, status: :ok
+      else
+        render json: { error: 'Tier update failed', details: vendor_tier.errors.full_messages }, status: :unprocessable_entity
+      end
     else
-      render json: { error: 'Tier update failed', details: @current_vendor.errors.full_messages }, status: :unprocessable_entity
+      # Create a new entry in the vendor_tiers table
+      new_vendor_tier = VendorTier.new(vendor_id: @current_vendor.id, tier_id: tier.id, duration_months: tier_duration)
+      if new_vendor_tier.save
+        render json: new_vendor_tier, serializer: VendorTierSerializer, status: :created
+      else
+        render json: { error: 'Failed to create new tier', details: new_vendor_tier.errors.full_messages }, status: :unprocessable_entity
+      end
     end
   end
-  
 
-  private 
+  private
 
   def authenticate_vendor
     @current_vendor = VendorAuthorizeApiRequest.new(request.headers).result
