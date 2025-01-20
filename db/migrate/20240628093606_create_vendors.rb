@@ -1,7 +1,6 @@
 class CreateVendors < ActiveRecord::Migration[7.1]
   def change
     create_table :vendors do |t|
-      t.references :tier, null: false, foreign_key: true
       t.string :fullname
       t.string :username
       t.string :description
@@ -10,7 +9,6 @@ class CreateVendors < ActiveRecord::Migration[7.1]
       t.string :business_registration_number
       t.string :enterprise_name
       t.string :email
-      t.string :tier_duration
       t.string :profilepicture
       t.datetime :birthdate
       t.string :zipcode
