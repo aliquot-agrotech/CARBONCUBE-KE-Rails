@@ -108,8 +108,8 @@ class Vendor::AnalyticsController < ApplicationController
                         .joins("LEFT JOIN wish_lists ON wish_lists.ad_id = ads.id")
                         .joins("LEFT JOIN order_items ON order_items.ad_id = ads.id")
                         .select('ads.title AS ad_title, 
-                                 COUNT(wish_lists.id) AS wishlist_count, 
-                                 SUM(order_items.quantity) AS purchase_count')
+                                  COUNT(wish_lists.id) AS wishlist_count, 
+                                  SUM(order_items.quantity) AS purchase_count')
                         .group('ads.title')
   
     # Calculate conversion rates and add fallback logic
@@ -127,11 +127,11 @@ class Vendor::AnalyticsController < ApplicationController
     end
   
     # Sort by conversion rate or wishlist count as a fallback
-    sorted_ads = if processed_ads.any? { |ad| ad[:purchase_count] > 0 }
-                   processed_ads.sort_by { |ad| -ad[:conversion_rate] }
-                 else
-                   processed_ads.sort_by { |ad| -ad[:wishlist_count] }
-                 end
+    sorted_ads =  if processed_ads.any? { |ad| ad[:purchase_count] > 0 }
+                    processed_ads.sort_by { |ad| -ad[:conversion_rate] }
+                  else
+                    processed_ads.sort_by { |ad| -ad[:wishlist_count] }
+                  end
   
     # Return top 3 ads
     sorted_ads.first(3)
