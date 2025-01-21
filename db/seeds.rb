@@ -432,6 +432,14 @@ category_ads = {
     { title: 'Fluoride Removal Filter', description: 'Filter for removing fluoride from water', media: ['https://m.media-amazon.com/images/I/51U-CNVnn3L.__AC_SX300_SY300_QL70_FMwebp_.jpg', 'https://m.media-amazon.com/images/I/61rvh811buL._AC_SX679_.jpg'] }
   ],
 
+
+
+  ###
+  
+
+
+  ##
+
   'Hardware Tools' => [
     { title: 'Hammer', description: 'Durable hammer for various tasks', media: ['https://m.media-amazon.com/images/I/716uFZq0wAL.__AC_SY300_SX300_QL70_FMwebp_.jpg', 'https://m.media-amazon.com/images/I/81jHRwcu-iL._AC_SX679_.jpg'] },
     { title: 'Screwdriver Set', description: 'Set of screwdrivers with various heads', media: ['https://m.media-amazon.com/images/I/71Jli9bYEnL.__AC_SX300_SY300_QL70_FMwebp_.jpg', 'https://m.media-amazon.com/images/I/712UpxUORcL._AC_SX679_.jpg'] },
@@ -748,7 +756,7 @@ category_ads = {
 # Define the date range for April
 april_range = (Date.new(2024, 4, 1)..Date.new(2024, 4, 30))
 
-# Seed ads
+# Seed ads with vendors restricted to their categories
 category_ads.each do |category_name, ads|
   # Find the category by name
   category = Category.find_by(name: category_name)
@@ -762,14 +770,17 @@ category_ads.each do |category_name, ads|
   subcategory_index = 0
   
   ads.each do |ad_data|
-    # Ensure there are vendors to assign to ads
-    vendor = Vendor.all.sample
-  
-    if vendor.nil?
-      puts "No vendors available to assign to this ad: #{ad_data[:title]}. Skipping ad."
+    # Find vendors restricted to the current category
+    eligible_vendors = Vendor.where("category_ids @> ARRAY[?]::integer[]", [category.id])
+    
+    if eligible_vendors.empty?
+      puts "No vendors available in category: #{category.name} to assign to this ad: #{ad_data[:title]}. Skipping ad."
       next
     end
-  
+    
+    # Select a random vendor from eligible vendors
+    vendor = eligible_vendors.sample
+    
     # Assign the subcategory in a round-robin manner
     assigned_subcategory = subcategories[subcategory_index]
   
@@ -786,7 +797,7 @@ category_ads.each do |category_name, ads|
       ad.description = ad_data[:description]
       ad.category_id = category.id
       ad.subcategory_id = assigned_subcategory.id if assigned_subcategory.present?
-      ad.vendor_id = vendor.id # Assign vendor_id from the existing vendor
+      ad.vendor_id = vendor.id # Assign vendor_id from the eligible vendor
       ad.price = Faker::Commerce.price(range: 200..10000)
       ad.quantity = Faker::Number.between(from: 30, to: 100)
       ad.brand = Faker::Company.name
@@ -805,8 +816,8 @@ category_ads.each do |category_name, ads|
       puts "Ad already exists: #{ad.title}. Skipping ad."
     end
   end
-  
 end
+
 
 puts "Starts seeding the orders"
 
