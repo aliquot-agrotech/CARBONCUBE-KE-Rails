@@ -769,10 +769,10 @@ category_ads.each do |category_name, ads|
   # Initialize a counter to track subcategory assignment
   subcategory_index = 0
   
+  eligible_vendors = Vendor.joins("INNER JOIN categories_vendors ON categories_vendors.vendor_id = vendors.id")
+                         .where(categories_vendors: { category_id: category.id })
+
   ads.each do |ad_data|
-    # Find vendors restricted to the current category
-    eligible_vendors = Vendor.where("category_ids @> ARRAY[?]::integer[]", [category.id])
-    
     if eligible_vendors.empty?
       puts "No vendors available in category: #{category.name} to assign to this ad: #{ad_data[:title]}. Skipping ad."
       next

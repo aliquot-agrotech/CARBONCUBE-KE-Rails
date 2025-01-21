@@ -11,6 +11,8 @@ class Vendor < ApplicationRecord
   has_many :conversations
   has_many :notifications, as: :notifiable
   has_many :buy_for_me_order_vendors
+  has_one :categories_vendor
+  has_one :category, through: :categories_vendor
   has_one :vendor_tier
 
   validates :fullname, presence: true
