@@ -1,8 +1,8 @@
 class Tier < ApplicationRecord
   has_many :tier_features, dependent: :destroy
   has_many :tier_pricings, dependent: :destroy
-  has_many :vendors, dependent: :nullify
   has_many :vendor_tiers
+  has_many :vendors, through: :vendor_tiers
 
   validates :name, presence: true, uniqueness: true
   validates :ads_limit, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
