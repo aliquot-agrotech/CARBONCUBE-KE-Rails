@@ -14,7 +14,7 @@ class Vendor < ApplicationRecord
   has_one :categories_vendor
   has_one :category, through: :categories_vendor
   has_one :vendor_tier
-  has_one :tiers, through: :vendor_tier
+  has_one :tier, through: :vendor_tier
 
   validates :fullname, presence: true
   validates :phone_number, presence: true
