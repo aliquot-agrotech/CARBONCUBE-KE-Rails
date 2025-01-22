@@ -53,9 +53,12 @@ class Purchaser::PurchasersController < ApplicationController
   end
 
   def purchaser_params
-    params.require(:purchaser).permit(:fullname, :username, :email, :phone_number, :password, :password_confirmation, :birthdate, :zipcode, :city, :gender, :location)
+    params.require(:purchaser).permit(
+      :fullname, :username, :email, :phone_number, :password, 
+      :password_confirmation, :birthdate, :zipcode, :city, :gender, 
+      :location, :income_id, :sector_id, :education_id, :employment_id, :terms
+    )
   end
-  
 
   def set_default_format
     request.format = :json unless params[:format]
