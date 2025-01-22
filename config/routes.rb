@@ -18,6 +18,10 @@ Rails.application.routes.draw do
 
   # Routes for logging click events
   resources :click_events, only: [:create]
+  resources :incomes, only: [:index]
+  resources :sectors, only: [:index]
+  resources :educations, only: [:index]
+  resources :employments, only: [:index]
   
 
   # Admin namespace for admin-specific functionality
