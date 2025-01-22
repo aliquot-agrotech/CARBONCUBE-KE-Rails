@@ -20,12 +20,13 @@ class Purchaser < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :username, presence: true, uniqueness: true
   validates :password, presence: true, length: { minimum: 6 }, if: :password_required?
-  validates :phone_number, presence: true, length: { is: 10 }, format: { with: /\A\d{10}\z/ }
   validates :birthdate, presence: true
   validates :zipcode, presence: true
   validates :city, presence: true
   validates :gender, inclusion: { in: %w(Male Female Other) }
   validates :location, presence: true
+  validates :phone_number, presence: true, length: { is: 10, message: "must be exactly 10 digits" },
+            format: { with: /\A\d{10}\z/, message: "should only contain numbers" }
 
   attribute :cart_total_price, :decimal, default: 0
 
