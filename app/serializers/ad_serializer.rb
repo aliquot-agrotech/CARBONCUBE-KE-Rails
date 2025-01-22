@@ -21,20 +21,15 @@ class AdSerializer < ActiveModel::Serializer
   end
 
   def vendor_tier
-    # Fetch the tier ID for the vendor using vendor_tiers
-    vendor_tier = object.vendor.vendor_tiers.first
+    # Fetch the tier ID for the vendor using vendor_tier
+    vendor_tier = object.vendor.vendor_tier
     vendor_tier ? vendor_tier.tier_id : nil
   end
 
   def tier_name
-    # Fetch the tier name for the vendor using vendor_tiers and the Tier model
-    vendor_tier = object.vendor.vendor_tiers.first
-    if vendor_tier
-      tier = Tier.find_by(id: vendor_tier.tier_id)
-      tier ? tier.name : 'Unknown'
-    else
-      'Unknown'
-    end
+    # Fetch the tier name for the vendor using the associated tier
+    vendor_tier = object.vendor.vendor_tier
+    vendor_tier&.tier&.name || 'Unknown'
   end
 
   def category_name
