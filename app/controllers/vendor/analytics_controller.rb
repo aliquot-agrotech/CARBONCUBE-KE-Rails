@@ -181,9 +181,7 @@ end
 
 # Group wishlists by income ranges
 def group_wishlist_by_income
-  WishList.joins(:ad)  # Ensure ads table is joined
-          .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
-          .joins("LEFT JOIN incomes ON purchasers.income_id = incomes.id")  # Join incomes table
+  WishList.joins(:ad, purchaser: :income)  # Using associations to join 'ad' and 'income' through 'purchaser'
           .where(ads: { vendor_id: current_vendor.id })
           .group("incomes.range")
           .count
@@ -191,11 +189,10 @@ def group_wishlist_by_income
 end
 
 
+
 # Group wishlists by education levels
 def group_wishlist_by_education
-  WishList.joins(:ad)  # Ensure ads table is joined
-          .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
-          .joins("LEFT JOIN educations ON purchasers.education_id = educations.id")  # Join educations table
+  WishList.joins(:ad, purchaser: :education)  # Using associations to join 'ad' and 'education' through 'purchaser'
           .where(ads: { vendor_id: current_vendor.id })
           .group("educations.level")
           .count
@@ -203,11 +200,10 @@ def group_wishlist_by_education
 end
 
 
+
 # Group wishlists by employment statuses
 def group_wishlist_by_employment
-  WishList.joins(:ad)  # Ensure ads table is joined
-          .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
-          .joins("LEFT JOIN employments ON purchasers.employment_id = employments.id")  # Join employments table
+  WishList.joins(:ad, purchaser: :employment)  # Using associations to join 'ad' and 'employment' through 'purchaser'
           .where(ads: { vendor_id: current_vendor.id })
           .group("employments.status")
           .count
@@ -215,16 +211,16 @@ def group_wishlist_by_employment
 end
 
 
+
 # Group wishlists by sectors
 def group_wishlist_by_sector
-  WishList.joins(:ad)  # Ensure ads table is joined
-          .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
-          .joins("LEFT JOIN sectors ON purchasers.sector_id = sectors.id")  # Join sectors table
+  WishList.joins(:ad, purchaser: :sector)  # Using associations to join 'ad' and 'sector' through 'purchaser'
           .where(ads: { vendor_id: current_vendor.id })
           .group("sectors.name")
           .count
           .transform_keys { |k| { sector: k } }
 end
+
 
 
 
