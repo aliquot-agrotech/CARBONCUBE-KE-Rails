@@ -51,13 +51,19 @@ class Vendor::AnalyticsController < ApplicationController
   end
 
   # Group clicks by age groups
-def group_clicks_by_age
-  ClickEvent.includes(:purchaser, :ad)
-          .where(ads: { vendor_id: current_vendor.id })
-          .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5 AS age_group", :event_type)
-          .count
-            .transform_keys { |k| { age_group: "#{k[0]}–#{k[0] + 4}", event_type: k[1] } }
-end
+  def group_clicks_by_age
+    ClickEvent
+      .includes(:purchaser, :ad)
+      .where(ads: { vendor_id: current_vendor.id })
+      .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5", :event_type)
+      .count
+      .transform_keys do |k|
+        {
+          age_group: "#{k[0]}–#{k[0].to_i + 4}",
+          event_type: k[1]
+        }
+      end
+  end  
 
 # Group clicks by income ranges
 def group_clicks_by_income
