@@ -160,10 +160,24 @@ def group_wishlist_by_age
   WishList.joins(:purchaser)
           .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
           .where(ads: { vendor_id: current_vendor.id })
-          .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5 AS age_group")
+          .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5")
           .count
-          .transform_keys { |k| { age_group: "#{k[0]}–#{k[0] + 4}" } }
+          .transform_keys do |k|
+            { age_group: "#{k}–#{k.to_i + 4}" }
+          end
 end
+
+
+# def group_wishlist_by_age
+#   WishList.joins(:purchaser)
+#           .where(ads: { vendor_id: current_vendor.id })
+#           .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5")
+#           .count
+#           .transform_keys do |k|
+#             { age_group: "#{k}–#{k.to_i + 4}" }
+#           end
+# end
+
 
 # Group wishlists by income ranges
 def group_wishlist_by_income
