@@ -14,7 +14,11 @@ class Purchaser < ApplicationRecord
   has_many :buy_for_me_orders
   has_many :click_events
   has_many :ad_searches
-
+  
+  belongs_to :sector
+  belongs_to :income
+  belongs_to :education
+  belongs_to :employment
 
   validates :fullname, presence: true
   validates :email, presence: true, uniqueness: true
