@@ -130,7 +130,7 @@ Rails.application.routes.draw do
     resources :messages
     get 'identify', to: 'vendors#identify'
     resources :notifications
-    resources :vendor_tiers, only: [:show, :index] do
+    resources :vendor_tiers, only: [:show] do
       patch 'update_tier', on: :collection
     end    
   end
