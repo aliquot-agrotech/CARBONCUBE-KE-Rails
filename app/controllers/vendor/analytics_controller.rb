@@ -155,18 +155,6 @@ def calculate_wishlist_stats
   }
 end
 
-# Group wishlists by age groups
-def group_wishlist_by_age
-  WishList.joins(:purchaser)
-          .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
-          .where(ads: { vendor_id: current_vendor.id })
-          .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5")
-          .count
-          .transform_keys do |k|
-            { age_group: "#{k}–#{k.to_i + 4}" }
-          end
-end
-
 
 # def group_wishlist_by_age
 #   WishList.joins(:purchaser)
@@ -178,46 +166,66 @@ end
 #           end
 # end
 
+# Group wishlists by age groups
+def group_wishlist_by_age
+  WishList.joins(:ad)  # Ensure ads table is joined
+          .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
+          .where(ads: { vendor_id: current_vendor.id })
+          .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5")
+          .count
+          .transform_keys do |k|
+            { age_group: "#{k}–#{k.to_i + 4}" }
+          end
+end
+
 
 # Group wishlists by income ranges
 def group_wishlist_by_income
-  WishList.joins(:purchaser)
+  WishList.joins(:ad)  # Ensure ads table is joined
           .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
+          .joins("LEFT JOIN incomes ON purchasers.income_id = incomes.id")  # Join incomes table
           .where(ads: { vendor_id: current_vendor.id })
           .group("incomes.range")
           .count
-          .transform_keys { |k| { income_range: k[0] } }
+          .transform_keys { |k| { income_range: k } }
 end
+
 
 # Group wishlists by education levels
 def group_wishlist_by_education
-  WishList.joins(:purchaser)
+  WishList.joins(:ad)  # Ensure ads table is joined
           .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
+          .joins("LEFT JOIN educations ON purchasers.education_id = educations.id")  # Join educations table
           .where(ads: { vendor_id: current_vendor.id })
           .group("educations.level")
           .count
-          .transform_keys { |k| { education_level: k[0] } }
+          .transform_keys { |k| { education_level: k } }
 end
+
 
 # Group wishlists by employment statuses
 def group_wishlist_by_employment
-  WishList.joins(:purchaser)
+  WishList.joins(:ad)  # Ensure ads table is joined
           .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
+          .joins("LEFT JOIN employments ON purchasers.employment_id = employments.id")  # Join employments table
           .where(ads: { vendor_id: current_vendor.id })
           .group("employments.status")
           .count
-          .transform_keys { |k| { employment_status: k[0] } }
+          .transform_keys { |k| { employment_status: k } }
 end
+
 
 # Group wishlists by sectors
 def group_wishlist_by_sector
-  WishList.joins(:purchaser)
+  WishList.joins(:ad)  # Ensure ads table is joined
           .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
+          .joins("LEFT JOIN sectors ON purchasers.sector_id = sectors.id")  # Join sectors table
           .where(ads: { vendor_id: current_vendor.id })
           .group("sectors.name")
           .count
-          .transform_keys { |k| { sector: k[0] } }
+          .transform_keys { |k| { sector: k } }
 end
+
 
 
   def fetch_top_wishlisted_products
