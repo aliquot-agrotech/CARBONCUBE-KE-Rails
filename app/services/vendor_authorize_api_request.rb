@@ -1,5 +1,3 @@
-# app/services/vendor_authorize_api_request.rb
-
 class VendorAuthorizeApiRequest
   def initialize(headers = {})
     @headers = headers
@@ -34,11 +32,11 @@ class VendorAuthorizeApiRequest
   end
 
   def http_auth_header
-    if @headers['Authorization'].present?
-      return @headers['Authorization'].split(' ').last
+    authorization_header = @headers['Authorization']
+    if authorization_header.present?
+      return authorization_header.split(' ').last
     else
       raise ExceptionHandler::MissingToken, 'Missing token'
     end
-    nil
   end
 end
