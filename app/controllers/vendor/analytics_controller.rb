@@ -21,12 +21,13 @@ class Vendor::AnalyticsController < ApplicationController
       response_data.merge!(calculate_basic_tier_data)
     when 3 # Standard tier
       response_data.merge!(calculate_standard_tier_data)
-      response_data.merge!(wishlist_stats: calculate_wishlist_stats)
+      response_data.merge!(demographic_stats: calculate_demographic_stats)
     when 4 # Premium tier
       response_data.merge!(calculate_premium_tier_data)
       response_data.merge!(
         wishlist_stats: calculate_wishlist_stats,
-        competitor_stats: calculate_competitor_stats
+        competitor_stats: calculate_competitor_stats,
+        demographic_stats: calculate_demographic_stats
       )
     else
       render json: { error: 'Invalid tier' }, status: 400
@@ -38,7 +39,63 @@ class Vendor::AnalyticsController < ApplicationController
 
   private
 
-  # Data for Free tier (id: 1)
+  # Calculate demographic stats for Standard and Premium tiers
+  def calculate_demographic_stats
+    {
+      age_groups: group_clicks_by_age,
+      income_ranges: group_clicks_by_income,
+      education_levels: group_clicks_by_education,
+      employment_statuses: group_clicks_by_employment,
+      sectors: group_clicks_by_sector
+    }
+  end
+
+  # Group clicks by age groups
+def group_clicks_by_age
+  ClickEvent.includes(:purchaser, :ad)
+          .where(ads: { vendor_id: current_vendor.id })
+          .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5 AS age_group", :event_type)
+          .count
+            .transform_keys { |k| { age_group: "#{k[0]}–#{k[0] + 4}", event_type: k[1] } }
+end
+
+# Group clicks by income ranges
+def group_clicks_by_income
+  ClickEvent.joins(ad: {}, purchaser: :income)
+            .where(ads: { vendor_id: current_vendor.id })
+            .group("incomes.range", :event_type)
+            .count
+            .transform_keys { |k| { income_range: k[0], event_type: k[1] } }
+end
+
+# Group clicks by education levels
+def group_clicks_by_education
+  ClickEvent.joins(ad: {}, purchaser: :education)
+            .where(ads: { vendor_id: current_vendor.id })
+            .group("educations.level", :event_type)
+            .count
+            .transform_keys { |k| { education_level: k[0], event_type: k[1] } }
+end
+
+# Group clicks by employment statuses
+def group_clicks_by_employment
+  ClickEvent.joins(ad: {}, purchaser: :employment)
+            .where(ads: { vendor_id: current_vendor.id })
+            .group("employments.status", :event_type)
+            .count
+            .transform_keys { |k| { employment_status: k[0], event_type: k[1] } }
+end
+
+# Group clicks by sectors
+def group_clicks_by_sector
+  ClickEvent.joins(ad: {}, purchaser: :sector)
+            .where(ads: { vendor_id: current_vendor.id })
+            .group("sectors.name", :event_type)
+            .count
+            .transform_keys { |k| { sector: k[0], event_type: k[1] } }
+end
+
+  # Data for Free tier
   def calculate_free_tier_data
     {
       total_orders: calculate_total_orders,
@@ -47,14 +104,14 @@ class Vendor::AnalyticsController < ApplicationController
     }
   end
 
-  # Data for Basic tier (id: 2)
+  # Data for Basic tier
   def calculate_basic_tier_data
     {
       total_revenue: calculate_total_revenue
     }
   end
 
-  # Data for Standard tier (id: 3)
+  # Data for Standard tier
   def calculate_standard_tier_data
     {
       total_revenue: calculate_total_revenue,
@@ -64,25 +121,84 @@ class Vendor::AnalyticsController < ApplicationController
     }
   end
 
-  # Data for Premium tier (id: 4)
+  # Data for Premium tier
   def calculate_premium_tier_data
     {
       total_revenue: calculate_total_revenue,
       average_rating: calculate_average_rating,
       total_reviews: calculate_total_reviews,
       sales_performance: calculate_sales_performance,
-      best_selling_ads: fetch_best_selling_ads
+      best_selling_ads: fetch_best_selling_ads,
+      wishlist_stats: calculate_wishlist_stats, # Merge wishlist stats into the response
+      demographic_stats: calculate_demographic_stats
     }
   end
 
-  # Wishlist Stats
-  def calculate_wishlist_stats
-    {
-      top_wishlisted_products: fetch_top_wishlisted_products,
-      wishlist_conversion_rate: calculate_wishlist_conversion_rate,
-      wishlist_trends: calculate_wishlist_trends
-    }
-  end
+
+  # Wishlist Stats with Demographics
+def calculate_wishlist_stats
+  {
+    top_wishlisted_products: fetch_top_wishlisted_products,
+    wishlist_conversion_rate: calculate_wishlist_conversion_rate,
+    wishlist_trends: calculate_wishlist_trends,
+    wishlist_by_age_groups: group_wishlist_by_age,
+    wishlist_by_income_ranges: group_wishlist_by_income,
+    wishlist_by_education_levels: group_wishlist_by_education,
+    wishlist_by_employment_statuses: group_wishlist_by_employment,
+    wishlist_by_sectors: group_wishlist_by_sector
+  }
+end
+
+# Group wishlists by age groups
+def group_wishlist_by_age
+  WishList.joins(:purchaser)
+          .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
+          .where(ads: { vendor_id: current_vendor.id })
+          .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5 AS age_group")
+          .count
+          .transform_keys { |k| { age_group: "#{k[0]}–#{k[0] + 4}" } }
+end
+
+# Group wishlists by income ranges
+def group_wishlist_by_income
+  WishList.joins(:purchaser)
+          .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
+          .where(ads: { vendor_id: current_vendor.id })
+          .group("incomes.range")
+          .count
+          .transform_keys { |k| { income_range: k[0] } }
+end
+
+# Group wishlists by education levels
+def group_wishlist_by_education
+  WishList.joins(:purchaser)
+          .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
+          .where(ads: { vendor_id: current_vendor.id })
+          .group("educations.level")
+          .count
+          .transform_keys { |k| { education_level: k[0] } }
+end
+
+# Group wishlists by employment statuses
+def group_wishlist_by_employment
+  WishList.joins(:purchaser)
+          .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
+          .where(ads: { vendor_id: current_vendor.id })
+          .group("employments.status")
+          .count
+          .transform_keys { |k| { employment_status: k[0] } }
+end
+
+# Group wishlists by sectors
+def group_wishlist_by_sector
+  WishList.joins(:purchaser)
+          .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
+          .where(ads: { vendor_id: current_vendor.id })
+          .group("sectors.name")
+          .count
+          .transform_keys { |k| { sector: k[0] } }
+end
+
 
   def fetch_top_wishlisted_products
     WishList.joins(:ad)
