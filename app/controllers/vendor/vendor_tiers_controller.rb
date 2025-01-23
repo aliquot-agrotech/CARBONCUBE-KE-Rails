@@ -1,4 +1,4 @@
-# app/controllers/vendor_tiers_controller.rb
+# app/controllers/vendor/vendor_tiers_controller.rb
 class Vendor::VendorTiersController < ApplicationController
   def show
     vendor_tier = VendorTier.where(vendor_id: params[:vendor_id]).order(updated_at: :desc).first

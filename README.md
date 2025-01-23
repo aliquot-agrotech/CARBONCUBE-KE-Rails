@@ -10,7 +10,7 @@ Before getting started, ensure you have the following installed on your system:
 
 - Ruby (version 3.3.6)
 - Ruby on Rails (version 8.0)
-- PostgreSQL
+- PostgreSQL (version 17)
 
 ## Getting Started
 
