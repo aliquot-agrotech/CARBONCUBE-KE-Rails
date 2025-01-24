@@ -1,13 +1,16 @@
 class Vendor::VendorTiersController < ApplicationController
   def show
-    # Find the most recent vendor tier entry for this vendor using vendor_id from the params
-    vendor_tier = VendorTier.where(vendor_id: params[:vendor_id]).order(updated_at: :desc).first
+    # Check for vendor_id or fallback to id
+    vendor_id = params[:vendor_id] || params[:id]
+
+    # Find the most recent vendor tier entry for this vendor
+    vendor_tier = VendorTier.where(vendor_id: vendor_id).order(updated_at: :desc).first
 
     if vendor_tier
       # Call the subscription_countdown method on the vendor_tier instance
       countdown = vendor_tier.subscription_countdown
 
-      # Check if the countdown is expired or not
+      # Check if the countdown is expired
       if countdown[:expired]
         render json: {
           vendor_id: vendor_tier.vendor_id,
@@ -23,7 +26,7 @@ class Vendor::VendorTiersController < ApplicationController
         }
       end
     else
-      render json: { error: "No subscription found for this vendor." }, status: :not_found
+      render json: { error: "Vendor tier not found." }, status: :not_found
     end
   end
 end

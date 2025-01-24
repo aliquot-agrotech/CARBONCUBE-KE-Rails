@@ -109,7 +109,7 @@ Rails.application.routes.draw do
   # Vendor namespace for vendor-specific functionality
   namespace :vendor do
     post 'signup', to: 'vendors#create'
-    # patch 'update_tier', on: :member
+    
     resources :ads
     resources :orders do
       member do
@@ -123,21 +123,23 @@ Rails.application.routes.draw do
     resources :analytics, only: [:index]
     resources :reviews, only: [:index, :show] do
       post 'reply', on: :member
-    end      
+    end
     resource :profile, only: [:show, :update] do
       post 'change-password', to: 'profiles#change_password'
     end
     resources :messages
     get 'identify', to: 'vendors#identify'
     resources :notifications
+
+    # Vendor Tiers
     resources :vendor_tiers, only: [:show] do
       patch 'update_tier', on: :collection
     end
-    
-    # Custom route to use :vendor_id instead of :id
-    get '/vendor/vendor_tiers/:vendor_id', to: 'vendor/vendor_tiers#show'
-      
+
+    # Custom route for vendor_id handling
+    get 'vendor_tiers/:vendor_id', to: 'vendor_tiers#show'
   end
+
 
   # Purchaser namespace for purchaser-specific functionality
   namespace :purchaser, defaults:{ format: :json}, path: 'purchaser' do
