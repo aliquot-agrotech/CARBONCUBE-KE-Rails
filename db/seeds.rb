@@ -1052,10 +1052,10 @@ puts "Seeding click_events and wish_lists..."
 
 # Seed data
 purchasers.each do |purchaser_id|
-  ad_sample = ads.sample(20) # Select a random sample of 20 ads for this purchaser
+  ad_sample = ads.sample(50) # Select a random sample of 20 ads for this purchaser
 
   ad_sample.each do |ad_id|
-    # Create 20 Ad-Click events
+    # Create 50 Ad-Click events
     ClickEvent.create!(
       purchaser_id: purchaser_id,
       ad_id: ad_id,
@@ -1063,7 +1063,7 @@ purchasers.each do |purchaser_id|
       metadata: nil
     )
 
-    # Create 20 Add-to-Wish-List events
+    # Create 50 Add-to-Wish-List events
     ClickEvent.create!(
       purchaser_id: purchaser_id,
       ad_id: ad_id,
@@ -1071,7 +1071,7 @@ purchasers.each do |purchaser_id|
       metadata: nil
     )
 
-    # Create 20 Reveal-Vendor-Details events
+    # Create 50 Reveal-Vendor-Details events
     ClickEvent.create!(
       purchaser_id: purchaser_id,
       ad_id: ad_id,
