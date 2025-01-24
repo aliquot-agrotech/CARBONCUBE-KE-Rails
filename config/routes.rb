@@ -132,7 +132,11 @@ Rails.application.routes.draw do
     resources :notifications
     resources :vendor_tiers, only: [:show] do
       patch 'update_tier', on: :collection
-    end    
+    end
+    
+    # Custom route to use :vendor_id instead of :id
+    get '/vendor/vendor_tiers/:vendor_id', to: 'vendor/vendor_tiers#show'
+      
   end
 
   # Purchaser namespace for purchaser-specific functionality
