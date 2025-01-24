@@ -1044,9 +1044,55 @@ end
 
 puts "Starts seeding for the ad reviews"
 
-# Generate 10 reviews for each ad
+# Fetch all purchaser and ad IDs
+purchasers = Purchaser.pluck(:id)
+ads = Ad.pluck(:id)
+
+puts "Seeding click_events and wish_lists..."
+
+# Seed data
+purchasers.each do |purchaser_id|
+  ad_sample = ads.sample(20) # Select a random sample of 20 ads for this purchaser
+
+  ad_sample.each do |ad_id|
+    # Create 20 Ad-Click events
+    ClickEvent.create!(
+      purchaser_id: purchaser_id,
+      ad_id: ad_id,
+      event_type: "Ad-Click",
+      metadata: nil
+    )
+
+    # Create 20 Add-to-Wish-List events
+    ClickEvent.create!(
+      purchaser_id: purchaser_id,
+      ad_id: ad_id,
+      event_type: "Add-to-Wish-List",
+      metadata: nil
+    )
+
+    # Create 20 Reveal-Vendor-Details events
+    ClickEvent.create!(
+      purchaser_id: purchaser_id,
+      ad_id: ad_id,
+      event_type: "Reveal-Vendor-Details",
+      metadata: nil
+    )
+
+    # Ensure wish_lists table mirrors Add-to-Wish-List events
+    WishList.create!(
+      purchaser_id: purchaser_id,
+      ad_id: ad_id
+    )
+  end
+end
+
+puts "Seeding completed successfully!"
+
+
+# Generate 20 reviews for each ad
 Ad.all.each do |ad|
-  10.times do
+  20.times do
     purchaser = Purchaser.all.sample
     rating = Faker::Number.between(from: 1, to: 5)
     review_text = Faker::Lorem.sentence(word_count: Faker::Number.between(from: 5, to: 15))
