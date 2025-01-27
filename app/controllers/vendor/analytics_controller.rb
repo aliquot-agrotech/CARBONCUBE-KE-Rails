@@ -267,15 +267,15 @@ end
     end
   
     # Sort by conversion rate or wishlist count as a fallback
-    sorted_ads =  if processed_ads.any? { |ad| ad[:purchase_count] > 0 }
-                    processed_ads.sort_by { |ad| -ad[:conversion_rate] }
-                  else
-                    processed_ads.sort_by { |ad| -ad[:wishlist_count] }
-                  end
+    sorted_ads = if processed_ads.any? { |ad| ad[:purchase_count] > 0 }
+                   processed_ads.sort_by { |ad| -ad[:conversion_rate] }
+                 else
+                   processed_ads.sort_by { |ad| -ad[:wishlist_count] }
+                 end
   
-    # Return top 3 ads
-    sorted_ads.first(3)
-  end
+    # Ensure it always returns an array
+    sorted_ads.first(3) || []
+  end  
   
 
   def calculate_wishlist_trends
