@@ -255,7 +255,6 @@ class Vendor::AnalyticsController < ApplicationController
   #   # Ensure it always returns an array
   #   sorted_ads.first(3) || []
   # end  
-  
 
   def calculate_wishlist_trends
     # Get the date range for the last 5 months
@@ -272,7 +271,7 @@ class Vendor::AnalyticsController < ApplicationController
     # Prepare the result in the desired format (an array of hashes with month names and counts)
     monthly_wishlist_counts = []
     (start_date..end_date).to_a.reverse.each do |month_date|
-      month_key = month_date.beginning_of_month.to_date.strftime('%Y-%m')
+      month_key = month_date.beginning_of_month.to_date.strftime('%Y-%m')  # Format as 'YYYY-MM'
       wishlist_count = wishlist_counts[month_key] || 0
       monthly_wishlist_counts << { month: month_date.strftime('%B %Y'), wishlist_count: wishlist_count }
     end
@@ -280,7 +279,6 @@ class Vendor::AnalyticsController < ApplicationController
     # Return the prepared data for the graph
     monthly_wishlist_counts
   end
-  
 
   # Competitor Stats
   def calculate_competitor_stats
