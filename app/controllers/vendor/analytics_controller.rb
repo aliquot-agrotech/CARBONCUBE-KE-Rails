@@ -276,9 +276,12 @@ class Vendor::AnalyticsController < ApplicationController
       monthly_wishlist_counts << { month: month_date.strftime('%B %Y'), wishlist_count: wishlist_count }
     end
   
+    # Log the data to make sure it's correct
+    puts "Wishlist Trends: #{monthly_wishlist_counts.inspect}"
+  
     # Return the prepared data for the graph
     monthly_wishlist_counts
-  end
+  end  
 
   # Competitor Stats
   def calculate_competitor_stats
