@@ -257,34 +257,33 @@ class Vendor::AnalyticsController < ApplicationController
   # end  
 
   def calculate_wishlist_trends
-    # Get the start and end dates for the last 5 months
+    # Calculate the last 5 months dynamically, including the current month
     end_date = Date.today.end_of_month
-    start_date = end_date - 4.months # Include the current month and 4 previous months
+    start_date = end_date - 4.months # Covers the current month and 4 previous months
   
-    # Query wishlists grouped by month
+    # Query wishlists grouped by month for the current vendor
     wishlist_counts = WishList.joins(:ad)
                               .where(ads: { vendor_id: current_vendor.id })
                               .where('wish_lists.created_at BETWEEN ? AND ?', start_date.beginning_of_month, end_date)
                               .group("DATE_TRUNC('month', wish_lists.created_at)")
                               .count
   
-    # Prepare the results for each month within the range
+    # Prepare the results for the last 5 months
     monthly_wishlist_counts = (0..4).map do |i|
-      month_date = (end_date - i.months).beginning_of_month
-      # month_key = month_date.to_date.strftime('%Y-%m') # Key as 'YYYY-MM'
+      # Calculate each month's starting date dynamically
+      month_date = end_date - i.months
       {
-        month: month_date.strftime('%B %Y'), # Format as 'Month Year'
+        month: month_date.strftime('%B %Y'), # Format: 'Month Year'
         wishlist_count: wishlist_counts[month_date.beginning_of_month] || 0
       }
-    end.reverse
+    end.reverse # Reverse to start from the oldest month
   
-    # Debug logs
+    # Debug logs for visibility in the logs
     Rails.logger.info("Wishlist Trends: #{monthly_wishlist_counts.inspect}")
   
     # Return the prepared data for the frontend
     monthly_wishlist_counts
-  end
-    
+  end  
 
   # Competitor Stats
   def calculate_competitor_stats
