@@ -257,33 +257,35 @@ class Vendor::AnalyticsController < ApplicationController
   # end  
 
   def calculate_wishlist_trends
-    # Calculate the last 5 months dynamically, including the current month
+    # Define the date range: the current month and the previous 4 months
     end_date = Date.today.end_of_month
-    start_date = end_date - 4.months # Covers the current month and 4 previous months
+    start_date = (end_date - 4.months).beginning_of_month
   
-    # Query wishlists grouped by month for the current vendor
-    wishlist_counts = WishList.joins(:ad)
-                              .where(ads: { vendor_id: current_vendor.id })
-                              .where('wish_lists.created_at BETWEEN ? AND ?', start_date.beginning_of_month, end_date)
-                              .group("DATE_TRUNC('month', wish_lists.created_at)")
+    # Step 1: Find all ad IDs that belong to the current vendor
+    ad_ids = Ad.where(vendor_id: current_vendor.id).pluck(:id)
+  
+    # Step 2: Query the wishlists for those ads within the date range
+    wishlist_counts = WishList.where(ad_id: ad_ids)
+                              .where('created_at BETWEEN ? AND ?', start_date, end_date)
+                              .group("DATE_TRUNC('month', created_at)")
                               .count
   
-    # Prepare the results for the last 5 months
+    # Step 3: Build the monthly data for the past 5 months
     monthly_wishlist_counts = (0..4).map do |i|
-      # Calculate each month's starting date dynamically
       month_date = end_date - i.months
       {
-        month: month_date.strftime('%B %Y'), # Format: 'Month Year'
+        month: month_date.strftime('%B %Y'), # Format: "Month Year"
         wishlist_count: wishlist_counts[month_date.beginning_of_month] || 0
       }
-    end.reverse # Reverse to start from the oldest month
+    end.reverse
   
-    # Debug logs for visibility in the logs
+    # Debugging output
     Rails.logger.info("Wishlist Trends: #{monthly_wishlist_counts.inspect}")
   
-    # Return the prepared data for the frontend
+    # Return the result for the frontend
     monthly_wishlist_counts
-  end  
+  end
+    
 
   # Competitor Stats
   def calculate_competitor_stats
