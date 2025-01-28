@@ -263,28 +263,42 @@ class Vendor::AnalyticsController < ApplicationController
   
     # Step 1: Find all ad IDs that belong to the current vendor
     ad_ids = Ad.where(vendor_id: current_vendor.id).pluck(:id)
+    Rails.logger.info("Ad IDs for Vendor #{current_vendor.id}: #{ad_ids.inspect}")
+  
+    if ad_ids.empty?
+      Rails.logger.warn("No Ads found for Vendor #{current_vendor.id}")
+      return (0..4).map do |i|
+        month_date = end_date - i.months
+        {
+          month: month_date.strftime('%B %Y'),
+          wishlist_count: 0
+        }
+      end.reverse
+    end
   
     # Step 2: Query the wishlists for those ads within the date range
     wishlist_counts = WishList.where(ad_id: ad_ids)
-                              .where('created_at BETWEEN ? AND ?', start_date, end_date)
-                              .group("DATE_TRUNC('month', created_at)")
+                              .where('created_at BETWEEN ? AND ?', start_date.in_time_zone('UTC'), end_date.in_time_zone('UTC'))
+                              .group("DATE_TRUNC('month', created_at AT TIME ZONE 'UTC')")
                               .count
+    Rails.logger.info("Wishlist Counts Grouped by Month: #{wishlist_counts.inspect}")
   
     # Step 3: Build the monthly data for the past 5 months
     monthly_wishlist_counts = (0..4).map do |i|
-      month_date = end_date - i.months
+      month_date = (end_date - i.months).beginning_of_month
       {
         month: month_date.strftime('%B %Y'), # Format: "Month Year"
-        wishlist_count: wishlist_counts[month_date.beginning_of_month] || 0
+        wishlist_count: wishlist_counts[month_date] || 0
       }
     end.reverse
   
     # Debugging output
-    Rails.logger.info("Wishlist Trends: #{monthly_wishlist_counts.inspect}")
+    Rails.logger.info("Wishlist Trends for Vendor #{current_vendor.id}: #{monthly_wishlist_counts.inspect}")
   
     # Return the result for the frontend
     monthly_wishlist_counts
   end
+  
     
 
   # Competitor Stats
