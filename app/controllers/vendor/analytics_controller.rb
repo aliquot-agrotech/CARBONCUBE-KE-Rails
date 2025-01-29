@@ -21,13 +21,13 @@ class Vendor::AnalyticsController < ApplicationController
       response_data.merge!(calculate_basic_tier_data)
     when 3 # Standard tier
       response_data.merge!(calculate_standard_tier_data)
-      response_data.merge!(demographic_stats: calculate_demographic_stats)
+      response_data.merge!(click_events_stats: calculate_click_events_stats)
     when 4 # Premium tier
       response_data.merge!(calculate_premium_tier_data)
       response_data.merge!(
         wishlist_stats: top_wishlist_stats,
         competitor_stats: calculate_competitor_stats,
-        demographic_stats: calculate_demographic_stats
+        click_events_stats: calculate_click_events_stats
       )
     else
       render json: { error: 'Invalid tier' }, status: 400
