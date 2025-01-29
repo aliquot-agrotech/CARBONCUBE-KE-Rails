@@ -1050,11 +1050,14 @@ ads = Ad.pluck(:id)
 
 puts "Seeding click_events and wish_lists..."
 
-# Seed data
+# Click Events and Wish Lists seeding logic
 purchasers.each do |purchaser_id|
-  ad_sample = ads.sample(50) # Select a random sample of 20 ads for this purchaser
+  ad_sample = ads.sample(50) # Select a random sample of 50 ads for this purchaser
 
   ad_sample.each do |ad_id|
+    # Generate a random timestamp within the last 6 months
+    created_at_time = Faker::Time.between(from: 6.months.ago, to: Time.current)
+
     # Create 50 Ad-Click events
     ClickEvent.create!(
       purchaser_id: purchaser_id,
@@ -1068,7 +1071,9 @@ purchasers.each do |purchaser_id|
       purchaser_id: purchaser_id,
       ad_id: ad_id,
       event_type: "Add-to-Wish-List",
-      metadata: nil
+      metadata: nil,
+      created_at: created_at_time,
+      updated_at: created_at_time
     )
 
     # Create 50 Reveal-Vendor-Details events
@@ -1082,13 +1087,14 @@ purchasers.each do |purchaser_id|
     # Ensure wish_lists table mirrors Add-to-Wish-List events
     WishList.create!(
       purchaser_id: purchaser_id,
-      ad_id: ad_id
+      ad_id: ad_id,
+      created_at: created_at_time,
+      updated_at: created_at_time
     )
   end
 end
 
 puts "Seeding completed successfully!"
-
 
 # Generate 20 reviews for each ad
 Ad.all.each do |ad|
