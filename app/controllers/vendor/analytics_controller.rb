@@ -101,33 +101,35 @@ class Vendor::AnalyticsController < ApplicationController
   #   }
   # end
 
-  # Combined method to return all top groups with logging
-def top_wishlist_stats
-  stats = {
-    top_age_group: top_age_group,
-    top_income_range: top_income_range,
-    top_education_level: top_education_level,
-    top_employment_status: top_employment_status,
-    top_sector: top_sector,
-    wishlist_trends: wishlist_trends,
-    top_wishlisted_products: top_wishlisted_products,
-  }
+#================================================= COMBINE ALL TOP CLICK EVENT STATS =================================================#
+  def top_wishlist_stats
+    stats = {
+      top_age_group: top_age_group,
+      top_income_range: top_income_range,
+      top_education_level: top_education_level,
+      top_employment_status: top_employment_status,
+      top_sector: top_sector,
+      wishlist_trends: wishlist_trends,
+      top_wishlisted_products: top_wishlisted_products,
+    }
 
-  Rails.logger.info "Final Wishlist Stats: #{stats}"
-  stats
-end
+    Rails.logger.info "Final Wishlist Stats: #{stats}"
+    stats
+  end
 
 
 #================================================= COMBINE ALL TOP CLICK EVENT STATS =================================================#
-
   def top_click_event_stats
-    {
+    stats = {
       top_age_group_clicks: top_clicks_by_age,
       top_income_range_clicks: top_clicks_by_income,
       top_education_level_clicks: top_clicks_by_education,
       top_employment_status_clicks: top_clicks_by_employment,
       top_sector_clicks: top_clicks_by_sector
     }
+
+    Rails.logger.info "Final Click Events Stats: #{stats}"
+    stats
   end
 
 
@@ -187,7 +189,7 @@ end
   # Get the age group with the highest click events
   def top_clicks_by_age
     clicks = group_clicks_by_age
-    Rails.logger.info "Age Group Click Distribution: #{clicks}"
+    # Rails.logger.info "Age Group Click Distribution: #{clicks}"
 
     result = get_top_clicks(clicks, :age_group)
     Rails.logger.info "Top Age Group Clicks: #{result}"
@@ -197,7 +199,7 @@ end
   # Get the income range with the highest click events
   def top_clicks_by_income
     clicks = group_clicks_by_income
-    Rails.logger.info "Income Range Click Distribution: #{clicks}"
+    # Rails.logger.info "Income Range Click Distribution: #{clicks}"
 
     result = get_top_clicks(clicks, :income_range)
     Rails.logger.info "Top Income Clicks: #{result}"
@@ -207,7 +209,7 @@ end
   # Get the education level with the highest click events
   def top_clicks_by_education
     clicks = group_clicks_by_education
-    Rails.logger.info "Education Click Distribution: #{clicks}"
+    # Rails.logger.info "Education Click Distribution: #{clicks}"
 
     result = get_top_clicks(clicks, :education_level)
     Rails.logger.info "Top Education Clicks: #{result}"
@@ -217,7 +219,7 @@ end
   # Get the employment status with the highest click events
   def top_clicks_by_employment
     clicks = group_clicks_by_employment
-    Rails.logger.info "Employment Status Click Distribution: #{clicks}"
+    # Rails.logger.info "Employment Status Click Distribution: #{clicks}"
 
     result = get_top_clicks(clicks, :employment_status)
     Rails.logger.info "Top Employment Clicks: #{result}"
@@ -227,7 +229,7 @@ end
   # Get the sector with the highest click events
   def top_clicks_by_sector
     clicks = group_clicks_by_sector
-    Rails.logger.info "Sector Click Distribution: #{clicks}"
+    # Rails.logger.info "Sector Click Distribution: #{clicks}"
 
     result = get_top_clicks(clicks, :sector)
     Rails.logger.info "Top Sector Clicks: #{result}"
@@ -262,7 +264,7 @@ end
                   .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5")
                   .count
     
-    Rails.logger.info "Age Group Wishlist Distribution: #{data}"
+    # Rails.logger.info "Age Group Wishlist Distribution: #{data}"
 
     group = data.max_by { |_, count| count }
 
@@ -280,7 +282,7 @@ end
                   .group("incomes.range")
                   .count
     
-    Rails.logger.info "Income Range Wishlist Distribution: #{data}"
+    # Rails.logger.info "Income Range Wishlist Distribution: #{data}"
 
     group = data.max_by { |_, count| count }
 
@@ -298,7 +300,7 @@ end
                   .group("educations.level")
                   .count
 
-    Rails.logger.info "Education Level Wishlist Distribution: #{data}"
+    # Rails.logger.info "Education Level Wishlist Distribution: #{data}"
 
     group = data.max_by { |_, count| count }
 
@@ -316,7 +318,7 @@ end
                   .group("employments.status")
                   .count
 
-    Rails.logger.info "Employment Status Wishlist Distribution: #{data}"
+    # Rails.logger.info "Employment Status Wishlist Distribution: #{data}"
 
     group = data.max_by { |_, count| count }
 
@@ -334,7 +336,7 @@ end
                   .group("sectors.name")
                   .count
 
-    Rails.logger.info "Sector Wishlist Distribution: #{data}"
+    # Rails.logger.info "Sector Wishlist Distribution: #{data}"
 
     group = data.max_by { |_, count| count }
 
