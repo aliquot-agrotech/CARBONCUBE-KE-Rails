@@ -24,7 +24,7 @@ Rails.application.routes.draw do
   resources :employments, only: [:index]
   
 
-  # Admin namespace for admin-specific functionality
+  #========================================Admin namespace for admin-specific functionality==========================================#
   namespace :admin do
     namespace :vendor do
       get ':vendor_id/profile', to: 'profiles#show'
@@ -106,7 +106,7 @@ Rails.application.routes.draw do
     resources :tiers, only: [:index, :show, :create, :update, :destroy]
   end
 
-  # Vendor namespace for vendor-specific functionality
+  #=================================================Vendor namespace for vendor-specific functionality===============================#
   namespace :vendor do
     post 'signup', to: 'vendors#create'
     
@@ -141,7 +141,7 @@ Rails.application.routes.draw do
   end
 
 
-  # Purchaser namespace for purchaser-specific functionality
+  #==========================================Purchaser namespace for purchaser-specific functionality=========================================#
   namespace :purchaser, defaults:{ format: :json}, path: 'purchaser' do
     post 'signup', to: 'purchasers#create'
 
@@ -196,6 +196,7 @@ Rails.application.routes.draw do
     get 'identify', to: 'purchasers#identify'
   end
 
+  #==========================================Rider namespace for purchaser-specific functionality=========================================#
   namespace :rider do
     resources :riders
     resources :orders

@@ -117,7 +117,9 @@ def top_wishlist_stats
   stats
 end
 
-  # Calculate CLICK EVENTS STATS
+
+#================================================= COMBINE ALL TOP CLICK EVENT STATS =================================================#
+
   def top_click_event_stats
     {
       top_age_group_clicks: top_clicks_by_age,
@@ -127,8 +129,6 @@ end
       top_sector_clicks: top_clicks_by_sector
     }
   end
-  
-
 
 
 
@@ -234,23 +234,13 @@ end
     result
   end
 
-#================================================= COMBINE ALL TOP CLICK EVENT STATS =================================================#
 
-  def top_click_event_stats
-    {
-      top_age_group_clicks: top_clicks_by_age,
-      top_income_range_clicks: top_clicks_by_income,
-      top_education_level_clicks: top_clicks_by_education,
-      top_employment_status_clicks: top_clicks_by_employment,
-      top_sector_clicks: top_clicks_by_sector
-    }
-  end
 
 #================================================= HELPER METHOD FOR GETTING TOP CLICKS =================================================#
 
   def get_top_clicks(clicks, group_key)
     top_ad_click = clicks.select { |k, _| k[:event_type] == 'Ad-Click' }.max_by { |_, count| count }
-    top_wishlist = clicks.select { |k, _| k[:event_type] == 'Add-to-WishList' }.max_by { |_, count| count }
+    top_wishlist = clicks.select { |k, _| k[:event_type] == 'Add-to-Wish-List' }.max_by { |_, count| count }
     top_reveal = clicks.select { |k, _| k[:event_type] == 'Reveal-Vendor-Details' }.max_by { |_, count| count }
 
     {
