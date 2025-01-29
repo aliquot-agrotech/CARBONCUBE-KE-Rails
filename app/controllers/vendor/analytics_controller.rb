@@ -25,7 +25,7 @@ class Vendor::AnalyticsController < ApplicationController
     when 4 # Premium tier
       response_data.merge!(calculate_premium_tier_data)
       response_data.merge!(
-        wishlist_stats: calculate_wishlist_stats,
+        wishlist_stats: top_wishlist_stats,
         competitor_stats: calculate_competitor_stats,
         demographic_stats: calculate_demographic_stats
       )
@@ -37,10 +37,72 @@ class Vendor::AnalyticsController < ApplicationController
     render json: response_data
   end
 
+
+
+
+
   private
 
-  # Calculate demographic stats for Standard and Premium tiers
-  def calculate_demographic_stats
+
+
+
+
+  # Data for Free tier
+  def calculate_free_tier_data
+    {
+      total_orders: calculate_total_orders,
+      total_ads: calculate_total_ads,
+      average_rating: calculate_average_rating
+    }
+  end
+
+  # Data for Basic tier
+  def calculate_basic_tier_data
+    {
+      total_revenue: calculate_total_revenue
+    }
+  end
+
+  # Data for Standard tier
+  def calculate_standard_tier_data
+    {
+      total_revenue: calculate_total_revenue,
+      total_reviews: calculate_total_reviews,
+      sales_performance: calculate_sales_performance,
+      best_selling_ads: fetch_best_selling_ads
+    }
+  end
+
+  # Data for Premium tier
+  def calculate_premium_tier_data
+    {
+      total_revenue: calculate_total_revenue,
+      average_rating: calculate_average_rating,
+      total_reviews: calculate_total_reviews,
+      sales_performance: calculate_sales_performance,
+      best_selling_ads: fetch_best_selling_ads,
+      wishlist_stats: top_wishlist_stats, # Merge wishlist stats into the response
+      click_events_stats: calculate_click_events_stats
+    }
+  end
+
+  #==========================================================
+
+  # Combined method to return all top groups
+  def top_wishlist_stats
+    {
+      top_age_group: top_age_group,
+      top_income_range: top_income_range,
+      top_education_level: top_education_level,
+      top_employment_status: top_employment_status,
+      top_sector: top_sector,
+      wishlist_trends: wishlist_trends,
+      top_wishlisted_products: top_wishlisted_products,
+    }
+  end
+
+  # Calculate CLICK EVENTS STATS
+  def calculate_click_events_stats
     {
       age_groups: group_clicks_by_age,
       income_ranges: group_clicks_by_income,
@@ -50,10 +112,15 @@ class Vendor::AnalyticsController < ApplicationController
     }
   end
 
+
+
+
+
+  #================================================= CLICK EVENTS PURCHASER DEMOGRAPHICS =================================================#
+
   # Group clicks by age groups
   def group_clicks_by_age
-    ClickEvent
-      .includes(:purchaser, :ad)
+    ClickEvent.includes(:purchaser, :ad)
       .where(ads: { vendor_id: current_vendor.id })
       .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5", :event_type)
       .count
@@ -101,118 +168,72 @@ class Vendor::AnalyticsController < ApplicationController
               .transform_keys { |k| { sector: k[0], event_type: k[1] } }
   end
 
-  # Data for Free tier
-  def calculate_free_tier_data
-    {
-      total_orders: calculate_total_orders,
-      total_ads: calculate_total_ads,
-      average_rating: calculate_average_rating
-    }
+
+
+
+#================================================= WISHLISTS PURCHASER DEMOGRAPHICS =================================================#
+  # Get the age group with the highest wishlists
+  def top_age_group
+    group = WishList.joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
+                    .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id") # Explicitly join ads table
+                    .where(ads: { vendor_id: current_vendor.id })
+                    .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5")
+                    .count
+                    .max_by { |_, count| count } # Get the max count
+
+    group ? { age_group: "#{group[0]}–#{group[0] + 4}", wishlists: group[1] } : nil
   end
 
-  # Data for Basic tier
-  def calculate_basic_tier_data
-    {
-      total_revenue: calculate_total_revenue
-    }
+  # Get the income range with the highest wishlists
+  def top_income_range
+    group = WishList.joins(:ad, purchaser: :income)
+                    .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id") # Explicitly join ads table
+                    .where(ads: { vendor_id: current_vendor.id })
+                    .group("incomes.range")
+                    .count
+                    .max_by { |_, count| count }
+
+    group ? { income_range: group[0], wishlists: group[1] } : nil
   end
 
-  # Data for Standard tier
-  def calculate_standard_tier_data
-    {
-      total_revenue: calculate_total_revenue,
-      total_reviews: calculate_total_reviews,
-      sales_performance: calculate_sales_performance,
-      best_selling_ads: fetch_best_selling_ads
-    }
+  # Get the education level with the highest wishlists
+  def top_education_level
+    group = WishList.joins(:ad, purchaser: :education)
+                    .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id") # Explicitly join ads table
+                    .where(ads: { vendor_id: current_vendor.id })
+                    .group("educations.level")
+                    .count
+                    .max_by { |_, count| count }
+
+    group ? { education_level: group[0], wishlists: group[1] } : nil
   end
 
-  # Data for Premium tier
-  def calculate_premium_tier_data
-    {
-      total_revenue: calculate_total_revenue,
-      average_rating: calculate_average_rating,
-      total_reviews: calculate_total_reviews,
-      sales_performance: calculate_sales_performance,
-      best_selling_ads: fetch_best_selling_ads,
-      wishlist_stats: calculate_wishlist_stats, # Merge wishlist stats into the response
-      demographic_stats: calculate_demographic_stats
-    }
+  # Get the employment status with the highest wishlists
+  def top_employment_status
+    group = WishList.joins(:ad, purchaser: :employment)
+                    .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id") # Explicitly join ads table
+                    .where(ads: { vendor_id: current_vendor.id })
+                    .group("employments.status")
+                    .count
+                    .max_by { |_, count| count }
+
+    group ? { employment_status: group[0], wishlists: group[1] } : nil
   end
 
-  # Wishlist Stats with Demographics
-  def calculate_wishlist_stats
-    {
-      top_wishlisted_products: fetch_top_wishlisted_products,
-      # wishlist_conversion_rate: calculate_wishlist_conversion_rate,
-      wishlist_trends: calculate_wishlist_trends,
-      wishlist_by_age_groups: group_wishlist_by_age,
-      wishlist_by_income_ranges: group_wishlist_by_income,
-      wishlist_by_education_levels: group_wishlist_by_education,
-      wishlist_by_employment_statuses: group_wishlist_by_employment,
-      wishlist_by_sectors: group_wishlist_by_sector
-    }
+  # Get the sector with the highest wishlists
+  def top_sector
+    group = WishList.joins(:ad, purchaser: :sector)
+                    .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id") # Explicitly join ads table
+                    .where(ads: { vendor_id: current_vendor.id })
+                    .group("sectors.name")
+                    .count
+                    .max_by { |_, count| count }
+
+    group ? { sector: group[0], wishlists: group[1] } : nil
   end
 
-# def group_wishlist_by_age
-#   WishList.joins(:purchaser)
-#           .where(ads: { vendor_id: current_vendor.id })
-#           .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5")
-#           .count
-#           .transform_keys do |k|
-#             { age_group: "#{k}–#{k.to_i + 4}" }
-#           end
-# end
 
-  # Group wishlists by age groups
-  def group_wishlist_by_age
-    WishList.joins(:ad)  # Ensure ads table is joined
-            .joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
-            .where(ads: { vendor_id: current_vendor.id })
-            .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5")
-            .count
-            .transform_keys do |k|
-              { age_group: "#{k}–#{k.to_i + 4}" }
-            end
-  end
-
-  # Group wishlists by income ranges
-  def group_wishlist_by_income
-    WishList.joins(:ad, purchaser: :income)  # Using associations to join 'ad' and 'income' through 'purchaser'
-            .where(ads: { vendor_id: current_vendor.id })
-            .group("incomes.range")
-            .count
-            .transform_keys { |k| { income_range: k } }
-  end
-
-  # Group wishlists by education levels
-  def group_wishlist_by_education
-    WishList.joins(:ad, purchaser: :education)  # Using associations to join 'ad' and 'education' through 'purchaser'
-            .where(ads: { vendor_id: current_vendor.id })
-            .group("educations.level")
-            .count
-            .transform_keys { |k| { education_level: k } }
-  end
-
-  # Group wishlists by employment statuses
-  def group_wishlist_by_employment
-    WishList.joins(:ad, purchaser: :employment)  # Using associations to join 'ad' and 'employment' through 'purchaser'
-            .where(ads: { vendor_id: current_vendor.id })
-            .group("employments.status")
-            .count
-            .transform_keys { |k| { employment_status: k } }
-  end
-
-  # Group wishlists by sectors
-  def group_wishlist_by_sector
-    WishList.joins(:ad, purchaser: :sector)  # Using associations to join 'ad' and 'sector' through 'purchaser'
-            .where(ads: { vendor_id: current_vendor.id })
-            .group("sectors.name")
-            .count
-            .transform_keys { |k| { sector: k } }
-  end
-
-  def fetch_top_wishlisted_products
+  def top_wishlisted_products
     WishList.joins(:ad)
             .where(ads: { vendor_id: current_vendor.id })
             .group('ads.id', 'ads.title')  # Add 'ads.title' to the GROUP BY clause
@@ -222,41 +243,7 @@ class Vendor::AnalyticsController < ApplicationController
             .map { |record| { ad_title: record.ad_title, wishlist_count: record.wishlist_count } }
   end   
 
-  # def calculate_wishlist_conversion_rate
-  #   ads = current_vendor.ads
-  #                       .joins("LEFT JOIN wish_lists ON wish_lists.ad_id = ads.id")
-  #                       .joins("LEFT JOIN order_items ON order_items.ad_id = ads.id")
-  #                       .select('ads.title AS ad_title, 
-  #                                 COUNT(wish_lists.id) AS wishlist_count, 
-  #                                 SUM(order_items.quantity) AS purchase_count')
-  #                       .group('ads.title')
-  
-  #   # Calculate conversion rates and add fallback logic
-  #   processed_ads = ads.map do |ad|
-  #     wishlist_count = ad.wishlist_count.to_i
-  #     purchase_count = ad.purchase_count.to_i
-  #     conversion_rate = wishlist_count > 0 ? (purchase_count.to_f / wishlist_count) : 0
-  
-  #     {
-  #       ad_title: ad.ad_title,
-  #       wishlist_count: wishlist_count,
-  #       purchase_count: purchase_count,
-  #       conversion_rate: conversion_rate
-  #     }
-  #   end
-  
-  #   # Sort by conversion rate or wishlist count as a fallback
-  #   sorted_ads =  if processed_ads.any? { |ad| ad[:purchase_count] > 0 }
-  #                   processed_ads.sort_by { |ad| -ad[:conversion_rate] }
-  #                 else
-  #                     processed_ads.sort_by { |ad| -ad[:wishlist_count] }
-  #                 end
-  
-  #   # Ensure it always returns an array
-  #   sorted_ads.first(3) || []
-  # end  
-
-  def calculate_wishlist_trends
+  def wishlist_trends
     # Define the date range: the current month and the previous 4 months
     end_date = Date.today.end_of_month
     start_date = (end_date - 4.months).beginning_of_month
@@ -301,6 +288,9 @@ class Vendor::AnalyticsController < ApplicationController
     monthly_wishlist_counts
   end
 
+
+
+  #================================================= COMPETITOR STATS =================================================#
   # Competitor Stats
   def calculate_competitor_stats
     category_id = current_vendor.ads.select(:category_id).distinct.pluck(:category_id).first
@@ -350,7 +340,10 @@ class Vendor::AnalyticsController < ApplicationController
           .to_f.round(2)
   end
 
-  # Helper Methods (unchanged)
+
+
+
+  #===================================== HELPER METHODS =================================================#
   def calculate_total_orders
     current_vendor.orders.count
   end
@@ -411,3 +404,62 @@ class Vendor::AnalyticsController < ApplicationController
     @current_user
   end
 end
+
+
+# def calculate_wishlist_conversion_rate
+#   ads = current_vendor.ads
+#                       .joins("LEFT JOIN wish_lists ON wish_lists.ad_id = ads.id")
+#                       .joins("LEFT JOIN order_items ON order_items.ad_id = ads.id")
+#                       .select('ads.title AS ad_title, 
+#                                 COUNT(wish_lists.id) AS wishlist_count, 
+#                                 SUM(order_items.quantity) AS purchase_count')
+#                       .group('ads.title')
+
+#   # Calculate conversion rates and add fallback logic
+#   processed_ads = ads.map do |ad|
+#     wishlist_count = ad.wishlist_count.to_i
+#     purchase_count = ad.purchase_count.to_i
+#     conversion_rate = wishlist_count > 0 ? (purchase_count.to_f / wishlist_count) : 0
+
+#     {
+#       ad_title: ad.ad_title,
+#       wishlist_count: wishlist_count,
+#       purchase_count: purchase_count,
+#       conversion_rate: conversion_rate
+#     }
+#   end
+
+#   # Sort by conversion rate or wishlist count as a fallback
+#   sorted_ads =  if processed_ads.any? { |ad| ad[:purchase_count] > 0 }
+#                   processed_ads.sort_by { |ad| -ad[:conversion_rate] }
+#                 else
+#                     processed_ads.sort_by { |ad| -ad[:wishlist_count] }
+#                 end
+
+#   # Ensure it always returns an array
+#   sorted_ads.first(3) || []
+# end  
+
+# def group_wishlist_by_age
+#   WishList.joins(:purchaser)
+#           .where(ads: { vendor_id: current_vendor.id })
+#           .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5")
+#           .count
+#           .transform_keys do |k|
+#             { age_group: "#{k}–#{k.to_i + 4}" }
+#           end
+# end
+# 
+# Wishlist Stats with Demographics
+# def calculate_wishlist_stats
+#   {
+#     wishlist_trends: calculate_wishlist_trends,
+#     top_wishlisted_products: fetch_top_wishlisted_products,
+#     wishlist_conversion_rate: calculate_wishlist_conversion_rate,
+#     wishlist_by_age_groups: group_wishlist_by_age,
+#     wishlist_by_income_ranges: group_wishlist_by_income,
+#     wishlist_by_education_levels: group_wishlist_by_education,
+#     wishlist_by_employment_statuses: group_wishlist_by_employment,
+#     wishlist_by_sectors: group_wishlist_by_sector
+#   }
+# end
