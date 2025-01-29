@@ -133,83 +133,93 @@ end
 
 
 
-  #================================================= CLICK EVENTS PURCHASER DEMOGRAPHICS =================================================#
+#================================================= CLICK EVENTS PURCHASER DEMOGRAPHICS =================================================#
+
+  # Group clicks by age groups
+  def group_clicks_by_age
+    ClickEvent.includes(:purchaser, :ad)
+      .where(ads: { vendor_id: current_vendor.id })
+      .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5", :event_type)
+      .count
+      .transform_keys do |k|
+        { age_group: "#{k[0]}–#{k[0].to_i + 4}", event_type: k[1] }
+      end
+  end
+
+  # Group clicks by income ranges
+  def group_clicks_by_income
+    ClickEvent.joins(ad: {}, purchaser: :income)
+              .where(ads: { vendor_id: current_vendor.id })
+              .group("incomes.range", :event_type)
+              .count
+              .transform_keys { |k| { income_range: k[0], event_type: k[1] } }
+  end
+
+  # Group clicks by education levels
+  def group_clicks_by_education
+    ClickEvent.joins(ad: {}, purchaser: :education)
+              .where(ads: { vendor_id: current_vendor.id })
+              .group("educations.level", :event_type)
+              .count
+              .transform_keys { |k| { education_level: k[0], event_type: k[1] } }
+  end
+
+  # Group clicks by employment statuses
+  def group_clicks_by_employment
+    ClickEvent.joins(ad: {}, purchaser: :employment)
+              .where(ads: { vendor_id: current_vendor.id })
+              .group("employments.status", :event_type)
+              .count
+              .transform_keys { |k| { employment_status: k[0], event_type: k[1] } }
+  end
+
+  # Group clicks by sectors
+  def group_clicks_by_sector
+    ClickEvent.joins(ad: {}, purchaser: :sector)
+              .where(ads: { vendor_id: current_vendor.id })
+              .group("sectors.name", :event_type)
+              .count
+              .transform_keys { |k| { sector: k[0], event_type: k[1] } }
+  end
+
+  #================================================= TOP CLICK EVENTS BY PURCHASER DEMOGRAPHICS =================================================#
 
   # Get the age group with the highest click events
   def top_clicks_by_age
     clicks = group_clicks_by_age
     Rails.logger.info "Age Group Click Distribution: #{clicks}"
-  
-    top_ad_click = clicks.select { |k, _| k[:event_type] == 'Ad-Click' }.max_by { |_, count| count }
-    top_wishlist = clicks.select { |k, _| k[:event_type] == 'Add-to-WishList' }.max_by { |_, count| count }
-    top_reveal = clicks.select { |k, _| k[:event_type] == 'Reveal-Vendor-Details' }.max_by { |_, count| count }
-  
-    result = {
-      top_ad_click: top_ad_click ? { age_group: top_ad_click[0][:age_group], clicks: top_ad_click[1] } : nil,
-      top_wishlist: top_wishlist ? { age_group: top_wishlist[0][:age_group], clicks: top_wishlist[1] } : nil,
-      top_reveal: top_reveal ? { age_group: top_reveal[0][:age_group], clicks: top_reveal[1] } : nil
-    }
-  
+
+    result = get_top_clicks(clicks, :age_group)
     Rails.logger.info "Top Age Group Clicks: #{result}"
     result
   end
-    
 
   # Get the income range with the highest click events
   def top_clicks_by_income
     clicks = group_clicks_by_income
     Rails.logger.info "Income Range Click Distribution: #{clicks}"
-  
-    top_ad_click = clicks.select { |k, _| k[:event_type] == 'Ad-Click' }.max_by { |_, count| count }
-    top_wishlist = clicks.select { |k, _| k[:event_type] == 'Add-to-WishList' }.max_by { |_, count| count }
-    top_reveal = clicks.select { |k, _| k[:event_type] == 'Reveal-Vendor-Details' }.max_by { |_, count| count }
-  
-    result = {
-      top_ad_click: top_ad_click ? { income_range: top_ad_click[0][:income_range], clicks: top_ad_click[1] } : nil,
-      top_wishlist: top_wishlist ? { income_range: top_wishlist[0][:income_range], clicks: top_wishlist[1] } : nil,
-      top_reveal: top_reveal ? { income_range: top_reveal[0][:income_range], clicks: top_reveal[1] } : nil
-    }
-  
+
+    result = get_top_clicks(clicks, :income_range)
     Rails.logger.info "Top Income Clicks: #{result}"
     result
   end
-  
 
   # Get the education level with the highest click events
   def top_clicks_by_education
     clicks = group_clicks_by_education
     Rails.logger.info "Education Click Distribution: #{clicks}"
-  
-    top_ad_click = clicks.select { |k, _| k[:event_type] == 'Ad-Click' }.max_by { |_, count| count }
-    top_wishlist = clicks.select { |k, _| k[:event_type] == 'Add-to-WishList' }.max_by { |_, count| count }
-    top_reveal = clicks.select { |k, _| k[:event_type] == 'Reveal-Vendor-Details' }.max_by { |_, count| count }
-  
-    result = {
-      top_ad_click: top_ad_click ? { education_level: top_ad_click[0][:education_level], clicks: top_ad_click[1] } : nil,
-      top_wishlist: top_wishlist ? { education_level: top_wishlist[0][:education_level], clicks: top_wishlist[1] } : nil,
-      top_reveal: top_reveal ? { education_level: top_reveal[0][:education_level], clicks: top_reveal[1] } : nil
-    }
-  
+
+    result = get_top_clicks(clicks, :education_level)
     Rails.logger.info "Top Education Clicks: #{result}"
     result
   end
-  
 
-  # Get the sector with the highest click events
+  # Get the employment status with the highest click events
   def top_clicks_by_employment
     clicks = group_clicks_by_employment
     Rails.logger.info "Employment Status Click Distribution: #{clicks}"
-  
-    top_ad_click = clicks.select { |k, _| k[:event_type] == 'Ad-Click' }.max_by { |_, count| count }
-    top_wishlist = clicks.select { |k, _| k[:event_type] == 'Add-to-WishList' }.max_by { |_, count| count }
-    top_reveal = clicks.select { |k, _| k[:event_type] == 'Reveal-Vendor-Details' }.max_by { |_, count| count }
-  
-    result = {
-      top_ad_click: top_ad_click ? { employment_status: top_ad_click[0][:employment_status], clicks: top_ad_click[1] } : nil,
-      top_wishlist: top_wishlist ? { employment_status: top_wishlist[0][:employment_status], clicks: top_wishlist[1] } : nil,
-      top_reveal: top_reveal ? { employment_status: top_reveal[0][:employment_status], clicks: top_reveal[1] } : nil
-    }
-  
+
+    result = get_top_clicks(clicks, :employment_status)
     Rails.logger.info "Top Employment Clicks: #{result}"
     result
   end
@@ -218,21 +228,37 @@ end
   def top_clicks_by_sector
     clicks = group_clicks_by_sector
     Rails.logger.info "Sector Click Distribution: #{clicks}"
-  
-    top_ad_click = clicks.select { |k, _| k[:event_type] == 'Ad-Click' }.max_by { |_, count| count }
-    top_wishlist = clicks.select { |k, _| k[:event_type] == 'Add-to-WishList' }.max_by { |_, count| count }
-    top_reveal = clicks.select { |k, _| k[:event_type] == 'Reveal-Vendor-Details' }.max_by { |_, count| count }
-  
-    result = {
-      top_ad_click: top_ad_click ? { sector: top_ad_click[0][:sector], clicks: top_ad_click[1] } : nil,
-      top_wishlist: top_wishlist ? { sector: top_wishlist[0][:sector], clicks: top_wishlist[1] } : nil,
-      top_reveal: top_reveal ? { sector: top_reveal[0][:sector], clicks: top_reveal[1] } : nil
-    }
-  
+
+    result = get_top_clicks(clicks, :sector)
     Rails.logger.info "Top Sector Clicks: #{result}"
     result
   end
-  
+
+#================================================= COMBINE ALL TOP CLICK EVENT STATS =================================================#
+
+  def top_click_event_stats
+    {
+      top_age_group_clicks: top_clicks_by_age,
+      top_income_range_clicks: top_clicks_by_income,
+      top_education_level_clicks: top_clicks_by_education,
+      top_employment_status_clicks: top_clicks_by_employment,
+      top_sector_clicks: top_clicks_by_sector
+    }
+  end
+
+#================================================= HELPER METHOD FOR GETTING TOP CLICKS =================================================#
+
+  def get_top_clicks(clicks, group_key)
+    top_ad_click = clicks.select { |k, _| k[:event_type] == 'Ad-Click' }.max_by { |_, count| count }
+    top_wishlist = clicks.select { |k, _| k[:event_type] == 'Add-to-WishList' }.max_by { |_, count| count }
+    top_reveal = clicks.select { |k, _| k[:event_type] == 'Reveal-Vendor-Details' }.max_by { |_, count| count }
+
+    {
+      top_ad_click: top_ad_click ? { group_key => top_ad_click[0][group_key], clicks: top_ad_click[1] } : nil,
+      top_wishlist: top_wishlist ? { group_key => top_wishlist[0][group_key], clicks: top_wishlist[1] } : nil,
+      top_reveal: top_reveal ? { group_key => top_reveal[0][group_key], clicks: top_reveal[1] } : nil
+    }
+  end
 
 
 
