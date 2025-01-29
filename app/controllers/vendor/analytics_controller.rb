@@ -21,13 +21,13 @@ class Vendor::AnalyticsController < ApplicationController
       response_data.merge!(calculate_basic_tier_data)
     when 3 # Standard tier
       response_data.merge!(calculate_standard_tier_data)
-      response_data.merge!(click_events_stats: calculate_click_events_stats)
+      response_data.merge!(click_events_stats: top_click_event_stats)
     when 4 # Premium tier
       response_data.merge!(calculate_premium_tier_data)
       response_data.merge!(
         wishlist_stats: top_wishlist_stats,
         competitor_stats: calculate_competitor_stats,
-        click_events_stats: calculate_click_events_stats
+        click_events_stats: top_click_event_stats
       )
     else
       render json: { error: 'Invalid tier' }, status: 400
@@ -82,7 +82,7 @@ class Vendor::AnalyticsController < ApplicationController
       sales_performance: calculate_sales_performance,
       best_selling_ads: fetch_best_selling_ads,
       wishlist_stats: top_wishlist_stats, # Merge wishlist stats into the response
-      click_events_stats: calculate_click_events_stats
+      click_events_stats: top_click_event_stats
     }
   end
 
@@ -118,15 +118,16 @@ def top_wishlist_stats
 end
 
   # Calculate CLICK EVENTS STATS
-  def calculate_click_events_stats
+  def top_click_event_stats
     {
-      age_groups: group_clicks_by_age,
-      income_ranges: group_clicks_by_income,
-      education_levels: group_clicks_by_education,
-      employment_statuses: group_clicks_by_employment,
-      sectors: group_clicks_by_sector
+      top_age_group_clicks: top_clicks_by_age,
+      top_income_range_clicks: top_clicks_by_income,
+      top_education_level_clicks: top_clicks_by_education,
+      top_employment_status_clicks: top_clicks_by_employment,
+      top_sector_clicks: top_clicks_by_sector
     }
   end
+  
 
 
 
@@ -134,149 +135,198 @@ end
 
   #================================================= CLICK EVENTS PURCHASER DEMOGRAPHICS =================================================#
 
-  # Group clicks by age groups
-  def group_clicks_by_age
-    ClickEvent.includes(:purchaser, :ad)
-      .where(ads: { vendor_id: current_vendor.id })
-      .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5", :event_type)
-      .count
-      .transform_keys do |k|
-        {
-          age_group: "#{k[0]}–#{k[0].to_i + 4}",
-          event_type: k[1]
-        }
-      end
-  end  
+  # Get the age group with the highest click events
+  def top_clicks_by_age
+    clicks = group_clicks_by_age
+    Rails.logger.info "Age Group Click Distribution: #{clicks}"
+  
+    top_ad_click = clicks.select { |k, _| k[:event_type] == 'Ad-Click' }.max_by { |_, count| count }
+    top_wishlist = clicks.select { |k, _| k[:event_type] == 'Add-to-WishList' }.max_by { |_, count| count }
+    top_reveal = clicks.select { |k, _| k[:event_type] == 'Reveal-Vendor-Details' }.max_by { |_, count| count }
+  
+    result = {
+      top_ad_click: top_ad_click ? { age_group: top_ad_click[0][:age_group], clicks: top_ad_click[1] } : nil,
+      top_wishlist: top_wishlist ? { age_group: top_wishlist[0][:age_group], clicks: top_wishlist[1] } : nil,
+      top_reveal: top_reveal ? { age_group: top_reveal[0][:age_group], clicks: top_reveal[1] } : nil
+    }
+  
+    Rails.logger.info "Top Age Group Clicks: #{result}"
+    result
+  end
+    
 
-  # Group clicks by income ranges
-  def group_clicks_by_income
-    ClickEvent.joins(ad: {}, purchaser: :income)
-              .where(ads: { vendor_id: current_vendor.id })
-              .group("incomes.range", :event_type)
-              .count
-              .transform_keys { |k| { income_range: k[0], event_type: k[1] } }
+  # Get the income range with the highest click events
+  def top_clicks_by_income
+    clicks = group_clicks_by_income
+    Rails.logger.info "Income Range Click Distribution: #{clicks}"
+  
+    top_ad_click = clicks.select { |k, _| k[:event_type] == 'Ad-Click' }.max_by { |_, count| count }
+    top_wishlist = clicks.select { |k, _| k[:event_type] == 'Add-to-WishList' }.max_by { |_, count| count }
+    top_reveal = clicks.select { |k, _| k[:event_type] == 'Reveal-Vendor-Details' }.max_by { |_, count| count }
+  
+    result = {
+      top_ad_click: top_ad_click ? { income_range: top_ad_click[0][:income_range], clicks: top_ad_click[1] } : nil,
+      top_wishlist: top_wishlist ? { income_range: top_wishlist[0][:income_range], clicks: top_wishlist[1] } : nil,
+      top_reveal: top_reveal ? { income_range: top_reveal[0][:income_range], clicks: top_reveal[1] } : nil
+    }
+  
+    Rails.logger.info "Top Income Clicks: #{result}"
+    result
+  end
+  
+
+  # Get the education level with the highest click events
+  def top_clicks_by_education
+    clicks = group_clicks_by_education
+    Rails.logger.info "Education Click Distribution: #{clicks}"
+  
+    top_ad_click = clicks.select { |k, _| k[:event_type] == 'Ad-Click' }.max_by { |_, count| count }
+    top_wishlist = clicks.select { |k, _| k[:event_type] == 'Add-to-WishList' }.max_by { |_, count| count }
+    top_reveal = clicks.select { |k, _| k[:event_type] == 'Reveal-Vendor-Details' }.max_by { |_, count| count }
+  
+    result = {
+      top_ad_click: top_ad_click ? { education_level: top_ad_click[0][:education_level], clicks: top_ad_click[1] } : nil,
+      top_wishlist: top_wishlist ? { education_level: top_wishlist[0][:education_level], clicks: top_wishlist[1] } : nil,
+      top_reveal: top_reveal ? { education_level: top_reveal[0][:education_level], clicks: top_reveal[1] } : nil
+    }
+  
+    Rails.logger.info "Top Education Clicks: #{result}"
+    result
+  end
+  
+
+  # Get the sector with the highest click events
+  def top_clicks_by_employment
+    clicks = group_clicks_by_employment
+    Rails.logger.info "Employment Status Click Distribution: #{clicks}"
+  
+    top_ad_click = clicks.select { |k, _| k[:event_type] == 'Ad-Click' }.max_by { |_, count| count }
+    top_wishlist = clicks.select { |k, _| k[:event_type] == 'Add-to-WishList' }.max_by { |_, count| count }
+    top_reveal = clicks.select { |k, _| k[:event_type] == 'Reveal-Vendor-Details' }.max_by { |_, count| count }
+  
+    result = {
+      top_ad_click: top_ad_click ? { employment_status: top_ad_click[0][:employment_status], clicks: top_ad_click[1] } : nil,
+      top_wishlist: top_wishlist ? { employment_status: top_wishlist[0][:employment_status], clicks: top_wishlist[1] } : nil,
+      top_reveal: top_reveal ? { employment_status: top_reveal[0][:employment_status], clicks: top_reveal[1] } : nil
+    }
+  
+    Rails.logger.info "Top Employment Clicks: #{result}"
+    result
   end
 
-  # Group clicks by education levels
-  def group_clicks_by_education
-    ClickEvent.joins(ad: {}, purchaser: :education)
-              .where(ads: { vendor_id: current_vendor.id })
-              .group("educations.level", :event_type)
-              .count
-              .transform_keys { |k| { education_level: k[0], event_type: k[1] } }
+  # Get the sector with the highest click events
+  def top_clicks_by_sector
+    clicks = group_clicks_by_sector
+    Rails.logger.info "Sector Click Distribution: #{clicks}"
+  
+    top_ad_click = clicks.select { |k, _| k[:event_type] == 'Ad-Click' }.max_by { |_, count| count }
+    top_wishlist = clicks.select { |k, _| k[:event_type] == 'Add-to-WishList' }.max_by { |_, count| count }
+    top_reveal = clicks.select { |k, _| k[:event_type] == 'Reveal-Vendor-Details' }.max_by { |_, count| count }
+  
+    result = {
+      top_ad_click: top_ad_click ? { sector: top_ad_click[0][:sector], clicks: top_ad_click[1] } : nil,
+      top_wishlist: top_wishlist ? { sector: top_wishlist[0][:sector], clicks: top_wishlist[1] } : nil,
+      top_reveal: top_reveal ? { sector: top_reveal[0][:sector], clicks: top_reveal[1] } : nil
+    }
+  
+    Rails.logger.info "Top Sector Clicks: #{result}"
+    result
   end
-
-  # Group clicks by employment statuses
-  def group_clicks_by_employment
-    ClickEvent.joins(ad: {}, purchaser: :employment)
-              .where(ads: { vendor_id: current_vendor.id })
-              .group("employments.status", :event_type)
-              .count
-              .transform_keys { |k| { employment_status: k[0], event_type: k[1] } }
-  end
-
-  # Group clicks by sectors
-  def group_clicks_by_sector
-    ClickEvent.joins(ad: {}, purchaser: :sector)
-              .where(ads: { vendor_id: current_vendor.id })
-              .group("sectors.name", :event_type)
-              .count
-              .transform_keys { |k| { sector: k[0], event_type: k[1] } }
-  end
+  
 
 
 
 
 #================================================= WISHLISTS PURCHASER DEMOGRAPHICS =================================================#
   # Get the age group with the highest wishlists
-def top_age_group
-  data = WishList.joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
-                 .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id")
-                 .where(ads: { vendor_id: current_vendor.id })
-                 .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5")
-                 .count
-  
-  Rails.logger.info "Age Group Wishlist Distribution: #{data}"
+  def top_age_group
+    data = WishList.joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
+                  .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id")
+                  .where(ads: { vendor_id: current_vendor.id })
+                  .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5")
+                  .count
+    
+    Rails.logger.info "Age Group Wishlist Distribution: #{data}"
 
-  group = data.max_by { |_, count| count }
+    group = data.max_by { |_, count| count }
 
-  result = group ? { age_group: "#{group[0]}–#{group[0] + 4}", wishlists: group[1] } : nil
-  Rails.logger.info "Top Age Group: #{result}"
-  
-  result
-end
+    result = group ? { age_group: "#{group[0]}–#{group[0] + 4}", wishlists: group[1] } : nil
+    Rails.logger.info "Top Age Group: #{result}"
+    
+    result
+  end
 
-# Get the income range with the highest wishlists
-def top_income_range
-  data = WishList.joins(:ad, purchaser: :income)
-                 .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id")
-                 .where(ads: { vendor_id: current_vendor.id })
-                 .group("incomes.range")
-                 .count
-  
-  Rails.logger.info "Income Range Wishlist Distribution: #{data}"
+  # Get the income range with the highest wishlists
+  def top_income_range
+    data = WishList.joins(:ad, purchaser: :income)
+                  .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id")
+                  .where(ads: { vendor_id: current_vendor.id })
+                  .group("incomes.range")
+                  .count
+    
+    Rails.logger.info "Income Range Wishlist Distribution: #{data}"
 
-  group = data.max_by { |_, count| count }
+    group = data.max_by { |_, count| count }
 
-  result = group ? { income_range: group[0], wishlists: group[1] } : nil
-  Rails.logger.info "Top Income Range: #{result}"
-  
-  result
-end
+    result = group ? { income_range: group[0], wishlists: group[1] } : nil
+    Rails.logger.info "Top Income Range: #{result}"
+    
+    result
+  end
 
-# Get the education level with the highest wishlists
-def top_education_level
-  data = WishList.joins(:ad, purchaser: :education)
-                 .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id")
-                 .where(ads: { vendor_id: current_vendor.id })
-                 .group("educations.level")
-                 .count
+  # Get the education level with the highest wishlists
+  def top_education_level
+    data = WishList.joins(:ad, purchaser: :education)
+                  .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id")
+                  .where(ads: { vendor_id: current_vendor.id })
+                  .group("educations.level")
+                  .count
 
-  Rails.logger.info "Education Level Wishlist Distribution: #{data}"
+    Rails.logger.info "Education Level Wishlist Distribution: #{data}"
 
-  group = data.max_by { |_, count| count }
+    group = data.max_by { |_, count| count }
 
-  result = group ? { education_level: group[0], wishlists: group[1] } : nil
-  Rails.logger.info "Top Education Level: #{result}"
-  
-  result
-end
+    result = group ? { education_level: group[0], wishlists: group[1] } : nil
+    Rails.logger.info "Top Education Level: #{result}"
+    
+    result
+  end
 
-# Get the employment status with the highest wishlists
-def top_employment_status
-  data = WishList.joins(:ad, purchaser: :employment)
-                 .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id")
-                 .where(ads: { vendor_id: current_vendor.id })
-                 .group("employments.status")
-                 .count
+  # Get the employment status with the highest wishlists
+  def top_employment_status
+    data = WishList.joins(:ad, purchaser: :employment)
+                  .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id")
+                  .where(ads: { vendor_id: current_vendor.id })
+                  .group("employments.status")
+                  .count
 
-  Rails.logger.info "Employment Status Wishlist Distribution: #{data}"
+    Rails.logger.info "Employment Status Wishlist Distribution: #{data}"
 
-  group = data.max_by { |_, count| count }
+    group = data.max_by { |_, count| count }
 
-  result = group ? { employment_status: group[0], wishlists: group[1] } : nil
-  Rails.logger.info "Top Employment Status: #{result}"
-  
-  result
-end
+    result = group ? { employment_status: group[0], wishlists: group[1] } : nil
+    Rails.logger.info "Top Employment Status: #{result}"
+    
+    result
+  end
 
-# Get the sector with the highest wishlists
-def top_sector
-  data = WishList.joins(:ad, purchaser: :sector)
-                 .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id")
-                 .where(ads: { vendor_id: current_vendor.id })
-                 .group("sectors.name")
-                 .count
+  # Get the sector with the highest wishlists
+  def top_sector
+    data = WishList.joins(:ad, purchaser: :sector)
+                  .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id")
+                  .where(ads: { vendor_id: current_vendor.id })
+                  .group("sectors.name")
+                  .count
 
-  Rails.logger.info "Sector Wishlist Distribution: #{data}"
+    Rails.logger.info "Sector Wishlist Distribution: #{data}"
 
-  group = data.max_by { |_, count| count }
+    group = data.max_by { |_, count| count }
 
-  result = group ? { sector: group[0], wishlists: group[1] } : nil
-  Rails.logger.info "Top Sector: #{result}"
-  
-  result
-end
+    result = group ? { sector: group[0], wishlists: group[1] } : nil
+    Rails.logger.info "Top Sector: #{result}"
+    
+    result
+  end
 
 
   def top_wishlisted_products
