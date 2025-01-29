@@ -278,17 +278,19 @@ class Vendor::AnalyticsController < ApplicationController
   
     # Step 2: Query the wishlists for those ads within the date range
     wishlist_counts = WishList.where(ad_id: ad_ids)
-                              .where('created_at BETWEEN ? AND ?', start_date.in_time_zone('UTC'), end_date.in_time_zone('UTC'))
-                              .group("DATE_TRUNC('month', created_at AT TIME ZONE 'UTC')")
+                              .where('created_at BETWEEN ? AND ?', start_date, end_date)
+                              .group("DATE_TRUNC('month', created_at)")
                               .count
     Rails.logger.info("Wishlist Counts Grouped by Month: #{wishlist_counts.inspect}")
   
     # Step 3: Build the monthly data for the past 5 months
     monthly_wishlist_counts = (0..4).map do |i|
       month_date = (end_date - i.months).beginning_of_month
+      wishlist_count = wishlist_counts.find { |key, _| key.to_date == month_date.to_date }&.last || 0
+  
       {
         month: month_date.strftime('%B %Y'), # Format: "Month Year"
-        wishlist_count: wishlist_counts[month_date] || 0
+        wishlist_count: wishlist_count
       }
     end.reverse
   
@@ -298,8 +300,6 @@ class Vendor::AnalyticsController < ApplicationController
     # Return the result for the frontend
     monthly_wishlist_counts
   end
-  
-    
 
   # Competitor Stats
   def calculate_competitor_stats
