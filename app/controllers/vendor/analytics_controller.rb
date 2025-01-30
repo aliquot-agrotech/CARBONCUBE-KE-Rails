@@ -410,7 +410,7 @@ class Vendor::AnalyticsController < ApplicationController
                          {
                            ad_title: record.ad_title,
                            wishlist_count: record.wishlist_count,
-                           ad_media: record.ad_media,
+                           ad_media: JSON.parse(record.ad_media || '[]'), # Parse the media as an array
                            ad_price: record.ad_price
                          }
                        }
