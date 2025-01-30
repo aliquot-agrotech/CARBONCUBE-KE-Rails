@@ -396,26 +396,32 @@ class Vendor::AnalyticsController < ApplicationController
     result
   end
 
-
   def top_wishlisted_ads
     Rails.logger.info "Fetching top wishlisted ads for vendor with ID: #{current_vendor.id}"
     
     begin
       result = WishList.joins(:ad)
                        .where(ads: { vendor_id: current_vendor.id })
-                       .group('ads.id', 'ads.title')  # Add 'ads.title' to the GROUP BY clause
-                       .select('ads.title AS ad_title, COUNT(wish_lists.id) AS wishlist_count')
+                       .group('ads.id', 'ads.title', 'ads.media', 'ads.price')  # Add 'ads.media' and 'ads.price' to the GROUP BY clause
+                       .select('ads.title AS ad_title, COUNT(wish_lists.id) AS wishlist_count, ads.media AS ad_media, ads.price AS ad_price')
                        .order('wishlist_count DESC')
                        .limit(3)
-                       .map { |record| { ad_title: record.ad_title, wishlist_count: record.wishlist_count } }
-      
+                       .map { |record| 
+                         {
+                           ad_title: record.ad_title,
+                           wishlist_count: record.wishlist_count,
+                           ad_media: record.ad_media,
+                           ad_price: record.ad_price
+                         }
+                       }
+  
       Rails.logger.info "Successfully fetched top wishlisted ads: #{result.inspect}"
       result
     rescue StandardError => e
       Rails.logger.error "Error fetching top wishlisted ads: #{e.message}"
       []
     end
-  end
+  end  
 
   def wishlist_trends
     # Define the date range: the current month and the previous 4 months
