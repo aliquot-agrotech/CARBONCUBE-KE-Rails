@@ -89,21 +89,6 @@ class Vendor::AnalyticsController < ApplicationController
     }
   end
 
-  #==========================================================
-
-  # Combined method to return all top groups
-  # def top_wishlist_stats
-  #   {
-  #     top_age_group: top_age_group,
-  #     top_income_range: top_income_range,
-  #     top_education_level: top_education_level,
-  #     top_employment_status: top_employment_status,
-  #     top_sector: top_sector,
-  #     wishlist_trends: wishlist_trends,
-  #     top_wishlisted_products: top_wishlisted_products,
-  #   }
-  # end
-
 #================================================= COMBINE ALL WISHLIST STATS =================================================#
   def top_wishlist_stats
     stats = {
@@ -142,7 +127,7 @@ class Vendor::AnalyticsController < ApplicationController
 
   def basic_click_event_stats
     {
-      click_events_trends: click_events_trends
+      click_event_trends: click_event_trends
     }
   end
 
@@ -643,3 +628,18 @@ end
 #     wishlist_by_sectors: group_wishlist_by_sector
 #   }
 # end
+
+  #==========================================================
+
+  # Combined method to return all top groups
+  # def top_wishlist_stats
+  #   {
+  #     top_age_group: top_age_group,
+  #     top_income_range: top_income_range,
+  #     top_education_level: top_education_level,
+  #     top_employment_status: top_employment_status,
+  #     top_sector: top_sector,
+  #     wishlist_trends: wishlist_trends,
+  #     top_wishlisted_products: top_wishlisted_products,
+  #   }
+  # end
