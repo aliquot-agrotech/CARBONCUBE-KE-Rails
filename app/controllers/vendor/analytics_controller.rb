@@ -205,7 +205,7 @@ class Vendor::AnalyticsController < ApplicationController
     # Step 2: Query the click events for those ads within the date range
     click_events = ClickEvent.where(ad_id: ad_ids)
                              .where('created_at BETWEEN ? AND ?', start_date, end_date)
-                             .group("DATE_TRUNC('month', created_at), event_type")
+                             .group("DATE_TRUNC('month', created_at)", :event_type)
                              .count
 
     Rails.logger.info("Click Events Grouped by Month and Event Type: #{click_events.inspect}")
@@ -214,10 +214,10 @@ class Vendor::AnalyticsController < ApplicationController
     monthly_click_events = (0..4).map do |i|
       month_date = (end_date - i.months).beginning_of_month
 
-      # Find the total counts for each event type for the current month
-      ad_clicks = click_events.select { |key, _| key[0].to_date == month_date.to_date && key[1] == 'Ad-Click' }.values.sum || 0
-      add_to_wish_list = click_events.select { |key, _| key[0].to_date == month_date.to_date && key[1] == 'Add-to-Wish-List' }.values.sum || 0
-      reveal_vendor_details = click_events.select { |key, _| key[0].to_date == month_date.to_date && key[1] == 'Reveal-Vendor-Details' }.values.sum || 0
+      # Ensure key structure matches expected format
+      ad_clicks = click_events.select { |(date, event), _| date && date.to_date == month_date.to_date && event == 'Ad-Click' }.values.sum || 0
+      add_to_wish_list = click_events.select { |(date, event), _| date && date.to_date == month_date.to_date && event == 'Add-to-Wish-List' }.values.sum || 0
+      reveal_vendor_details = click_events.select { |(date, event), _| date && date.to_date == month_date.to_date && event == 'Reveal-Vendor-Details' }.values.sum || 0
 
       {
         month: month_date.strftime('%B %Y'), # Format: "Month Year"
@@ -233,8 +233,6 @@ class Vendor::AnalyticsController < ApplicationController
     # Return the result for the frontend
     monthly_click_events
   end
-
-  
 
   #================================================= TOP CLICK EVENTS BY PURCHASER DEMOGRAPHICS =================================================#
 
