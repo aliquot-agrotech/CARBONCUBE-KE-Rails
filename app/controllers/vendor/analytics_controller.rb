@@ -99,7 +99,7 @@ class Vendor::AnalyticsController < ApplicationController
       top_sector: top_sector
     }
 
-    Rails.logger.info "Final Wishlist Stats: #{stats}"
+    # Rails.logger.info "Final Wishlist Stats: #{stats}"
     stats
   end
 
@@ -121,7 +121,7 @@ class Vendor::AnalyticsController < ApplicationController
       top_sector_clicks: top_clicks_by_sector
     }
 
-    Rails.logger.info "Final Click Events Stats: #{stats}"
+    # Rails.logger.info "Final Click Events Stats: #{stats}"
     stats
   end
 
@@ -242,7 +242,7 @@ class Vendor::AnalyticsController < ApplicationController
     # Rails.logger.info "Age Group Click Distribution: #{clicks}"
 
     result = get_top_clicks(clicks, :age_group)
-    Rails.logger.info "Top Age Group Clicks: #{result}"
+    # Rails.logger.info "Top Age Group Clicks: #{result}"
     result
   end
 
@@ -252,7 +252,7 @@ class Vendor::AnalyticsController < ApplicationController
     # Rails.logger.info "Income Range Click Distribution: #{clicks}"
 
     result = get_top_clicks(clicks, :income_range)
-    Rails.logger.info "Top Income Clicks: #{result}"
+    # Rails.logger.info "Top Income Clicks: #{result}"
     result
   end
 
@@ -262,7 +262,7 @@ class Vendor::AnalyticsController < ApplicationController
     # Rails.logger.info "Education Click Distribution: #{clicks}"
 
     result = get_top_clicks(clicks, :education_level)
-    Rails.logger.info "Top Education Clicks: #{result}"
+    # Rails.logger.info "Top Education Clicks: #{result}"
     result
   end
 
@@ -272,7 +272,7 @@ class Vendor::AnalyticsController < ApplicationController
     # Rails.logger.info "Employment Status Click Distribution: #{clicks}"
 
     result = get_top_clicks(clicks, :employment_status)
-    Rails.logger.info "Top Employment Clicks: #{result}"
+    # Rails.logger.info "Top Employment Clicks: #{result}"
     result
   end
 
@@ -282,7 +282,7 @@ class Vendor::AnalyticsController < ApplicationController
     # Rails.logger.info "Sector Click Distribution: #{clicks}"
 
     result = get_top_clicks(clicks, :sector)
-    Rails.logger.info "Top Sector Clicks: #{result}"
+    # Rails.logger.info "Top Sector Clicks: #{result}"
     result
   end
 
@@ -319,7 +319,7 @@ class Vendor::AnalyticsController < ApplicationController
     group = data.max_by { |_, count| count }
 
     result = group ? { age_group: "#{group[0]}–#{group[0] + 4}", wishlists: group[1] } : nil
-    Rails.logger.info "Top Age Group: #{result}"
+    # Rails.logger.info "Top Age Group: #{result}"
     
     result
   end
@@ -337,7 +337,7 @@ class Vendor::AnalyticsController < ApplicationController
     group = data.max_by { |_, count| count }
 
     result = group ? { income_range: group[0], wishlists: group[1] } : nil
-    Rails.logger.info "Top Income Range: #{result}"
+    # Rails.logger.info "Top Income Range: #{result}"
     
     result
   end
@@ -355,7 +355,7 @@ class Vendor::AnalyticsController < ApplicationController
     group = data.max_by { |_, count| count }
 
     result = group ? { education_level: group[0], wishlists: group[1] } : nil
-    Rails.logger.info "Top Education Level: #{result}"
+    # Rails.logger.info "Top Education Level: #{result}"
     
     result
   end
@@ -373,7 +373,7 @@ class Vendor::AnalyticsController < ApplicationController
     group = data.max_by { |_, count| count }
 
     result = group ? { employment_status: group[0], wishlists: group[1] } : nil
-    Rails.logger.info "Top Employment Status: #{result}"
+    # Rails.logger.info "Top Employment Status: #{result}"
     
     result
   end
@@ -391,7 +391,7 @@ class Vendor::AnalyticsController < ApplicationController
     group = data.max_by { |_, count| count }
 
     result = group ? { sector: group[0], wishlists: group[1] } : nil
-    Rails.logger.info "Top Sector: #{result}"
+    # Rails.logger.info "Top Sector: #{result}"
     
     result
   end
@@ -414,10 +414,10 @@ class Vendor::AnalyticsController < ApplicationController
   
     # Step 1: Find all ad IDs that belong to the current vendor
     ad_ids = Ad.where(vendor_id: current_vendor.id).pluck(:id)
-    Rails.logger.info("Ad IDs for Vendor #{current_vendor.id}: #{ad_ids.inspect}")
+    # Rails.logger.info("Ad IDs for Vendor #{current_vendor.id}: #{ad_ids.inspect}")
   
     if ad_ids.empty?
-      Rails.logger.warn("No Ads found for Vendor #{current_vendor.id}")
+      # Rails.logger.warn("No Ads found for Vendor #{current_vendor.id}")
       return (0..4).map do |i|
         month_date = end_date - i.months
         {
@@ -432,7 +432,7 @@ class Vendor::AnalyticsController < ApplicationController
                               .where('created_at BETWEEN ? AND ?', start_date, end_date)
                               .group("DATE_TRUNC('month', created_at)")
                               .count
-    Rails.logger.info("Wishlist Counts Grouped by Month: #{wishlist_counts.inspect}")
+    # Rails.logger.info("Wishlist Counts Grouped by Month: #{wishlist_counts.inspect}")
   
     # Step 3: Build the monthly data for the past 5 months
     monthly_wishlist_counts = (0..4).map do |i|
@@ -446,7 +446,7 @@ class Vendor::AnalyticsController < ApplicationController
     end.reverse
   
     # Debugging output
-    Rails.logger.info("Wishlist Trends for Vendor #{current_vendor.id}: #{monthly_wishlist_counts.inspect}")
+    # Rails.logger.info("Wishlist Trends for Vendor #{current_vendor.id}: #{monthly_wishlist_counts.inspect}")
   
     # Return the result for the frontend
     monthly_wishlist_counts
