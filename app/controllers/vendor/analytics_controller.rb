@@ -84,7 +84,8 @@ class Vendor::AnalyticsController < ApplicationController
       best_selling_ads: fetch_best_selling_ads,
       wishlist_stats: top_wishlist_stats, # Merge wishlist stats into the response
       click_events_stats: top_click_event_stats,
-      basic_wishlist_stats: basic_wishlist_stats
+      basic_wishlist_stats: basic_wishlist_stats,
+      basic_click_event_stats: basic_click_event_stats
     }
   end
 
@@ -139,8 +140,11 @@ class Vendor::AnalyticsController < ApplicationController
     stats
   end
 
-
-
+  def basic_click_event_stats
+    {
+      click_events_trends: click_events_trends
+    }
+  end
 
 #================================================= CLICK EVENTS PURCHASER DEMOGRAPHICS =================================================#
 
@@ -190,6 +194,61 @@ class Vendor::AnalyticsController < ApplicationController
               .count
               .transform_keys { |k| { sector: k[0], event_type: k[1] } }
   end
+
+  def click_event_trends
+    # Define the date range: the current month and the previous 4 months
+    end_date = Date.today.end_of_month
+    start_date = (end_date - 4.months).beginning_of_month
+  
+    # Step 1: Find all ad IDs that belong to the current vendor
+    ad_ids = Ad.where(vendor_id: current_vendor.id).pluck(:id)
+    Rails.logger.info("Ad IDs for Vendor #{current_vendor.id}: #{ad_ids.inspect}")
+  
+    if ad_ids.empty?
+      Rails.logger.warn("No Ads found for Vendor #{current_vendor.id}")
+      return (0..4).map do |i|
+        month_date = end_date - i.months
+        {
+          month: month_date.strftime('%B %Y'),
+          ad_clicks: 0,
+          add_to_wish_list: 0,
+          reveal_vendor_details: 0
+        }
+      end.reverse
+    end
+  
+    # Step 2: Query the click events for those ads within the date range
+    click_events = ClickEvent.where(ad_id: ad_ids)
+                             .where('created_at BETWEEN ? AND ?', start_date, end_date)
+                             .group("DATE_TRUNC('month', created_at), event_type")
+                             .count
+  
+    Rails.logger.info("Click Events Grouped by Month and Event Type: #{click_events.inspect}")
+  
+    # Step 3: Build the monthly data for the past 5 months
+    monthly_click_events = (0..4).map do |i|
+      month_date = (end_date - i.months).beginning_of_month
+      
+      # Find the counts for each event type in the current month
+      ad_clicks = click_events.find { |key, _| key.to_date == month_date.to_date && key[1] == 'Ad-Click' }&.last || 0
+      add_to_wish_list = click_events.find { |key, _| key.to_date == month_date.to_date && key[1] == 'Add-to-Wish-List' }&.last || 0
+      reveal_vendor_details = click_events.find { |key, _| key.to_date == month_date.to_date && key[1] == 'Reveal-Vendor-Details' }&.last || 0
+  
+      {
+        month: month_date.strftime('%B %Y'), # Format: "Month Year"
+        ad_clicks: ad_clicks,
+        add_to_wish_list: add_to_wish_list,
+        reveal_vendor_details: reveal_vendor_details
+      }
+    end.reverse
+  
+    # Debugging output
+    Rails.logger.info("Click Event Trends for Vendor #{current_vendor.id}: #{monthly_click_events.inspect}")
+  
+    # Return the result for the frontend
+    monthly_click_events
+  end
+  
 
   #================================================= TOP CLICK EVENTS BY PURCHASER DEMOGRAPHICS =================================================#
 
