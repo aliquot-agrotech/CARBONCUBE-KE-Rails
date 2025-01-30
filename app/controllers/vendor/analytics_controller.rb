@@ -208,7 +208,7 @@ class Vendor::AnalyticsController < ApplicationController
                              .group("DATE_TRUNC('month', created_at)", :event_type)
                              .count
 
-    Rails.logger.info("Click Events Grouped by Month and Event Type: #{click_events.inspect}")
+    # Rails.logger.info("Click Events Grouped by Month and Event Type: #{click_events.inspect}")
 
     # Step 3: Build the monthly data for the past 5 months
     monthly_click_events = (0..4).map do |i|
