@@ -106,7 +106,7 @@ class Vendor::AnalyticsController < ApplicationController
   def basic_wishlist_stats
     {
       wishlist_trends: wishlist_trends,
-      top_wishlisted_products: top_wishlisted_products
+      top_wishlisted_ads: top_wishlisted_ads
     }
   end
 
@@ -397,7 +397,7 @@ class Vendor::AnalyticsController < ApplicationController
   end
 
 
-  def top_wishlisted_products
+  def top_wishlisted_ads
     WishList.joins(:ad)
             .where(ads: { vendor_id: current_vendor.id })
             .group('ads.id', 'ads.title')  # Add 'ads.title' to the GROUP BY clause
