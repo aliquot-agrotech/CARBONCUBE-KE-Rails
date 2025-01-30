@@ -398,14 +398,24 @@ class Vendor::AnalyticsController < ApplicationController
 
 
   def top_wishlisted_ads
-    WishList.joins(:ad)
-            .where(ads: { vendor_id: current_vendor.id })
-            .group('ads.id', 'ads.title')  # Add 'ads.title' to the GROUP BY clause
-            .select('ads.title AS ad_title, COUNT(wish_lists.id) AS wishlist_count')
-            .order('wishlist_count DESC')
-            .limit(3)
-            .map { |record| { ad_title: record.ad_title, wishlist_count: record.wishlist_count } }
-  end   
+    Rails.logger.info "Fetching top wishlisted ads for vendor with ID: #{current_vendor.id}"
+    
+    begin
+      result = WishList.joins(:ad)
+                       .where(ads: { vendor_id: current_vendor.id })
+                       .group('ads.id', 'ads.title')  # Add 'ads.title' to the GROUP BY clause
+                       .select('ads.title AS ad_title, COUNT(wish_lists.id) AS wishlist_count')
+                       .order('wishlist_count DESC')
+                       .limit(3)
+                       .map { |record| { ad_title: record.ad_title, wishlist_count: record.wishlist_count } }
+      
+      Rails.logger.info "Successfully fetched top wishlisted ads: #{result.inspect}"
+      result
+    rescue StandardError => e
+      Rails.logger.error "Error fetching top wishlisted ads: #{e.message}"
+      []
+    end
+  end
 
   def wishlist_trends
     # Define the date range: the current month and the previous 4 months
@@ -618,7 +628,7 @@ end
 # def calculate_wishlist_stats
 #   {
 #     wishlist_trends: calculate_wishlist_trends,
-#     top_wishlisted_products: fetch_top_wishlisted_products,
+#     top_wishlisted_ads: fetch_top_wishlisted_ads,
 #     wishlist_conversion_rate: calculate_wishlist_conversion_rate,
 #     wishlist_by_age_groups: group_wishlist_by_age,
 #     wishlist_by_income_ranges: group_wishlist_by_income,
@@ -639,6 +649,6 @@ end
   #     top_employment_status: top_employment_status,
   #     top_sector: top_sector,
   #     wishlist_trends: wishlist_trends,
-  #     top_wishlisted_products: top_wishlisted_products,
+  #     top_wishlisted_ads: top_wishlisted_ads,
   #   }
   # end
