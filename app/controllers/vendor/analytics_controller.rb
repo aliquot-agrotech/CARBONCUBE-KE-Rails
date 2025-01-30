@@ -26,6 +26,7 @@ class Vendor::AnalyticsController < ApplicationController
       response_data.merge!(calculate_premium_tier_data)
       response_data.merge!(
         wishlist_stats: top_wishlist_stats,
+        basic_wishlist_stats: basic_wishlist_stats,
         competitor_stats: calculate_competitor_stats,
         click_events_stats: top_click_event_stats
       )
@@ -82,7 +83,8 @@ class Vendor::AnalyticsController < ApplicationController
       sales_performance: calculate_sales_performance,
       best_selling_ads: fetch_best_selling_ads,
       wishlist_stats: top_wishlist_stats, # Merge wishlist stats into the response
-      click_events_stats: top_click_event_stats
+      click_events_stats: top_click_event_stats,
+      basic_wishlist_stats: basic_wishlist_stats
     }
   end
 
@@ -101,7 +103,7 @@ class Vendor::AnalyticsController < ApplicationController
   #   }
   # end
 
-#================================================= COMBINE ALL TOP CLICK EVENT STATS =================================================#
+#================================================= COMBINE ALL WISHLIST STATS =================================================#
   def top_wishlist_stats
     stats = {
       top_age_group: top_age_group,
@@ -109,12 +111,17 @@ class Vendor::AnalyticsController < ApplicationController
       top_education_level: top_education_level,
       top_employment_status: top_employment_status,
       top_sector: top_sector,
-      wishlist_trends: wishlist_trends,
-      top_wishlisted_products: top_wishlisted_products,
     }
 
     Rails.logger.info "Final Wishlist Stats: #{stats}"
     stats
+  end
+
+  def basic_wishlist_stats
+    {
+      wishlist_trends: wishlist_trends,
+      top_wishlisted_products: top_wishlisted_products
+    }
   end
 
 
