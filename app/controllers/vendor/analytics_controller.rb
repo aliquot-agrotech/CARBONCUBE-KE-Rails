@@ -110,7 +110,7 @@ class Vendor::AnalyticsController < ApplicationController
       top_income_range: top_income_range,
       top_education_level: top_education_level,
       top_employment_status: top_employment_status,
-      top_sector: top_sector,
+      top_sector: top_sector
     }
 
     Rails.logger.info "Final Wishlist Stats: #{stats}"
