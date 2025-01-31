@@ -1055,18 +1055,23 @@ purchasers.each do |purchaser_id|
   ad_sample = ads.sample(50) # Select a random sample of 50 ads for this purchaser
 
   ad_sample.each do |ad_id|
-    # Generate a random timestamp within the last 6 months
-    created_at_time = Faker::Time.between(from: 6.months.ago, to: Time.current)
+    # Generate a random timestamp within the last  months (consistent for wish lists)
+    created_at_time = Faker::Time.between(from: 5.months.ago, to: Time.current)
 
-    # Create 50 Ad-Click events
+    # Generate a separate randomized timestamp for Click Events (to keep them different)
+    click_event_time = Faker::Time.between(from: 5.months.ago, to: Time.current)
+
+    # Create 50 Ad-Click events with unique timestamps
     ClickEvent.create!(
       purchaser_id: purchaser_id,
       ad_id: ad_id,
       event_type: "Ad-Click",
-      metadata: nil
+      metadata: nil,
+      created_at: click_event_time,
+      updated_at: click_event_time
     )
 
-    # Create 50 Add-to-Wish-List events
+    # Create 50 Add-to-Wish-List events with wish list timestamps 
     ClickEvent.create!(
       purchaser_id: purchaser_id,
       ad_id: ad_id,
@@ -1076,15 +1081,17 @@ purchasers.each do |purchaser_id|
       updated_at: created_at_time
     )
 
-    # Create 50 Reveal-Vendor-Details events
+    # Create 50 Reveal-Vendor-Details events with unique timestamps
     ClickEvent.create!(
       purchaser_id: purchaser_id,
       ad_id: ad_id,
       event_type: "Reveal-Vendor-Details",
-      metadata: nil
+      metadata: nil,
+      created_at: click_event_time,
+      updated_at: click_event_time
     )
 
-    # Ensure wish_lists table mirrors Add-to-Wish-List events
+    # Ensure wish_lists table mirrors Add-to-Wish-List events 
     WishList.create!(
       purchaser_id: purchaser_id,
       ad_id: ad_id,
@@ -1093,6 +1100,7 @@ purchasers.each do |purchaser_id|
     )
   end
 end
+
 
 puts "Seeding completed successfully!"
 
