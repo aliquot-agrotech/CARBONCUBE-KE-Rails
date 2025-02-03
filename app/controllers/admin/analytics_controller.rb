@@ -28,7 +28,7 @@ class Admin::AnalyticsController < ApplicationController
 
 
     # Get selected metric from query parameter, default to 'Total Click Events' if none provided
-    selected_metric = params[:metric] || 'Total Click Events'
+    selected_metric = params[:metric] || 'Total Wishlists'
 
     # Calculate purchaser total click events (sum of all click types)
     purchasers_by_clicks = Purchaser.joins(:click_events)
