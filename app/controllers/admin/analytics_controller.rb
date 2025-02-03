@@ -30,17 +30,17 @@ class Admin::AnalyticsController < ApplicationController
     # Get selected metric from query parameter, default to 'Total Click Events' if none provided
     selected_metric = params[:metric] || 'Total Wishlists'
 
+    # Calculate purchaser total wishlists
+    purchasers_by_wishlists = Purchaser.joins(:wish_lists)
+                              .select('purchasers.id AS purchaser_id, purchasers.fullname, COUNT(wish_lists.id) AS total_wishlists')
+                              .group('purchasers.id')
+                              .order('total_wishlists DESC')
+
     # Calculate purchaser total click events (sum of all click types)
     purchasers_by_clicks = Purchaser.joins(:click_events)
                               .select('purchasers.id AS purchaser_id, purchasers.fullname, COUNT(click_events.id) AS total_clicks')
                               .group('purchasers.id')
                               .order('total_clicks DESC')
-
-    # Calculate purchaser total wishlists
-    purchasers_by_wishlists = Purchaser.joins(:wish_lists)
-                                .select('purchasers.id AS purchaser_id, purchasers.fullname, COUNT(wish_lists.id) AS total_wishlists')
-                                .group('purchasers.id')
-                                .order('total_wishlists DESC')
 
     # Dynamically select the purchasers' insights based on the metric
     purchasers_insights = case selected_metric
