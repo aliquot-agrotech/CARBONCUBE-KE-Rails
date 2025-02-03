@@ -102,13 +102,32 @@ class Admin::AnalyticsController < ApplicationController
     .map { |record| { category_name: record.category_name, total_ads: record.total_ads } }
 
     # Log the result of the query
-    Rails.logger.info "Fetched Top 4 Categories by Ad Count: #{ads_per_category.inspect}"
+    # Rails.logger.info "Fetched Top 4 Categories by Ad Count: #{ads_per_category.inspect}"
 
-    # Log if no data was fetched
-    if ads_per_category.empty?
-    Rails.logger.warn "No ads found for any categories."
-    end
+    # # Log if no data was fetched
+    # if ads_per_category.empty?
+    # Rails.logger.warn "No ads found for any categories."
+    # end
 
+    #Count of Click Events for each category
+    category_click_events = Category.joins(ads: :click_events)
+      .select('categories.name AS category_name, 
+                SUM(CASE WHEN click_events.event_type = "Ad-Click" THEN 1 ELSE 0 END) AS ad_clicks,
+                SUM(CASE WHEN click_events.event_type = "Add-to-Wish-List" THEN 1 ELSE 0 END) AS wish_list_clicks,
+                SUM(CASE WHEN click_events.event_type = "Reveal-Vendor-Details" THEN 1 ELSE 0 END) AS reveal_clicks')
+      .group('categories.id')
+      .order('category_name')
+      .map { |record| 
+        {
+          category_name: record.category_name,
+          ad_clicks: record.ad_clicks,
+          wish_list_clicks: record.wish_list_clicks,
+          reveal_clicks: record.reveal_clicks
+        }
+      }
+
+    # Log the data for tracking purposes
+    Rails.logger.info "Fetched Category Click Event Data: #{category_click_events.inspect}"
 
     # Total number of orders by status
     statuses = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned']
@@ -129,7 +148,8 @@ class Admin::AnalyticsController < ApplicationController
       vendors_insights: vendors_insights,
       sales_performance: sales_performance,
       ads_per_category: ads_per_category,
-      order_counts_by_status: order_counts_by_status
+      order_counts_by_status: order_counts_by_status,
+      category_click_events: category_click_events
     }
   end
 
