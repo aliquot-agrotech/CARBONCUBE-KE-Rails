@@ -44,11 +44,10 @@ class Admin::AnalyticsController < ApplicationController
 
     # Dynamically select the purchasers' insights based on the metric
     purchasers_insights = case selected_metric
-      when 'Total Click Events' then purchasers_by_clicks
       when 'Total Wishlists' then purchasers_by_wishlists
+      when 'Total Click Events' then purchasers_by_clicks
       else purchasers_by_clicks
     end.limit(10)
-
 
     # Get selected metric from query parameter, default to 'Total Orders' if none provided
     selected_metric = params[:metric] || 'Total Orders'
