@@ -26,6 +26,7 @@ class Admin::AnalyticsController < ApplicationController
     # Total Ads Wish-Listed
     total_ads_wish_listed = WishList.count
 
+#=============================================================PURCHASER INSIGHTS=============================================================#
 
     # Get selected metric from query parameter, default to 'Total Click Events' if none provided
     selected_metric = params[:metric] || 'Total Wishlists'
@@ -49,20 +50,10 @@ class Admin::AnalyticsController < ApplicationController
       else purchasers_by_clicks
     end.limit(10)
 
-    # Get selected metric from query parameter, default to 'Total Orders' if none provided
-    selected_metric = params[:metric] || 'Total Orders'
+#=============================================================VENDOR INSIGHTS=============================================================#
 
-    # Calculate vendor total orders
-    vendors_by_orders = Vendor.joins(orders: :order_items)
-                        .select( 'vendors.id AS vendor_id, vendors.fullname, COUNT(DISTINCT orders.id) AS total_orders') 
-                        .group('vendors.id')
-                        .order('total_orders DESC')
-
-    # Calculate vendor total revenue
-    vendors_by_revenue = Vendor.joins(ads: :order_items)
-                        .select('vendors.id, vendors.fullname, SUM(order_items.total_price) AS total_revenue')
-                        .group('vendors.id')
-                        .order('total_revenue DESC')
+    # Get selected metric from query parameter, default to 'Rating' if none provided
+    selected_metric = params[:metric] || 'Rating'
 
     # Calculate vendor mean rating
     vendors_by_rating = Vendor.joins(ads: :reviews)
@@ -70,14 +61,34 @@ class Admin::AnalyticsController < ApplicationController
                         .group('vendors.id')
                         .order('mean_rating DESC')
 
+    # Calculate vendor total ads
+    vendors_by_ads = Vendor.joins(:ads)
+                        .select('vendors.id, vendors.fullname, COUNT(ads.id) AS total_ads')
+                        .group('vendors.id')
+                        .order('total_ads DESC')
+
+    # Calculate vendor total reveal clicks
+    vendors_by_reveal_clicks = Vendor.joins(ads: :click_events)
+                        .where(click_events: { event_type: 'Reveal-Vendor-Details' })
+                        .select('vendors.id, vendors.fullname, COUNT(click_events.id) AS reveal_clicks')
+                        .group('vendors.id')
+                        .order('reveal_clicks DESC')
+
+    # Calculate vendor total ad clicks
+    vendors_by_ad_clicks = Vendor.joins(ads: :click_events)
+                        .where(click_events: { event_type: 'Ad-Click' })
+                        .select('vendors.id, vendors.fullname, COUNT(click_events.id) AS total_ad_clicks')
+                        .group('vendors.id')
+                        .order('total_ad_clicks DESC')
+
     # Dynamically select the vendors' insights based on the metric
     vendors_insights = case selected_metric
-      when 'Total Orders' then vendors_by_orders
-      when 'Total Revenue' then vendors_by_revenue
       when 'Rating' then vendors_by_rating
-      else vendors_by_revenue
+      when 'Total Ads' then vendors_by_ads
+      when 'Reveal Clicks' then vendors_by_reveal_clicks
+      when 'Ad Clicks' then vendors_by_ad_clicks
+      else vendors_by_rating
     end.limit(10)
-
 
     # # Total Revenue
     # total_revenue = Order.sum(:total_amount)
