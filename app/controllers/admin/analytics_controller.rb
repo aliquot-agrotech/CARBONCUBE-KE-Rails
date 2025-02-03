@@ -4,7 +4,6 @@ class Admin::AnalyticsController < ApplicationController
   def index
     @total_vendors = Vendor.count
     @total_purchasers = Purchaser.count
-    @total_orders = Order.count
     @total_ads = Ad.count
     @total_reviews = Review.count
 
@@ -80,8 +79,8 @@ class Admin::AnalyticsController < ApplicationController
     end.limit(10)
 
 
-    # Total Revenue
-    total_revenue = Order.sum(:total_amount)
+    # # Total Revenue
+    # total_revenue = Order.sum(:total_amount)
 
     # Sales Performance (example: revenue by month)
     # Sales Performance for the last 3 months
@@ -94,13 +93,14 @@ class Admin::AnalyticsController < ApplicationController
                         .sum('order_items.price * order_items.quantity')
                         .transform_keys { |k| k.strftime("%B %Y") }
 
-    # Best Selling Categories Analytics
-    best_selling_categories = Category.joins(ads: :order_items)
-                              .select('categories.name AS category_name, SUM(order_items.quantity) AS total_sold')
-                              .group('categories.id')
-                              .order('total_sold DESC')
-                              .limit(4)
-                              .map { |record| { category_name: record.category_name, total_sold: record.total_sold } }
+    # Count the number of ads for each category
+    ads_per_category = Category.joins(:ads)
+                      .select('categories.name AS category_name, COUNT(ads.id) AS total_ads')
+                      .group('categories.id')
+                      .order('total_ads DESC')
+                      .limit(4)
+                      .map { |record| { category_name: record.category_name, total_ads: record.total_ads } }
+
 
     # Total number of orders by status
     statuses = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned']
@@ -113,16 +113,14 @@ class Admin::AnalyticsController < ApplicationController
     render json: {
       total_vendors: @total_vendors,
       total_purchasers: @total_purchasers,
-      total_orders: @total_orders,
       total_ads: @total_ads,
       total_reviews: @total_reviews,
       top_wishlisted_ads: top_wishlisted_ads,
       total_ads_wish_listed: total_ads_wish_listed,
       purchasers_insights: purchasers_insights,
       vendors_insights: vendors_insights,
-      total_revenue: total_revenue,
       sales_performance: sales_performance,
-      best_selling_categories: best_selling_categories,
+      ads_per_category: ads_per_category,
       order_counts_by_status: order_counts_by_status
     }
   end
