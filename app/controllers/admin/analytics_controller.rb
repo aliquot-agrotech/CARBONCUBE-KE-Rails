@@ -27,27 +27,28 @@ class Admin::AnalyticsController < ApplicationController
     total_ads_wish_listed = WishList.count
 
 
-    # Get selected metric from query parameter, default to 'Total Orders' if none provided
-    selected_metric = params[:metric] || 'Total Orders'
+    # Get selected metric from query parameter, default to 'Total Click Events' if none provided
+    selected_metric = params[:metric] || 'Total Click Events'
 
-    # Calculate purchaser total orders
-    purchasers_by_orders = Purchaser.joins(:orders)
-                          .select('purchasers.id AS purchaser_id, purchasers.fullname, COUNT(orders.id) AS total_orders')
-                          .group('purchasers.id')
-                          .order('total_orders DESC')
+    # Calculate purchaser total click events (sum of all click types)
+    purchasers_by_clicks = Purchaser.joins(:click_events)
+                              .select('purchasers.id AS purchaser_id, purchasers.fullname, COUNT(click_events.id) AS total_clicks')
+                              .group('purchasers.id')
+                              .order('total_clicks DESC')
 
-    # Calculate purchaser total expenditure
-    purchasers_by_expenditure = Purchaser.joins(:orders)
-                                .select('purchasers.id AS purchaser_id, purchasers.fullname, SUM(orders.total_amount) AS total_expenditure')
+    # Calculate purchaser total wishlists
+    purchasers_by_wishlists = Purchaser.joins(:wish_lists)
+                                .select('purchasers.id AS purchaser_id, purchasers.fullname, COUNT(wish_lists.id) AS total_wishlists')
                                 .group('purchasers.id')
-                                .order('total_expenditure DESC')
+                                .order('total_wishlists DESC')
 
     # Dynamically select the purchasers' insights based on the metric
     purchasers_insights = case selected_metric
-      when 'Total Orders' then purchasers_by_orders
-      when 'Total Expenditure' then purchasers_by_expenditure
-      else purchasers_by_orders
+      when 'Total Click Events' then purchasers_by_clicks
+      when 'Total Wishlists' then purchasers_by_wishlists
+      else purchasers_by_clicks
     end.limit(10)
+
 
     # Get selected metric from query parameter, default to 'Total Orders' if none provided
     selected_metric = params[:metric] || 'Total Orders'
