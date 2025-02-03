@@ -121,7 +121,7 @@ class Vendor::AnalyticsController < ApplicationController
       top_sector_clicks: top_clicks_by_sector
     }
 
-    # Rails.logger.info "Final Click Events Stats: #{stats}"
+    Rails.logger.info "Final Click Events Stats: #{stats}"
     stats
   end
 
