@@ -24,8 +24,9 @@ class Admin::AnalyticsController < ApplicationController
                               }
                             }
 
-    # Total Ads Sold Out
-    total_ads_sold_out = OrderItem.sum(:quantity)
+    # Total Ads Wish-Listed
+    total_ads_wish_listed = WishList.count
+
 
     # Get selected metric from query parameter, default to 'Total Orders' if none provided
     selected_metric = params[:metric] || 'Total Orders'
@@ -116,7 +117,7 @@ class Admin::AnalyticsController < ApplicationController
       total_ads: @total_ads,
       total_reviews: @total_reviews,
       best_selling_ads: best_selling_ads,
-      total_ads_sold_out: total_ads_sold_out,
+      total_ads_wish_listed: total_ads_wish_listed,
       purchasers_insights: purchasers_insights,
       vendors_insights: vendors_insights,
       total_revenue: total_revenue,
