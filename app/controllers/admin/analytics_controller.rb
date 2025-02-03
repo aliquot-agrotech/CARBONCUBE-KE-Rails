@@ -8,21 +8,21 @@ class Admin::AnalyticsController < ApplicationController
     @total_ads = Ad.count
     @total_reviews = Review.count
 
-    # Top 6 Best Selling Ads Overall
-    best_selling_ads = Ad.joins(:order_items)
-                            .select('ads.id AS ad_id, ads.title AS ad_title, ads.price AS ad_price, SUM(order_items.quantity) AS total_sold, ads.media AS media')
-                            .group('ads.id')
-                            .order('total_sold DESC')
-                            .limit(6)
-                            .map { |record| 
-                              {
-                                ad_id: record.ad_id,
-                                ad_title: record.ad_title,
-                                ad_price: record.ad_price,
-                                total_sold: record.total_sold,
-                                media: record.media
-                              }
-                            }
+    # Top 6 Most Wish-Listed Ads Overall
+    top_wishlisted_ads = Ad.joins(:wish_lists)
+                        .select('ads.id AS ad_id, ads.title AS ad_title, ads.price AS ad_price, COUNT(wish_lists.id) AS wishlist_count, ads.media AS media')
+                        .group('ads.id')
+                        .order('wishlist_count DESC')
+                        .limit(6)
+                        .map { |record| 
+                          {
+                            ad_id: record.ad_id,
+                            ad_title: record.ad_title,
+                            ad_price: record.ad_price,
+                            wishlist_count: record.wishlist_count,
+                            media: record.media
+                          }
+                        }
 
     # Total Ads Wish-Listed
     total_ads_wish_listed = WishList.count
@@ -116,7 +116,7 @@ class Admin::AnalyticsController < ApplicationController
       total_orders: @total_orders,
       total_ads: @total_ads,
       total_reviews: @total_reviews,
-      best_selling_ads: best_selling_ads,
+      top_wishlisted_ads: top_wishlisted_ads,
       total_ads_wish_listed: total_ads_wish_listed,
       purchasers_insights: purchasers_insights,
       vendors_insights: vendors_insights,
