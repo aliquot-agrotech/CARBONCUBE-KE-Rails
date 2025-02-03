@@ -95,11 +95,19 @@ class Admin::AnalyticsController < ApplicationController
 
     # Count the number of ads for each category
     ads_per_category = Category.joins(:ads)
-                      .select('categories.name AS category_name, COUNT(ads.id) AS total_ads')
-                      .group('categories.id')
-                      .order('total_ads DESC')
-                      .limit(4)
-                      .map { |record| { category_name: record.category_name, total_ads: record.total_ads } }
+    .select('categories.name AS category_name, COUNT(ads.id) AS total_ads')
+    .group('categories.id')
+    .order('total_ads DESC')
+    .limit(4)
+    .map { |record| { category_name: record.category_name, total_ads: record.total_ads } }
+
+    # Log the result of the query
+    Rails.logger.info "Fetched Top 4 Categories by Ad Count: #{ads_per_category.inspect}"
+
+    # Log if no data was fetched
+    if ads_per_category.empty?
+    Rails.logger.warn "No ads found for any categories."
+    end
 
 
     # Total number of orders by status
