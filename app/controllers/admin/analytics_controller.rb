@@ -104,6 +104,8 @@ class Admin::AnalyticsController < ApplicationController
                         .sum('order_items.price * order_items.quantity')
                         .transform_keys { |k| k.strftime("%B %Y") }
 
+#===============================================================CATEGORY ANALYTICS===============================================================#
+
     # Count the number of ads for each category
     ads_per_category = Category.joins(:ads)
                       .select('categories.name AS category_name, COUNT(ads.id) AS total_ads')
@@ -138,7 +140,26 @@ class Admin::AnalyticsController < ApplicationController
                             }
 
     # Log the data for tracking purposes
-    Rails.logger.info "Fetched Category Click Event Data: #{category_click_events.inspect}"
+    # Rails.logger.info "Fetched Category Click Event Data: #{category_click_events.inspect}"
+    # 
+    category_wishlists = Category
+      .joins(ads: :wish_lists)
+      .select('categories.id, categories.name, COUNT(wish_lists.id) AS total_wishlists')
+      .group('categories.id, categories.name')
+      .order('total_wishlists DESC')
+
+    # Get total wishlists across all categories
+    total_wishlists = category_wishlists.sum(&:total_wishlists)
+
+    # Calculate percentage of wishlists per category
+    category_wishlist_data = category_wishlists.map do |category|
+      {
+        category_id: category.id,
+        category_name: category.name,
+        total_wishlists: category.total_wishlists,
+        wishlist_percentage: total_wishlists.zero? ? 0 : ((category.total_wishlists.to_f / total_wishlists) * 100).round(2)
+      }
+    end
 
     # Total number of orders by status
     statuses = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned']
@@ -160,7 +181,8 @@ class Admin::AnalyticsController < ApplicationController
       sales_performance: sales_performance,
       ads_per_category: ads_per_category,
       order_counts_by_status: order_counts_by_status,
-      category_click_events: category_click_events
+      category_click_events: category_click_events,
+      category_wishlist_data: category_wishlist_data
     }
   end
 
