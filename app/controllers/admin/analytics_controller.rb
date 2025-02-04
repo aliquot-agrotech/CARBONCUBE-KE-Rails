@@ -161,6 +161,9 @@ class Admin::AnalyticsController < ApplicationController
       }
     end
 
+    # Log the data for tracking purposes
+    Rails.logger.info "Fetched Category Wishlist Data: #{category_wishlist_data.inspect}"
+
     # Total number of orders by status
     statuses = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned']
     order_counts_by_status = statuses.map do |status|
