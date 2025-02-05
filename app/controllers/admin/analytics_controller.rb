@@ -170,20 +170,32 @@ class Admin::AnalyticsController < ApplicationController
       { name: status, count: Order.where(status: status).count }
     end
 
-
     # Calculate Age Groups
     age_groups = {
       '18-24' => 0, '25-34' => 0, '35-44' => 0, '45-54' => 0, '55+' => 0
     }
-    
+
     Purchaser.find_each do |purchaser|
-      age = purchaser.birthdate.present? ? ((Time.zone.today - purchaser.birthdate) / 365).to_i : nil
-      case age
-      when 18..24 then age_groups['18-24'] += 1
-      when 25..34 then age_groups['25-34'] += 1
-      when 35..44 then age_groups['35-44'] += 1
-      when 45..54 then age_groups['45-54'] += 1
-      else age_groups['55+'] += 1 if age && age >= 55
+      # Check for valid birthdate format and ensure it's a Date object
+      if purchaser.birthdate.present?
+        # Ensure the birthdate is a Date object
+        begin
+          birthdate = purchaser.birthdate.to_date
+          age = ((Time.zone.today - birthdate) / 365).to_i
+
+          # Handle age group assignment
+          case age
+          when 18..24 then age_groups['18-24'] += 1
+          when 25..34 then age_groups['25-34'] += 1
+          when 35..44 then age_groups['35-44'] += 1
+          when 45..54 then age_groups['45-54'] += 1
+          else age_groups['55+'] += 1 if age && age >= 55
+          end
+        rescue StandardError => e
+          Rails.logger.error "Error processing purchaser #{purchaser.id}: #{e.message}"
+        end
+      else
+        Rails.logger.warn "Purchaser #{purchaser.id} has an invalid or missing birthdate"
       end
     end
 
