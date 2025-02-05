@@ -162,13 +162,15 @@ class Admin::AnalyticsController < ApplicationController
     end
 
     # Log the data for tracking purposes
-    Rails.logger.info "Fetched Category Wishlist Data: #{category_wishlist_data.inspect}"
+    # Rails.logger.info "Fetched Category Wishlist Data: #{category_wishlist_data.inspect}"
 
     # Total number of orders by status
     statuses = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned']
     order_counts_by_status = statuses.map do |status|
       { name: status, count: Order.where(status: status).count }
     end
+
+#===============================================================PURCHASER ANALYTICS===============================================================#
 
     # Calculate Age Groups
     age_groups = {
@@ -203,17 +205,17 @@ class Admin::AnalyticsController < ApplicationController
     gender_distribution = Purchaser.group(:gender).count
 
     # Employment Breakdown
-    employment_data = EmploymentStatus.joins(:purchasers)
+    employment_data = Employment.joins(:purchasers)
                                       .select('employment_statuses.name, COUNT(purchasers.id) AS total')
                                       .group('employment_statuses.name')
 
     # Income Distribution
-    income_data = IncomeLevel.joins(:purchasers)
+    income_data = Income.joins(:purchasers)
                             .select('income_levels.name, COUNT(purchasers.id) AS total')
                             .group('income_levels.name')
 
     # Education Breakdown
-    education_data = EducationLevel.joins(:purchasers)
+    education_data = Education.joins(:purchasers)
                                   .select('education_levels.name, COUNT(purchasers.id) AS total')
                                   .group('education_levels.name')
 
