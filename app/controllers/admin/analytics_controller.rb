@@ -171,6 +171,56 @@ class Admin::AnalyticsController < ApplicationController
     end
 
 
+    # Calculate Age Groups
+    age_groups = {
+      '18-24' => 0, '25-34' => 0, '35-44' => 0, '45-54' => 0, '55+' => 0
+    }
+    
+    Purchaser.find_each do |purchaser|
+      age = purchaser.birthdate.present? ? ((Time.zone.today - purchaser.birthdate) / 365).to_i : nil
+      case age
+      when 18..24 then age_groups['18-24'] += 1
+      when 25..34 then age_groups['25-34'] += 1
+      when 35..44 then age_groups['35-44'] += 1
+      when 45..54 then age_groups['45-54'] += 1
+      else age_groups['55+'] += 1 if age && age >= 55
+      end
+    end
+
+    # Gender Distribution
+    gender_distribution = Purchaser.group(:gender).count
+
+    # Employment Breakdown
+    employment_data = EmploymentStatus.joins(:purchasers)
+                                      .select('employment_statuses.name, COUNT(purchasers.id) AS total')
+                                      .group('employment_statuses.name')
+
+    # Income Distribution
+    income_data = IncomeLevel.joins(:purchasers)
+                            .select('income_levels.name, COUNT(purchasers.id) AS total')
+                            .group('income_levels.name')
+
+    # Education Breakdown
+    education_data = EducationLevel.joins(:purchasers)
+                                  .select('education_levels.name, COUNT(purchasers.id) AS total')
+                                  .group('education_levels.name')
+
+    # Sector Breakdown
+    sector_data = Sector.joins(:purchasers)
+                        .select('sectors.name, COUNT(purchasers.id) AS total')
+                        .group('sectors.name')
+
+    # Location Distribution
+    # location_distribution = Purchaser.group(:location).count
+
+    # Log all purchaser insights in one entry
+    Rails.logger.info "Age Groups: #{age_groups}"
+    Rails.logger.info "Gender Distribution: #{gender_distribution}"
+    Rails.logger.info "Employment Data: #{employment_data.map { |e| { e.name => e.total } }}"
+    Rails.logger.info "Income Data: #{income_data.map { |i| { i.name => i.total } }}"
+    Rails.logger.info "Education Data: #{education_data.map { |e| { e.name => e.total } }}"
+    Rails.logger.info "Sector Data: #{sector_data.map { |s| { s.name => s.total } }}"
+    # Rails.logger.info "Location Distribution: #{location_distribution}"
 
     render json: {
       total_vendors: @total_vendors,
@@ -185,7 +235,14 @@ class Admin::AnalyticsController < ApplicationController
       ads_per_category: ads_per_category,
       order_counts_by_status: order_counts_by_status,
       category_click_events: category_click_events,
-      category_wishlist_data: category_wishlist_data
+      category_wishlist_data: category_wishlist_data,
+      age_groups: age_groups,
+      gender_distribution: gender_distribution,
+      employment_data: employment_data,
+      income_data: income_data,
+      education_data: education_data,
+      sector_data: sector_data
+      # location_distribution: location_distribution
     }
   end
 
