@@ -252,10 +252,10 @@ class Admin::AnalyticsController < ApplicationController
       category_wishlist_data: category_wishlist_data,
       age_groups: age_groups,
       gender_distribution: gender_distribution,
-      employment_data: employment_data,
-      income_data: income_data,
-      education_data: education_data,
-      sector_data: sector_data
+      employment_data: employment_data.map { |e| { e.status => e.total } },
+      income_data: income_data.map { |i| { i.range => i.total } },
+      education_data: education_data.map { |e| { e.level => e.total } },
+      sector_data: sector_data.map { |s| { s.name => s.total } }
       # location_distribution: location_distribution
     }
   end
