@@ -230,9 +230,9 @@ class Admin::AnalyticsController < ApplicationController
     # Log all purchaser insights in one entry
     Rails.logger.info "Age Groups: #{age_groups}"
     Rails.logger.info "Gender Distribution: #{gender_distribution}"
-    Rails.logger.info "Employment Data: #{employment_data.map { |e| { e.name => e.total } }}"
-    Rails.logger.info "Income Data: #{income_data.map { |i| { i.name => i.total } }}"
-    Rails.logger.info "Education Data: #{education_data.map { |e| { e.name => e.total } }}"
+    Rails.logger.info "Employment Data: #{employment_data.map { |e| { e.status => e.total } }}"
+    Rails.logger.info "Income Data: #{income_data.map { |i| { i.range => i.total } }}"
+    Rails.logger.info "Education Data: #{education_data.map { |e| { e.level => e.total } }}"
     Rails.logger.info "Sector Data: #{sector_data.map { |s| { s.name => s.total } }}"
     # Rails.logger.info "Location Distribution: #{location_distribution}"
 
