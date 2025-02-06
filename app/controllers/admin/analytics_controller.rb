@@ -206,18 +206,18 @@ class Admin::AnalyticsController < ApplicationController
 
     # Employment Breakdown
     employment_data = Employment.joins(:purchasers)
-                                      .select('employment_statuses.name, COUNT(purchasers.id) AS total')
-                                      .group('employment_statuses.name')
+                                      .select('employments.status, COUNT(purchasers.id) AS total')
+                                      .group('employments.status')
 
     # Income Distribution
     income_data = Income.joins(:purchasers)
-                            .select('income_levels.name, COUNT(purchasers.id) AS total')
-                            .group('income_levels.name')
+                            .select('incomes.range, COUNT(purchasers.id) AS total')
+                            .group('incomes.range')
 
     # Education Breakdown
     education_data = Education.joins(:purchasers)
-                                  .select('education_levels.name, COUNT(purchasers.id) AS total')
-                                  .group('education_levels.name')
+                                  .select('educations.level, COUNT(purchasers.id) AS total')
+                                  .group('educations.level')
 
     # Sector Breakdown
     sector_data = Sector.joins(:purchasers)
