@@ -251,10 +251,12 @@ class Admin::AnalyticsController < ApplicationController
     Rails.logger.info "Gender Distribution Computed: #{vendor_gender_distribution}"
 
     # Vendor Tier Breakdown
-    tier_data = VendorTier.joins(:vendors)
-                          .select('vendor_tiers.name, COUNT(vendors.id) AS total')
-                          .group('vendor_tiers.name')
-                          .as_json
+    # Corrected query
+    tier_data = VendorTier.joins(:vendor)
+                .joins(:tier)
+                .select('tiers.name AS tier_name, COUNT(vendor_tiers.vendor_id) AS total')
+                .group('tiers.name')
+                .as_json
 
     Rails.logger.info "Vendor Tier Data: #{tier_data}"
 
