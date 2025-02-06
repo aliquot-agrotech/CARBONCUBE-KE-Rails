@@ -218,6 +218,57 @@ class Admin::AnalyticsController < ApplicationController
 
 #================================================================VENDOR DEMOGRAPHICS===============================================================#
 
+    # Age Groups Calculation
+    vendor_age_groups = {
+      '18-24' => 0, '25-34' => 0, '35-44' => 0, '45-54' => 0, '55+' => 0
+    }
+
+    Vendor.find_each do |vendor|
+      if vendor.birthdate.present?
+        begin
+          birthdate = vendor.birthdate.to_date
+          age = ((Time.zone.today - birthdate) / 365).to_i
+
+          case age
+          when 18..24 then vendor_age_groups['18-24'] += 1
+          when 25..34 then vendor_age_groups['25-34'] += 1
+          when 35..44 then vendor_age_groups['35-44'] += 1
+          when 45..54 then vendor_age_groups['45-54'] += 1
+          else vendor_age_groups['55+'] += 1 if age && age >= 55
+          end
+        rescue StandardError => e
+          Rails.logger.error "Error processing vendor #{vendor.id}: #{e.message}"
+        end
+      else
+        Rails.logger.warn "Vendor #{vendor.id} has an invalid or missing birthdate"
+      end
+    end
+
+    Rails.logger.info "Age Groups Computed: #{vendor_age_groups}"
+
+    # Gender Distribution
+    vendor_gender_distribution = Vendor.group(:gender).count
+    Rails.logger.info "Gender Distribution Computed: #{vendor_gender_distribution}"
+
+    # Vendor Tier Breakdown
+    tier_data = VendorTier.joins(:vendors)
+                          .select('vendor_tiers.name, COUNT(vendors.id) AS total')
+                          .group('vendor_tiers.name')
+                          .as_json
+
+    Rails.logger.info "Vendor Tier Data: #{tier_data}"
+
+    # Vendor Category Breakdown
+    category_data = CategoryVendor.joins(:vendors)
+                                  .select('categories.name, COUNT(vendors.id) AS total')
+                                  .group('categories.name')
+                                  .as_json
+
+    Rails.logger.info "Vendor Category Data: #{category_data}"
+
+
+#================================================================RENDER SECTION===============================================================#
+
     render json: {
       total_vendors: @total_vendors,
       total_purchasers: @total_purchasers,
@@ -237,7 +288,11 @@ class Admin::AnalyticsController < ApplicationController
       employment_data: employment_data.map { |e| { e.status => e.total } },
       income_data: income_data.map { |i| { i.range => i.total } },
       education_data: education_data.map { |e| { e.level => e.total } },
-      sector_data: sector_data.map { |s| { s.name => s.total } }
+      sector_data: sector_data.map { |s| { s.name => s.total } },
+      vendor_age_groups: vendor_age_groups,
+      vendor_gender_distribution: vendor_gender_distribution,
+      tier_data: tier_data,
+      category_data: category_data
     }
   end
 

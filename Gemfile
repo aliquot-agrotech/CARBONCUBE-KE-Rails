@@ -43,11 +43,17 @@ gem "bootsnap", require: false
 
 # JWT authentication
 gem 'jwt'
+
+# Authentication
 gem 'bcrypt', '~> 3.1.7'  # for password hashing
+
+# CORS
 gem 'rack-cors', require: 'rack/cors'
 
-
+# YAML
 gem 'psych', '~> 5.1.0'
+
+# Rubyzip
 gem 'rubyzip', '~> 2.3.2'
 
 
@@ -73,10 +79,15 @@ gem 'groupdate'
 # Seed generator
 gem 'faker'
 
+# Redis
 gem 'redis'
 
 # Use hiredis to get better performance than the "redis" gem
 gem 'hiredis'
+
+
+# Amazon Rekognition for image moderation
+gem 'aws-sdk-rekognition', '~> 1.111'
 
 
 group :development, :test do
