@@ -294,8 +294,8 @@ class Admin::AnalyticsController < ApplicationController
       sector_data: sector_data.map { |s| { s.name => s.total } },
       vendor_age_groups: vendor_age_groups,
       vendor_gender_distribution: vendor_gender_distribution,
-      tier_data: tier_data,
-      category_data: category_data
+      tier_data: tier_data.map { |t| { t.name => t.total } },
+      category_data: category_data.map { |c| { c.name => c.total } }
     }
   end
 
