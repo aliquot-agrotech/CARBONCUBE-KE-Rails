@@ -261,10 +261,11 @@ class Admin::AnalyticsController < ApplicationController
     Rails.logger.info "Vendor Tier Data: #{tier_data}"
 
     # Vendor Category Breakdown
-    category_data = CategoryVendor.joins(:vendors)
-                                  .select('categories.name, COUNT(vendors.id) AS total')
-                                  .group('categories.name')
-                                  .as_json
+    category_data = CategoriesVendor.joins(:vendor)
+                                .joins(:category)
+                                .select('categories.name, COUNT(categories_vendors.vendor_id) AS total')
+                                .group('categories.name')
+                                .as_json
 
     Rails.logger.info "Vendor Category Data: #{category_data}"
 
