@@ -114,14 +114,6 @@ class Admin::AnalyticsController < ApplicationController
                       .limit(4)
                       .map { |record| { category_name: record.category_name, total_ads: record.total_ads } }
 
-    # Log the result of the query
-    # Rails.logger.info "Fetched Top 4 Categories by Ad Count: #{ads_per_category.inspect}"
-
-    # # Log if no data was fetched
-    # if ads_per_category.empty?
-    # Rails.logger.warn "No ads found for any categories."
-    # end
-
     #Count of Click Events for each category
     category_click_events = Category.joins(ads: :click_events)
                             .select('categories.name AS category_name, 
@@ -224,17 +216,7 @@ class Admin::AnalyticsController < ApplicationController
                         .select('sectors.name, COUNT(purchasers.id) AS total')
                         .group('sectors.name')
 
-    # Location Distribution
-    # location_distribution = Purchaser.group(:location).count
-
-    # Log all purchaser insights in one entry
-    Rails.logger.info "Age Groups: #{age_groups}"
-    Rails.logger.info "Gender Distribution: #{gender_distribution}"
-    Rails.logger.info "Employment Data: #{employment_data.map { |e| { e.status => e.total } }}"
-    Rails.logger.info "Income Data: #{income_data.map { |i| { i.range => i.total } }}"
-    Rails.logger.info "Education Data: #{education_data.map { |e| { e.level => e.total } }}"
-    Rails.logger.info "Sector Data: #{sector_data.map { |s| { s.name => s.total } }}"
-    # Rails.logger.info "Location Distribution: #{location_distribution}"
+#================================================================VENDOR DEMOGRAPHICS===============================================================#
 
     render json: {
       total_vendors: @total_vendors,
@@ -256,7 +238,6 @@ class Admin::AnalyticsController < ApplicationController
       income_data: income_data.map { |i| { i.range => i.total } },
       education_data: education_data.map { |e| { e.level => e.total } },
       sector_data: sector_data.map { |s| { s.name => s.total } }
-      # location_distribution: location_distribution
     }
   end
 
