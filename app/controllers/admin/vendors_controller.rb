@@ -184,7 +184,7 @@ class Admin::VendorsController < ApplicationController
   
     # Vendor Engagement & Visibility
     total_clicks = click_event_counts["Ad-Click"] || 0
-    total_profile_views = vendor.profile_views.count rescue 0 # Adjust based on actual tracking implementation
+    total_profile_views = click_event_counts["Reveal-Vendor-Details"] || 0
     reveal_vendor_details_clicks = click_event_counts["Reveal-Vendor-Details"] || 0
     ad_performance_rank = Vendor.joins(:ads)
                                 .group("vendors.id")
