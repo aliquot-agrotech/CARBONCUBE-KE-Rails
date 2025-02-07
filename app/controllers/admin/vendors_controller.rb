@@ -198,18 +198,22 @@ class Admin::VendorsController < ApplicationController
     ad_approval_rate = (vendor_ads.where(approved: true).count.to_f / vendor_ads.count * 100).round(2) rescue 0
   
     # Competitor & Category Insights
-    top_category = vendor_ads.joins(:category)
-                             .group("categories.name")
-                             .order("COUNT(ads.id) DESC")
-                             .limit(1)
-                             .count
-                             .keys.first rescue "Unknown"
+    top_category = vendor_ads.joins("JOIN categories_vendors ON ads.vendor_id = categories_vendors.vendor_id")
+                         .joins("JOIN categories ON categories_vendors.category_id = categories.id")
+                         .group("categories.name")
+                         .order("COUNT(ads.id) DESC")
+                         .limit(1)
+                         .count
+                         .keys.first rescue "Unknown"
+
     category_comparison = Vendor.joins(:ads)
-                                .where(category: vendor.category)
-                                .group("vendors.id")
-                                .count
-                                .sort_by { |_vendor_id, ad_count| -ad_count }
-                                .to_h
+                         .joins("JOIN categories_vendors ON vendors.id = categories_vendors.vendor_id")
+                         .where("categories_vendors.category_id IN (?)", vendor.categories_vendors.pluck(:category_id))
+                         .group("vendors.id")
+                         .count
+                         .sort_by { |_vendor_id, ad_count| -ad_count }
+                         .to_h
+
     vendor_category_rank = category_comparison.keys.index(vendor.id).to_i + 1 rescue nil
   
     # Customer Interest & Conversion
@@ -261,7 +265,6 @@ class Admin::VendorsController < ApplicationController
   
       # Engagement & Visibility Metrics
       total_profile_views: total_profile_views,
-      total_ads_expired: total_ads_expired,
       ad_performance_rank: ad_performance_rank,
   
       # Activity & Consistency
