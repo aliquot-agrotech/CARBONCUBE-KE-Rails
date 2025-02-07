@@ -194,7 +194,7 @@ class Admin::VendorsController < ApplicationController
   
     # Vendor Activity & Consistency
     last_activity = vendor.ads.order(updated_at: :desc).limit(1).pluck(:updated_at).first
-    total_ads_updated = vendor_ads.where.not(updated_at: created_at).count
+    total_ads_updated = vendor_ads.where.not("updated_at = created_at").count
     ad_approval_rate = (vendor_ads.where(approved: true).count.to_f / vendor_ads.count * 100).round(2) rescue 0
   
     # Competitor & Category Insights
