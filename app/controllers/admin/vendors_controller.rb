@@ -199,20 +199,20 @@ class Admin::VendorsController < ApplicationController
   
     # Competitor & Category Insights
     top_category = vendor_ads.joins("JOIN categories_vendors ON ads.vendor_id = categories_vendors.vendor_id")
-                         .joins("JOIN categories ON categories_vendors.category_id = categories.id")
-                         .group("categories.name")
-                         .order("COUNT(ads.id) DESC")
-                         .limit(1)
-                         .count
-                         .keys.first rescue "Unknown"
+                      .joins("JOIN categories ON categories_vendors.category_id = categories.id")
+                      .group("categories.name")
+                      .order("COUNT(ads.id) DESC")
+                      .limit(1)
+                      .count
+                      .keys.first rescue "Unknown"
 
     category_comparison = Vendor.joins(:ads)
-                         .joins("JOIN categories_vendors ON vendors.id = categories_vendors.vendor_id")
-                         .where("categories_vendors.category_id IN (?)", vendor.categories_vendors.pluck(:category_id))
-                         .group("vendors.id")
-                         .count
-                         .sort_by { |_vendor_id, ad_count| -ad_count }
-                         .to_h
+                      .joins("JOIN categories_vendors ON vendors.id = categories_vendors.vendor_id")
+                      .where("categories_vendors.category_id = ?", vendor.category.id)
+                      .group("vendors.id")
+                      .count
+                      .sort_by { |_vendor_id, ad_count| -ad_count }
+                      .to_h
 
     vendor_category_rank = category_comparison.keys.index(vendor.id).to_i + 1 rescue nil
   
@@ -220,11 +220,11 @@ class Admin::VendorsController < ApplicationController
     wishlist_to_click_ratio = (click_event_counts["Add-to-Wish-List"].to_f / total_clicks * 100).round(2) rescue 0
     wishlist_to_contact_ratio = (click_event_counts["Add-to-Wish-List"].to_f / reveal_vendor_details_clicks * 100).round(2) rescue 0
     most_wishlisted_ad = WishList.where(ad_id: ad_ids)
-                                 .group(:ad_id)
-                                 .order("count_id DESC")
-                                 .limit(1)
-                                 .count(:id)
-                                 .first
+                        .group(:ad_id)
+                        .order("count_id DESC")
+                        .limit(1)
+                        .count(:id)
+                        .first
   
     most_wishlisted_ad_data = most_wishlisted_ad ? Ad.find(most_wishlisted_ad[0]).as_json(only: [:id, :title]) : nil
   
