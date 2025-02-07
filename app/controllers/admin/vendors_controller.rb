@@ -177,50 +177,116 @@ class Admin::VendorsController < ApplicationController
   end
   
   def fetch_analytics(vendor)
-    click_events = ClickEvent.where(ad_id: vendor.ads.pluck(:id))
+    vendor_ads = vendor.ads
+    ad_ids = vendor_ads.pluck(:id)
+    click_events = ClickEvent.where(ad_id: ad_ids)
     click_event_counts = click_events.group(:event_type).count
   
+    # Vendor Engagement & Visibility
+    total_clicks = click_event_counts["Ad-Click"] || 0
+    total_profile_views = vendor.profile_views.count rescue 0 # Adjust based on actual tracking implementation
+    reveal_vendor_details_clicks = click_event_counts["Reveal-Vendor-Details"] || 0
+    total_ads_expired = vendor_ads.where("expiry_date < ?", Time.current).count
+    ad_performance_rank = Vendor.joins(:ads)
+                                .group("vendors.id")
+                                .order("COUNT(click_events.id) DESC")
+                                .count("click_events.id")
+                                .keys.index(vendor.id).to_i + 1 rescue nil
+  
+    # Vendor Activity & Consistency
+    active_ads = vendor_ads.where("expiry_date > ?", Time.current).count
+    avg_ad_duration = vendor_ads.average("DATE_PART('day', expiry_date - created_at)").to_f.round(2) rescue 0
+    last_activity = vendor.ads.order(updated_at: :desc).limit(1).pluck(:updated_at).first
+    total_ads_updated = vendor_ads.where.not(updated_at: created_at).count
+    ad_approval_rate = (vendor_ads.where(approved: true).count.to_f / vendor_ads.count * 100).round(2) rescue 0
+  
+    # Competitor & Category Insights
+    top_category = vendor_ads.joins(:category)
+                             .group("categories.name")
+                             .order("COUNT(ads.id) DESC")
+                             .limit(1)
+                             .count
+                             .keys.first rescue "Unknown"
+    category_comparison = Vendor.joins(:ads)
+                                .where(category: vendor.category)
+                                .group("vendors.id")
+                                .count
+                                .sort_by { |_vendor_id, ad_count| -ad_count }
+                                .to_h
+    vendor_category_rank = category_comparison.keys.index(vendor.id).to_i + 1 rescue nil
+  
+    # Customer Interest & Conversion
+    wishlist_to_click_ratio = (click_event_counts["Add-to-Wish-List"].to_f / total_clicks * 100).round(2) rescue 0
+    wishlist_to_contact_ratio = (click_event_counts["Add-to-Wish-List"].to_f / reveal_vendor_details_clicks * 100).round(2) rescue 0
+    most_wishlisted_ad = WishList.where(ad_id: ad_ids)
+                                 .group(:ad_id)
+                                 .order("count_id DESC")
+                                 .limit(1)
+                                 .count(:id)
+                                 .first
+  
+    most_wishlisted_ad_data = most_wishlisted_ad ? Ad.find(most_wishlisted_ad[0]).as_json(only: [:id, :title]) : nil
+  
     {
-      total_ads: vendor.ads.count,
-      total_ads_wishlisted: WishList.where(ad_id: vendor.ads.pluck(:id)).count,
+      total_ads: vendor_ads.count,
+      total_ads_wishlisted: WishList.where(ad_id: ad_ids).count,
       mean_rating: vendor.reviews.joins(:ad)
-                                  .where(ads: { id: vendor.ads.pluck(:id) })
-                                  .average(:rating).to_f.round(2),
+                                .where(ads: { id: ad_ids })
+                                .average(:rating).to_f.round(2),
   
       total_reviews: vendor.reviews.joins(:ad)
-                               .where(ads: { id: vendor.ads.pluck(:id) })
-                               .group(:rating)
-                               .count
-                               .values.sum,
+                                   .where(ads: { id: ad_ids })
+                                   .group(:rating)
+                                   .count
+                                   .values.sum,
+  
       rating_pie_chart: (1..5).map do |rating|
         {
           rating: rating,
           count: vendor.reviews.joins(:ad)
-                              .where(ads: { id: vendor.ads.pluck(:id) })
+                              .where(ads: { id: ad_ids })
                               .group(:rating)
                               .count[rating] || 0
         }
       end,
+  
       reviews: vendor.reviews.joins(:ad, :purchaser)
-                      .where(ads: { id: vendor.ads.pluck(:id) })
+                      .where(ads: { id: ad_ids })
                       .select('reviews.*, purchasers.fullname AS purchaser_name')
                       .as_json(only: [:id, :rating, :review, :created_at],
                                 include: { purchaser: { only: [:fullname] } }),
   
       # Click Event Breakdown
-      ad_clicks: click_event_counts["Ad-Click"] || 0,
+      ad_clicks: total_clicks,
       add_to_wish_list: click_event_counts["Add-to-Wish-List"] || 0,
-      reveal_vendor_details: click_event_counts["Reveal-Vendor-Details"] || 0,
+      reveal_vendor_details: reveal_vendor_details_clicks,
       total_click_events: click_events.count,
   
-      # Most Clicked Ad
+      # Engagement & Visibility Metrics
+      total_profile_views: total_profile_views,
+      total_ads_expired: total_ads_expired,
+      ad_performance_rank: ad_performance_rank,
+  
+      # Activity & Consistency
+      active_ads: active_ads,
+      avg_ad_duration: avg_ad_duration,
+      last_activity: last_activity,
+      total_ads_updated: total_ads_updated,
+      ad_approval_rate: ad_approval_rate,
+  
+      # Competitor & Category Insights
+      vendor_category: vendor.category.name,
+      top_performing_category: top_category,
+      category_rank: vendor_category_rank,
+  
+      # Customer Interest & Conversion
+      wishlist_to_click_ratio: wishlist_to_click_ratio,
+      wishlist_to_contact_ratio: wishlist_to_contact_ratio,
+      most_wishlisted_ad: most_wishlisted_ad_data,
       most_clicked_ad: most_clicked_ad(vendor),
   
-      vendor_category: vendor.category.name,
-      last_ad_posted_at: vendor.ads.order(created_at: :desc).limit(1).pluck(:created_at).first,
+      last_ad_posted_at: vendor_ads.order(created_at: :desc).limit(1).pluck(:created_at).first,
       account_age_days: (Time.current.to_date - vendor.created_at.to_date).to_i
     }
-  end
-  
-  
+  end  
 end
