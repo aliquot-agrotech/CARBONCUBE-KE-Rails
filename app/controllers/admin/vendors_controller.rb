@@ -154,6 +154,28 @@ class Admin::VendorsController < ApplicationController
     end
   end
 
+
+  def most_clicked_ad(vendor)
+    most_clicked = ClickEvent.where(ad_id: vendor.ads.pluck(:id))
+                             .group(:ad_id)
+                             .order('count_id DESC')
+                             .limit(1)
+                             .count(:id)
+                             .first
+  
+    if most_clicked
+      ad = Ad.find(most_clicked[0])
+      {
+        ad_id: ad.id,
+        title: ad.title,
+        total_clicks: most_clicked[1],
+        category: ad.category.name
+      }
+    else
+      nil
+    end
+  end
+  
   def fetch_analytics(vendor)
     click_events = ClickEvent.where(ad_id: vendor.ads.pluck(:id))
     click_event_counts = click_events.group(:event_type).count
@@ -185,17 +207,20 @@ class Admin::VendorsController < ApplicationController
                       .as_json(only: [:id, :rating, :review, :created_at],
                                 include: { purchaser: { only: [:fullname] } }),
   
-      # New Analytics
+      # Click Event Breakdown
       ad_clicks: click_event_counts["Ad-Click"] || 0,
       add_to_wish_list: click_event_counts["Add-to-Wish-List"] || 0,
       reveal_vendor_details: click_event_counts["Reveal Vendor Details"] || 0,
       total_click_events: click_events.count,
-      most_clicked_ad: most_clicked_ad_details ? most_clicked_ad_details.as_json(only: [:id, :title, :category_id]) : nil,
-      average_wish_list_rate: (vendor.ads.count > 0) ? (click_event_counts["Add-to-Wish-List"].to_f / vendor.ads.count).round(2) : 0,
+  
+      # Most Clicked Ad
+      most_clicked_ad: most_clicked_ad(vendor),
+  
       vendor_category: vendor.category.name,
       last_ad_posted_at: vendor.ads.order(created_at: :desc).limit(1).pluck(:created_at).first,
       account_age_days: (Time.current.to_date - vendor.created_at.to_date).to_i
     }
   end
+  
   
 end
