@@ -186,7 +186,6 @@ class Admin::VendorsController < ApplicationController
     total_clicks = click_event_counts["Ad-Click"] || 0
     total_profile_views = vendor.profile_views.count rescue 0 # Adjust based on actual tracking implementation
     reveal_vendor_details_clicks = click_event_counts["Reveal-Vendor-Details"] || 0
-    total_ads_expired = vendor_ads.where("expiry_date < ?", Time.current).count
     ad_performance_rank = Vendor.joins(:ads)
                                 .group("vendors.id")
                                 .order("COUNT(click_events.id) DESC")
@@ -194,8 +193,6 @@ class Admin::VendorsController < ApplicationController
                                 .keys.index(vendor.id).to_i + 1 rescue nil
   
     # Vendor Activity & Consistency
-    active_ads = vendor_ads.where("expiry_date > ?", Time.current).count
-    avg_ad_duration = vendor_ads.average("DATE_PART('day', expiry_date - created_at)").to_f.round(2) rescue 0
     last_activity = vendor.ads.order(updated_at: :desc).limit(1).pluck(:updated_at).first
     total_ads_updated = vendor_ads.where.not(updated_at: created_at).count
     ad_approval_rate = (vendor_ads.where(approved: true).count.to_f / vendor_ads.count * 100).round(2) rescue 0
