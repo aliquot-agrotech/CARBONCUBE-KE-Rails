@@ -265,8 +265,6 @@ class Admin::VendorsController < ApplicationController
       ad_performance_rank: ad_performance_rank,
   
       # Activity & Consistency
-      active_ads: active_ads,
-      avg_ad_duration: avg_ad_duration,
       last_activity: last_activity,
       total_ads_updated: total_ads_updated,
       ad_approval_rate: ad_approval_rate,
