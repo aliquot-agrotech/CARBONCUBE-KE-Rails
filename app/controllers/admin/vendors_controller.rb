@@ -210,7 +210,7 @@ class Admin::VendorsController < ApplicationController
       # Click Event Breakdown
       ad_clicks: click_event_counts["Ad-Click"] || 0,
       add_to_wish_list: click_event_counts["Add-to-Wish-List"] || 0,
-      reveal_vendor_details: click_event_counts["Reveal Vendor Details"] || 0,
+      reveal_vendor_details: click_event_counts["Reveal-Vendor-Details"] || 0,
       total_click_events: click_events.count,
   
       # Most Clicked Ad
