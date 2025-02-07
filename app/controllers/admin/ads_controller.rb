@@ -3,7 +3,7 @@ class Admin::AdsController < ApplicationController
   
   # GET /admin/ads
   def index
-    @ads = Ad.joins(vendor: :vendor_tiers)  # Join vendor_tiers through vendor
+    @ads = Ad.joins(vendor: :vendor_tier) # Join vendor_tiers through vendor
          .joins(:category, :subcategory)
          .where(vendors: { blocked: false })
          .select('ads.*, vendor_tiers.tier_id AS vendor_tier')  # Select tier_id from vendor_tiers
