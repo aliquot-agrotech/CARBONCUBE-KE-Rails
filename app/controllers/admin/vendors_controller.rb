@@ -186,12 +186,14 @@ class Admin::VendorsController < ApplicationController
     total_clicks = click_event_counts["Ad-Click"] || 0
     total_profile_views = click_event_counts["Reveal-Vendor-Details"] || 0
     reveal_vendor_details_clicks = click_event_counts["Reveal-Vendor-Details"] || 0
-    ad_performance_rank = Vendor.joins(:ads)
+    ad_performance_rankings = Vendor.joins(ads: :click_events)
                                 .group("vendors.id")
-                                .order("COUNT(click_events.id) DESC")
+                                .order(Arel.sql("COUNT(click_events.id) DESC"))
                                 .count("click_events.id")
-                                .keys.index(vendor.id).to_i + 1 rescue nil
-  
+                                .keys
+
+    ad_performance_rank = ad_performance_rankings.index(vendor.id)&.next || nil
+    
     # Vendor Activity & Consistency
     last_activity = vendor.ads.order(updated_at: :desc).limit(1).pluck(:updated_at).first
     total_ads_updated = vendor_ads.where.not("updated_at = created_at").count
