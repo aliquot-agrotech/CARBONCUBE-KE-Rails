@@ -155,17 +155,16 @@ class Admin::VendorsController < ApplicationController
   end
 
   def fetch_analytics(vendor)
+    click_events = ClickEvent.where(ad_id: vendor.ads.pluck(:id))
+    click_event_counts = click_events.group(:event_type).count
+  
     {
-      total_revenue: vendor.orders.joins(:order_items)
-                              .where(order_items: { ad_id: vendor.ads.pluck(:id) })
-                              .sum('order_items.quantity * order_items.price'),
       total_ads: vendor.ads.count,
-
       total_ads_wishlisted: WishList.where(ad_id: vendor.ads.pluck(:id)).count,
       mean_rating: vendor.reviews.joins(:ad)
                                   .where(ads: { id: vendor.ads.pluck(:id) })
                                   .average(:rating).to_f.round(2),
-            
+  
       total_reviews: vendor.reviews.joins(:ad)
                                .where(ads: { id: vendor.ads.pluck(:id) })
                                .group(:rating)
@@ -184,7 +183,19 @@ class Admin::VendorsController < ApplicationController
                       .where(ads: { id: vendor.ads.pluck(:id) })
                       .select('reviews.*, purchasers.fullname AS purchaser_name')
                       .as_json(only: [:id, :rating, :review, :created_at],
-                                include: { purchaser: { only: [:fullname] } })
+                                include: { purchaser: { only: [:fullname] } }),
+  
+      # New Analytics
+      ad_clicks: click_event_counts["Ad-Click"] || 0,
+      add_to_wish_list: click_event_counts["Add-to-Wish-List"] || 0,
+      reveal_vendor_details: click_event_counts["Reveal Vendor Details"] || 0,
+      total_click_events: click_events.count,
+      most_clicked_ad: most_clicked_ad_details ? most_clicked_ad_details.as_json(only: [:id, :title, :category_id]) : nil,
+      average_wish_list_rate: (vendor.ads.count > 0) ? (click_event_counts["Add-to-Wish-List"].to_f / vendor.ads.count).round(2) : 0,
+      vendor_category: vendor.category.name,
+      last_ad_posted_at: vendor.ads.order(created_at: :desc).limit(1).pluck(:created_at).first,
+      account_age_days: (Time.current.to_date - vendor.created_at.to_date).to_i
     }
   end
+  
 end
