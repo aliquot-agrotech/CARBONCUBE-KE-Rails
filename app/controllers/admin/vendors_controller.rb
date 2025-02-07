@@ -159,9 +159,8 @@ class Admin::VendorsController < ApplicationController
       total_revenue: vendor.orders.joins(:order_items)
                               .where(order_items: { ad_id: vendor.ads.pluck(:id) })
                               .sum('order_items.quantity * order_items.price'),
-      total_orders: vendor.orders.joins(:order_items)
-                            .where(order_items: { ad_id: vendor.ads.pluck(:id) })
-                            .distinct.count,
+      total_ads: vendor.ads.count,
+
       total_ads_wishlisted: WishList.where(ad_id: vendor.ads.pluck(:id)).count,
       mean_rating: vendor.reviews.joins(:ad)
                                   .where(ads: { id: vendor.ads.pluck(:id) })
