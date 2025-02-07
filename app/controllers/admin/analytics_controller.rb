@@ -295,7 +295,7 @@ class Admin::AnalyticsController < ApplicationController
       vendor_age_groups: vendor_age_groups,
       vendor_gender_distribution: vendor_gender_distribution,
       tier_data: tier_data.map { |t| { t['tier_name'] => t['total'] } },
-      category_data: category_data.map { |c| { c.name => c.total } }
+      category_data: category_data.map { |c| { c['name'] => c['total'] } }
     }
   end
 
