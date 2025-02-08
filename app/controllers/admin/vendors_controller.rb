@@ -231,18 +231,25 @@ class Admin::VendorsController < ApplicationController
     most_wishlisted_ad_data = most_wishlisted_ad ? Ad.find(most_wishlisted_ad[0]).as_json(only: [:id, :title]) : nil
   
     {
+      # Ad Inventory
       total_ads: vendor_ads.count,
+
+      # Ad Performance
       total_ads_wishlisted: WishList.where(ad_id: ad_ids).count,
+
+      # Rating
       mean_rating: vendor.reviews.joins(:ad)
                                 .where(ads: { id: ad_ids })
                                 .average(:rating).to_f.round(2),
   
+      # Total Reviews
       total_reviews: vendor.reviews.joins(:ad)
                                    .where(ads: { id: ad_ids })
                                    .group(:rating)
                                    .count
                                    .values.sum,
   
+      # Rating Breakdown
       rating_pie_chart: (1..5).map do |rating|
         {
           rating: rating,
@@ -253,6 +260,7 @@ class Admin::VendorsController < ApplicationController
         }
       end,
   
+      # Reviews
       reviews: vendor.reviews.joins(:ad, :purchaser)
                       .where(ads: { id: ad_ids })
                       .select('reviews.*, purchasers.fullname AS purchaser_name')
