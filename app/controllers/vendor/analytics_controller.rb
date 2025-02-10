@@ -508,12 +508,12 @@ class Vendor::AnalyticsController < ApplicationController
   
 
   def calculate_competitor_average_price(category_id)
-    Vendor.joins(ads: :order_items)
+    Vendor.joins(:ads)
           .where(ads: { category_id: category_id })
           .where.not(id: current_vendor.id)
           .average('ads.price')
           .to_f.round(2)
-  end
+  end  
 
 
 
