@@ -121,7 +121,7 @@ class Vendor::AnalyticsController < ApplicationController
       top_sector_clicks: top_clicks_by_sector
     }
 
-    Rails.logger.info "Final Click Events Stats: #{stats}"
+    # Rails.logger.info "Final Click Events Stats: #{stats}"
     stats
   end
 
@@ -187,10 +187,10 @@ class Vendor::AnalyticsController < ApplicationController
 
     # Step 1: Find all ad IDs that belong to the current vendor
     ad_ids = Ad.where(vendor_id: current_vendor.id).pluck(:id)
-    Rails.logger.info("Ad IDs for Vendor #{current_vendor.id}: #{ad_ids.inspect}")
+    # Rails.logger.info("Ad IDs for Vendor #{current_vendor.id}: #{ad_ids.inspect}")
 
     if ad_ids.empty?
-      Rails.logger.warn("No Ads found for Vendor #{current_vendor.id}")
+      # Rails.logger.warn("No Ads found for Vendor #{current_vendor.id}")
       return (0..4).map do |i|
         month_date = end_date - i.months
         {
@@ -228,7 +228,7 @@ class Vendor::AnalyticsController < ApplicationController
     end.reverse
 
     # Debugging output
-    Rails.logger.info("Click Event Trends for Vendor #{current_vendor.id}: #{monthly_click_events.inspect}")
+    # Rails.logger.info("Click Event Trends for Vendor #{current_vendor.id}: #{monthly_click_events.inspect}")
 
     # Return the result for the frontend
     monthly_click_events
@@ -397,31 +397,26 @@ class Vendor::AnalyticsController < ApplicationController
   end
 
   def top_wishlisted_ads
-    Rails.logger.info "Fetching top wishlisted ads for vendor with ID: #{current_vendor.id}"
-    
     begin
-      result = WishList.joins(:ad)
-                       .where(ads: { vendor_id: current_vendor.id })
-                       .group('ads.id', 'ads.title', 'ads.media', 'ads.price')  # Add 'ads.media' and 'ads.price' to the GROUP BY clause
-                       .select('ads.title AS ad_title, COUNT(wish_lists.id) AS wishlist_count, ads.media AS ad_media, ads.price AS ad_price')
-                       .order('wishlist_count DESC')
-                       .limit(3)
-                       .map { |record| 
-                         {
-                           ad_title: record.ad_title,
-                           wishlist_count: record.wishlist_count,
-                           ad_media: JSON.parse(record.ad_media || '[]'), # Parse the media as an array
-                           ad_price: record.ad_price
-                         }
-                       }
-  
-      Rails.logger.info "Successfully fetched top wishlisted ads: #{result.inspect}"
-      result
-    rescue StandardError => e
-      Rails.logger.error "Error fetching top wishlisted ads: #{e.message}"
+      WishList.joins(:ad)
+              .where(ads: { vendor_id: current_vendor.id })
+              .group('ads.id', 'ads.title', 'ads.media', 'ads.price')
+              .select('ads.title AS ad_title, COUNT(wish_lists.id) AS wishlist_count, ads.media AS ad_media, ads.price AS ad_price')
+              .order('wishlist_count DESC')
+              .limit(3)
+              .map do |record|
+                {
+                  ad_title: record.ad_title,
+                  wishlist_count: record.wishlist_count,
+                  ad_media: JSON.parse(record.ad_media || '[]'), # Parse media as an array
+                  ad_price: record.ad_price
+                }
+              end
+    rescue StandardError
       []
     end
-  end  
+  end
+  
 
   def wishlist_trends
     # Define the date range: the current month and the previous 4 months
