@@ -493,23 +493,23 @@ class Vendor::AnalyticsController < ApplicationController
   end
 
   def fetch_top_competitor_ads(category_id)
-    Vendor.joins(ads: { order_items: :order })
+    Vendor.joins(ads: :wish_lists)
           .where(ads: { category_id: category_id })
           .where.not(id: current_vendor.id)
-          .select('ads.id AS ad_id, ads.title AS ad_title, SUM(order_items.quantity) AS total_sold, ads.price AS ad_price, ads.media AS ad_media')
+          .select('ads.id AS ad_id, ads.title AS ad_title, COUNT(wish_lists.id) AS total_wishlists, ads.price AS ad_price, ads.media AS ad_media')
           .group('ads.id')
-          .order('total_sold DESC')
+          .order('total_wishlists DESC')
           .limit(3)
           .map { |record| 
             { 
               ad_id: record.ad_id,
               ad_title: record.ad_title,
-              total_sold: record.total_sold,
+              total_wishlists: record.total_wishlists,
               ad_price: record.ad_price,
               ad_media: JSON.parse(record.ad_media || '[]') # Parse the media as an array
             } 
           }
-  end
+  end  
   
 
   def calculate_competitor_average_price(category_id)
