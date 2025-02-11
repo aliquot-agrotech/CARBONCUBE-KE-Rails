@@ -132,7 +132,7 @@ Rails.application.routes.draw do
     resources :notifications
 
     # Vendor Tiers
-    resources :vendor_tiers, only: [:show] do
+    resources :vendor_tiers, only: [:index, :show] do
       patch 'update_tier', on: :collection
     end
 
