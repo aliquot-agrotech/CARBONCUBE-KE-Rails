@@ -1,4 +1,6 @@
 class Vendor::VendorTiersController < ApplicationController
+  before_action :authenticate_vendor
+
 
   def index
     @tiers = Tier.includes(:tier_features, :tier_pricings).all
@@ -64,6 +66,15 @@ class Vendor::VendorTiersController < ApplicationController
       else
         render json: { error: 'Failed to create new tier', details: new_vendor_tier.errors.full_messages }, status: :unprocessable_entity
       end
+    end
+  end
+
+  private
+
+  def authenticate_vendor
+    @current_vendor = VendorAuthorizeApiRequest.new(request.headers).result
+    unless @current_vendor
+      render json: { error: 'Not Authorized' }, status: :unauthorized
     end
   end
 end
