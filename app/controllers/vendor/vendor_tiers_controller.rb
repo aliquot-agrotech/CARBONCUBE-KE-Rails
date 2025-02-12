@@ -39,33 +39,31 @@ class Vendor::VendorTiersController < ApplicationController
   end
 
   def update_tier
-    tier = Tier.find_by(id: params[:tier_id]) # Find the tier by the provided ID
+    Rails.logger.info "🛠 VENDOR ID CHECK: @current_vendor.id = #{@current_vendor&.id}"
 
-    unless tier
-      return render json: { error: 'Invalid tier selected' }, status: :not_found
+    unless @current_vendor
+      return render json: { error: 'Vendor not found or not authenticated' }, status: :unauthorized
     end
+
+    tier = Tier.find_by(id: params[:tier_id])
+    return render json: { error: 'Invalid tier selected' }, status: :not_found unless tier
 
     # Extract numeric duration from the string (e.g., "6 months" => 6)
     tier_duration = params[:tier_duration].to_i
 
-    # Check if the vendor already has an entry in the vendor_tiers table
-    vendor_tier = VendorTier.where(vendor_id: @current_vendor.id, tier_id: tier.id).order(updated_at: :desc).first
+    # 🔥 Find the existing vendor_tier record (MUST EXIST)
+    vendor_tier = VendorTier.find_by(vendor_id: @current_vendor.id)
 
     if vendor_tier
-      # Update the existing entry
-      if vendor_tier.update(duration_months: tier_duration)
+      # ✅ Update only, no creation
+      if vendor_tier.update(tier_id: tier.id, duration_months: tier_duration)
         render json: vendor_tier, serializer: VendorTierSerializer, status: :ok
       else
         render json: { error: 'Tier update failed', details: vendor_tier.errors.full_messages }, status: :unprocessable_entity
       end
     else
-      # Create a new entry in the vendor_tiers table
-      new_vendor_tier = VendorTier.new(vendor_id: @current_vendor.id, tier_id: tier.id, duration_months: tier_duration)
-      if new_vendor_tier.save
-        render json: new_vendor_tier, serializer: VendorTierSerializer, status: :created
-      else
-        render json: { error: 'Failed to create new tier', details: new_vendor_tier.errors.full_messages }, status: :unprocessable_entity
-      end
+      # 🚫 If no existing record, return an error
+      render json: { error: 'Vendor tier record not found. Update failed.' }, status: :not_found
     end
   end
 
@@ -73,8 +71,13 @@ class Vendor::VendorTiersController < ApplicationController
 
   def authenticate_vendor
     @current_vendor = VendorAuthorizeApiRequest.new(request.headers).result
-    unless @current_vendor
+  
+    if @current_vendor.nil?
+      Rails.logger.error "❌ AUTHENTICATION FAILED: @current_vendor is nil"
       render json: { error: 'Not Authorized' }, status: :unauthorized
+    else
+      Rails.logger.info "✅ AUTHENTICATION SUCCESS: Vendor ID = #{@current_vendor.id}"
     end
   end
+  
 end
