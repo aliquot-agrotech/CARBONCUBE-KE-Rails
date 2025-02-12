@@ -9,7 +9,7 @@ class Vendor::TiersController < ApplicationController
     end
   
     tier = Tier.find_by(id: params[:tier_id])
-  
+    
     unless tier
       return render json: { error: 'Invalid tier selected' }, status: :not_found
     end
@@ -17,27 +17,21 @@ class Vendor::TiersController < ApplicationController
     # Extract numeric duration from the string (e.g., "6 months" => 6)
     tier_duration = params[:tier_duration].to_i
   
-    # Check if the vendor already has a record
-    vendor_tier = VendorTier.where(vendor_id: @current_vendor.id).order(updated_at: :desc).first
+    # 🔥 Always find vendor's active tier
+    vendor_tier = VendorTier.find_by(vendor_id: @current_vendor.id)
   
     if vendor_tier
-      # Update the vendor's existing tier entry
+      # ✅ Update the existing entry
       if vendor_tier.update(tier_id: tier.id, duration_months: tier_duration)
         render json: vendor_tier, serializer: VendorTierSerializer, status: :ok
       else
         render json: { error: 'Tier update failed', details: vendor_tier.errors.full_messages }, status: :unprocessable_entity
       end
     else
-      # Create a new entry if none exists
-      new_vendor_tier = VendorTier.new(vendor_id: @current_vendor.id, tier_id: tier.id, duration_months: tier_duration)
-      if new_vendor_tier.save
-        render json: new_vendor_tier, serializer: VendorTierSerializer, status: :created
-      else
-        render json: { error: 'Failed to create new tier', details: new_vendor_tier.errors.full_messages }, status: :unprocessable_entity
-      end
+      # 🚫 We should NOT create a new vendor_tier since each vendor should only have one
+      render json: { error: 'Vendor tier record not found' }, status: :not_found
     end
   end
-    
 
   private
 
