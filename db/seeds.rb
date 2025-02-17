@@ -224,7 +224,7 @@ end
 
 
 # Seed purchasers data
-50.times do
+300.times do
   Purchaser.find_or_create_by(email: nil) do |purchaser|
     fullname = Faker::Name.name
     username = fullname.downcase.gsub(/\s+/, "") # remove spaces and lowercase the name
@@ -1052,54 +1052,62 @@ puts "Seeding click_events and wish_lists..."
 
 # Click Events and Wish Lists seeding logic
 purchasers.each do |purchaser_id|
-  ad_sample = ads.sample(50) # Select a random sample of 50 ads for this purchaser
+  # Randomize number of ads (between 20 and 100 ads per purchaser)
+  num_ads = rand(20..100)
+  ad_sample = ads.sample(num_ads) # Select a random sample of ads for this purchaser
 
   ad_sample.each do |ad_id|
-    # Generate a random timestamp within the last  months (consistent for wish lists)
-    created_at_time = Faker::Time.between(from: 5.months.ago, to: Time.current)
+    # Generate a random number of events per ad for this purchaser (between 1 and 5 interactions)
+    num_clicks = rand(1..5)
+    
+    num_clicks.times do
+      # Generate a random timestamp within the last 5 months (consistent for wish lists)
+      created_at_time = Faker::Time.between(from: 5.months.ago, to: Time.current)
 
-    # Generate a separate randomized timestamp for Click Events (to keep them different)
-    click_event_time = Faker::Time.between(from: 5.months.ago, to: Time.current)
+      # Generate a separate randomized timestamp for Click Events (to keep them different)
+      click_event_time = Faker::Time.between(from: 5.months.ago, to: Time.current)
 
-    # Create 50 Ad-Click events with unique timestamps
-    ClickEvent.create!(
-      purchaser_id: purchaser_id,
-      ad_id: ad_id,
-      event_type: "Ad-Click",
-      metadata: nil,
-      created_at: click_event_time,
-      updated_at: click_event_time
-    )
+      # Create Click Event
+      ClickEvent.create!(
+        purchaser_id: purchaser_id,
+        ad_id: ad_id,
+        event_type: "Ad-Click",
+        metadata: nil,
+        created_at: click_event_time,
+        updated_at: click_event_time
+      )
 
-    # Create 50 Add-to-Wish-List events with wish list timestamps 
-    ClickEvent.create!(
-      purchaser_id: purchaser_id,
-      ad_id: ad_id,
-      event_type: "Add-to-Wish-List",
-      metadata: nil,
-      created_at: created_at_time,
-      updated_at: created_at_time
-    )
+      # Create Add-to-Wish-List Event with same timestamp
+      ClickEvent.create!(
+        purchaser_id: purchaser_id,
+        ad_id: ad_id,
+        event_type: "Add-to-Wish-List",
+        metadata: nil,
+        created_at: created_at_time,
+        updated_at: created_at_time
+      )
 
-    # Create 50 Reveal-Vendor-Details events with unique timestamps
-    ClickEvent.create!(
-      purchaser_id: purchaser_id,
-      ad_id: ad_id,
-      event_type: "Reveal-Vendor-Details",
-      metadata: nil,
-      created_at: click_event_time,
-      updated_at: click_event_time
-    )
+      # Create Reveal-Vendor-Details Event with click event time (can be different)
+      ClickEvent.create!(
+        purchaser_id: purchaser_id,
+        ad_id: ad_id,
+        event_type: "Reveal-Vendor-Details",
+        metadata: nil,
+        created_at: click_event_time,
+        updated_at: click_event_time
+      )
 
-    # Ensure wish_lists table mirrors Add-to-Wish-List events 
-    WishList.create!(
-      purchaser_id: purchaser_id,
-      ad_id: ad_id,
-      created_at: created_at_time,
-      updated_at: created_at_time
-    )
+      # Ensure wish_lists table mirrors Add-to-Wish-List events 
+      WishList.create!(
+        purchaser_id: purchaser_id,
+        ad_id: ad_id,
+        created_at: created_at_time,
+        updated_at: created_at_time
+      )
+    end
   end
 end
+
 
 
 puts "Seeding completed successfully!"
@@ -1109,7 +1117,7 @@ Ad.all.each do |ad|
   20.times do
     purchaser = Purchaser.all.sample
     rating = Faker::Number.between(from: 1, to: 5)
-    review_text = Faker::Lorem.sentence(word_count: Faker::Number.between(from: 5, to: 15))
+    review_text = Faker::Lorem.sentence(word_count: Faker::Number.between(from: 5, to: 10))
 
     Review.create!(
       ad_id: ad.id,
