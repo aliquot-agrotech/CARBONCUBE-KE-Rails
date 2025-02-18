@@ -50,21 +50,21 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_16_085516) do
 
   create_table "wishlists", force: :cascade do |t|
     t.bigint "purchaser_id", null: false
-    t.bigint "product_id", null: false
+    t.bigint "ad_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["product_id"], name: "index_wishlists_on_product_id"
+    t.index ["ad_id"], name: "index_wishlists_on_ad_id"
     t.index ["purchaser_id"], name: "index_wishlists_on_purchaser_id"
   end
 
   create_table "cart_items", force: :cascade do |t|
     t.bigint "purchaser_id", null: false
-    t.bigint "product_id", null: false
+    t.bigint "ad_id", null: false
     t.integer "quantity", default: 1, null: false
     t.decimal "price", precision: 10, scale: 2, default: "0.0", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["product_id"], name: "index_cart_items_on_product_id"
+    t.index ["ad_id"], name: "index_cart_items_on_ad_id"
     t.index ["purchaser_id"], name: "index_cart_items_on_purchaser_id"
   end
 
@@ -129,14 +129,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_16_085516) do
 
   create_table "order_items", force: :cascade do |t|
     t.bigint "order_id", null: false
-    t.bigint "product_id", null: false
+    t.bigint "ad_id", null: false
     t.integer "quantity", default: 1, null: false
     t.decimal "price", precision: 10, scale: 2, default: "0.0", null: false
     t.decimal "total_price", precision: 10, scale: 2, default: "0.0", null: false
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.index ["order_id"], name: "index_order_items_on_order_id"
-    t.index ["product_id"], name: "index_order_items_on_product_id"
+    t.index ["ad_id"], name: "index_order_items_on_ad_id"
   end
 
   create_table "order_vendors", force: :cascade do |t|
@@ -160,7 +160,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_16_085516) do
     t.index ["purchaser_id"], name: "index_orders_on_purchaser_id"
   end
 
-  create_table "products", force: :cascade do |t|
+  create_table "ads", force: :cascade do |t|
     t.bigint "vendor_id", null: false
     t.bigint "category_id", null: false
     t.bigint "subcategory_id", null: false
@@ -179,11 +179,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_16_085516) do
     t.boolean "flagged", default: false
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.index ["category_id"], name: "index_products_on_category_id"
-    t.index ["description"], name: "index_products_on_description", opclass: :gin_trgm_ops, using: :gin
-    t.index ["subcategory_id"], name: "index_products_on_subcategory_id"
-    t.index ["title"], name: "index_products_on_title", opclass: :gin_trgm_ops, using: :gin
-    t.index ["vendor_id"], name: "index_products_on_vendor_id"
+    t.index ["category_id"], name: "index_ads_on_category_id"
+    t.index ["description"], name: "index_ads_on_description", opclass: :gin_trgm_ops, using: :gin
+    t.index ["subcategory_id"], name: "index_ads_on_subcategory_id"
+    t.index ["title"], name: "index_ads_on_title", opclass: :gin_trgm_ops, using: :gin
+    t.index ["vendor_id"], name: "index_ads_on_vendor_id"
   end
 
   create_table "promotions", force: :cascade do |t|
@@ -217,14 +217,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_16_085516) do
   end
 
   create_table "reviews", force: :cascade do |t|
-    t.bigint "product_id", null: false
+    t.bigint "ad_id", null: false
     t.bigint "purchaser_id", null: false
     t.integer "rating", limit: 2, null: false
     t.text "review"
     t.text "reply"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["product_id"], name: "index_reviews_on_product_id"
+    t.index ["ad_id"], name: "index_reviews_on_ad_id"
     t.index ["purchaser_id"], name: "index_reviews_on_purchaser_id"
   end
 
@@ -265,22 +265,22 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_16_085516) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "wishlists", "products"
+  add_foreign_key "wishlists", "ads"
   add_foreign_key "wishlists", "purchasers"
-  add_foreign_key "cart_items", "products"
+  add_foreign_key "cart_items", "ads"
   add_foreign_key "cart_items", "purchasers"
   add_foreign_key "conversations", "admins"
   add_foreign_key "conversations", "purchasers"
   add_foreign_key "conversations", "vendors"
   add_foreign_key "order_items", "orders"
-  add_foreign_key "order_items", "products"
+  add_foreign_key "order_items", "ads"
   add_foreign_key "order_vendors", "orders"
   add_foreign_key "order_vendors", "vendors"
   add_foreign_key "orders", "purchasers"
-  add_foreign_key "products", "categories"
-  add_foreign_key "products", "subcategories"
-  add_foreign_key "products", "vendors"
-  add_foreign_key "reviews", "products"
+  add_foreign_key "ads", "categories"
+  add_foreign_key "ads", "subcategories"
+  add_foreign_key "ads", "vendors"
+  add_foreign_key "reviews", "ads"
   add_foreign_key "reviews", "purchasers"
   add_foreign_key "shipments", "orders"
 end
