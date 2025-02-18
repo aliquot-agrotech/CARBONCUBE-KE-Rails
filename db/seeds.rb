@@ -224,7 +224,7 @@ end
 
 
 # Seed purchasers data
-300.times do
+100.times do
   Purchaser.find_or_create_by(email: nil) do |purchaser|
     fullname = Faker::Name.name
     username = fullname.downcase.gsub(/\s+/, "") # remove spaces and lowercase the name
@@ -1053,7 +1053,7 @@ puts "Seeding click_events and wish_lists..."
 # Click Events and Wish Lists seeding logic
 purchasers.each do |purchaser_id|
   # Randomize number of ads (between 20 and 100 ads per purchaser)
-  num_ads = rand(20..100)
+  num_ads = rand(20..50)
   ad_sample = ads.sample(num_ads) # Select a random sample of ads for this purchaser
 
   ad_sample.each do |ad_id|
