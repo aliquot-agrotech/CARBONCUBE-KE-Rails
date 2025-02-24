@@ -183,6 +183,7 @@ Rails.application.routes.draw do
         get 'related', to: 'ads#related'
         get 'vendor', to: 'ads#vendor'
       end
+      resources :reviews, only: [:create, :index] # Nested reviews under ads
     end
     
     resources :orders, only: [:index, :show, :create] do
