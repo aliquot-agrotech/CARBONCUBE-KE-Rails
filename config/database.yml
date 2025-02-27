@@ -2,23 +2,15 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  timeout: 50000
+  timeout: 5000
   sslmode: require
 
-
-# development: 
-#   <<: *default
-#   database: carboncube_ke_db
-#   username: carboncube_ke_db_owner
-#   password: <%= ENV['DATABASE_PASSWORD'] %>
-#   host: localhost
-
+development:
+  <<: *default
+  url: <%= ENV['DATABASE_URL'] %>
 
 production:
   <<: *default
   url: <%= ENV['DATABASE_URL'] %>
-  database: carboncube_ke_db
-  username: carboncube_ke_db_owner
-  password: <%= ENV['DATABASE_PASSWORD'] %>
   pool: 10        # Adjust connection pool size
   reaping_frequency: 10 # Auto-closes stale connections
