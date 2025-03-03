@@ -26,18 +26,20 @@
         @vendor = Vendor.new(vendor_params)
       
         # Log the parameters for debugging
-        puts vendor_params.inspect
+        Rails.logger.info "Vendor Signup Params: #{vendor_params.inspect}"
       
         if @vendor.save
+          # Assign Free Tier (tier_id: 1) automatically
+          VendorTier.create(vendor_id: @vendor.id, tier_id: 1, duration_months: 0) 
+      
           token = JsonWebToken.encode(vendor_id: @vendor.id, role: 'Vendor')
           render json: { token: token, vendor: @vendor }, status: :created
         else
           # Log errors if save fails
-          puts @vendor.errors.full_messages.inspect
+          Rails.logger.error "Vendor Signup Failed: #{@vendor.errors.full_messages.inspect}"
           render json: @vendor.errors, status: :unprocessable_entity
         end
-      end      
-      
+      end
   
       private
   
