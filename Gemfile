@@ -85,9 +85,11 @@ gem 'redis'
 # Use hiredis to get better performance than the "redis" gem
 gem 'hiredis'
 
-
 # Amazon Rekognition for image moderation
-gem 'aws-sdk-rekognition', '~> 1.111'
+# gem 'aws-sdk-rekognition', '~> 1.111'
+
+# Cloudinary for image hosting
+gem 'cloudinary'
 
 
 group :development, :test do
