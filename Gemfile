@@ -68,7 +68,7 @@ gem 'active_model_serializers'
 # gem "image_processing", "~> 1.2"
 
 # Password manager env
-gem 'dotenv-rails'
+gem 'dotenv-rails', groups: [:development, :test]
 
 # Search on postgresql
 gem 'pg_search'
