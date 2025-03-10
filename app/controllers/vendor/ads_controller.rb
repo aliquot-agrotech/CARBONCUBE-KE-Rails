@@ -12,18 +12,43 @@ class Vendor::AdsController < ApplicationController
   end
 
   def create
-    # Build the ad with the permitted parameters
+    # Check if images are included
+    if params[:ad][:media].present?
+      uploaded_urls = []
+  
+      # Create a temporary folder with a timestamp
+      temp_folder = Rails.root.join("tmp/uploads/#{Time.now.to_i}")
+      FileUtils.mkdir_p(temp_folder)
+  
+      # Iterate through each uploaded image
+      params[:ad][:media].each do |image|
+        # Save temporary file
+        temp_file_path = temp_folder.join(image.original_filename)
+        File.open(temp_file_path, "wb") { |file| file.write(image.read) }
+  
+        # Upload to Cloudinary with the preset
+        uploaded_image = Cloudinary::Uploader.upload(temp_file_path, upload_preset: ENV['UPLOAD_PRESET'])
+  
+        # Store the secure URL
+        uploaded_urls << uploaded_image["secure_url"]
+      end
+  
+      # Cleanup: Delete the temp folder after successful upload
+      FileUtils.rm_rf(temp_folder)
+  
+      # Add media URLs to ad_params before saving
+      params[:ad][:media] = uploaded_urls
+    end
+  
+    # Create the Ad
     @ad = current_vendor.ads.build(ad_params)
   
-    # Save the ad and return appropriate JSON response
     if @ad.save
       render json: @ad.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating]), status: :created
     else
       render json: @ad.errors, status: :unprocessable_entity
     end
-  end
-  
-
+  end  
 
   def update
     if params[:ad][:media].present?
