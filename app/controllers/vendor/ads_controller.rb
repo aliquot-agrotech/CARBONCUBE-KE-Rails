@@ -2,8 +2,10 @@ class Vendor::AdsController < ApplicationController
   before_action :authenticate_vendor
   before_action :set_ad, only: [:show, :update, :destroy]
 
+  require "image_processing/vips"
+
   def index
-    @ads = current_vendor.ads.includes(:category, :reviews) # Ensure category and reviews are included
+    @ads = current_vendor.ads.includes(:category, :reviews)
     render json: @ads.to_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating])
   end
 
@@ -12,37 +14,9 @@ class Vendor::AdsController < ApplicationController
   end
 
   def create
-    # Check if images are included
-    if params[:ad][:media].present?
-      uploaded_urls = []
-  
-      # Create a temporary folder with a timestamp
-      temp_folder = Rails.root.join("tmp/uploads/#{Time.now.to_i}")
-      FileUtils.mkdir_p(temp_folder)
-  
-      # Iterate through each uploaded image
-      params[:ad][:media].each do |image|
-        # Save temporary file
-        temp_file_path = temp_folder.join(image.original_filename)
-        File.open(temp_file_path, "wb") { |file| file.write(image.read) }
-  
-        # Upload to Cloudinary with the preset
-        uploaded_image = Cloudinary::Uploader.upload(temp_file_path, upload_preset: ENV['UPLOAD_PRESET'])
-  
-        # Store the secure URL
-        uploaded_urls << uploaded_image["secure_url"]
-      end
-  
-      # Cleanup: Delete the temp folder after successful upload
-      FileUtils.rm_rf(temp_folder)
-  
-      # Add media URLs to ad_params before saving
-      params[:ad][:media] = uploaded_urls
-    end
-  
-    # Create the Ad
+    params[:ad][:media] = process_and_upload_images(params[:ad][:media]) if params[:ad][:media].present?
+    
     @ad = current_vendor.ads.build(ad_params)
-  
     if @ad.save
       render json: @ad.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating]), status: :created
     else
@@ -52,19 +26,15 @@ class Vendor::AdsController < ApplicationController
 
   def update
     if params[:ad][:media].present?
-      media = params[:ad][:media].is_a?(Array) ? params[:ad][:media] : [params[:ad][:media]]
-      @ad.media = media
+      params[:ad][:media] = process_and_upload_images(params[:ad][:media])
     end
-  
+
     if @ad.update(ad_params)
       render json: @ad.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating])
     else
       render json: @ad.errors, status: :unprocessable_entity
     end
   end
-  
-  
-
 
   def destroy
     @ad.destroy
@@ -73,7 +43,6 @@ class Vendor::AdsController < ApplicationController
 
   private
 
-  # app/controllers/vendor/ads_controller.rb
   def authenticate_vendor
     @current_user = VendorAuthorizeApiRequest.new(request.headers).result
     unless @current_user && @current_user.is_a?(Vendor)
@@ -81,22 +50,16 @@ class Vendor::AdsController < ApplicationController
     end
   end
 
-
   def current_vendor
     @current_user
   end
 
   def set_ad
     @vendor = current_vendor
-    if @vendor.nil?
-      render json: { error: 'Vendor not found' }, status: :not_found
-      return
-    end
+    return render json: { error: 'Vendor not found' }, status: :not_found unless @vendor
 
     @ad = @vendor.ads.find_by(id: params[:id])
-    unless @ad
-      render json: { error: 'Ad not found' }, status: :not_found
-    end
+    render json: { error: 'Ad not found' }, status: :not_found unless @ad
   end
 
   def ad_params
@@ -107,4 +70,41 @@ class Vendor::AdsController < ApplicationController
       media: [] # Allow an array of media
     )
   end
+
+  # Converts images to WebP and uploads them to Cloudinary
+  def process_and_upload_images(images)
+    uploaded_urls = []
+    temp_folder = Rails.root.join("tmp/uploads/#{Time.now.to_i}")
+    FileUtils.mkdir_p(temp_folder)
+  
+    Array(images).each do |image|
+      temp_file_path = temp_folder.join(image.original_filename)
+      File.open(temp_file_path, "wb") { |file| file.write(image.read) }
+  
+      # Resize & Convert to WebP
+      optimized_webp_path = optimize_and_convert_to_webp(temp_file_path)
+  
+      # Upload optimized WebP image
+      uploaded_image = Cloudinary::Uploader.upload(optimized_webp_path, upload_preset: ENV['UPLOAD_PRESET'])
+      
+      uploaded_urls << uploaded_image["secure_url"]
+    end
+  
+    FileUtils.rm_rf(temp_folder) # Cleanup temp folder
+    uploaded_urls
+  end
+  
+  # Optimize image size and convert to WebP using ImageProcessing + Vips
+  def optimize_and_convert_to_webp(image_path)
+    webp_path = image_path.sub(/\.\w+$/, ".webp")
+  
+    ImageProcessing::Vips
+      .source(image_path)
+      .resize_to_limit(1080, nil) # Resize width to 1080px (height auto-adjusts)
+      .convert("webp")
+      .saver(quality: 70) # Set WebP compression quality
+      .call(destination: webp_path)
+  
+    webp_path
+  end  
 end
