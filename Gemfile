@@ -69,7 +69,7 @@ gem "image_processing", "~> 1.2"
 gem "vips"
 
 # Password manager env
-gem 'dotenv-rails', groups: [:development, :test], groups: [:development, :test, :production]
+gem 'dotenv-rails', groups: [:development, :test, :production]
 
 # Search on postgresql
 gem 'pg_search'
