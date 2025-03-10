@@ -158,7 +158,11 @@ GEM
     jbuilder (2.13.0)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
+<<<<<<< HEAD
     json (2.10.1)
+=======
+    json (2.10.1)
+>>>>>>> 31475d9 (Adds new gems)
     jsonapi-renderer (0.2.2)
     jwt (2.9.3)
       base64
@@ -206,6 +210,10 @@ GEM
     nokogiri (1.16.7-x86_64-linux)
       racc (~> 1.4)
     ostruct (0.6.1)
+<<<<<<< HEAD
+    ostruct (0.6.1)
+=======
+>>>>>>> 31475d9 (Adds new gems)
     pg (1.5.9)
     pg_search (2.3.7)
       activerecord (>= 6.1)
