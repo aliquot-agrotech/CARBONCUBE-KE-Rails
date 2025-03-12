@@ -203,5 +203,7 @@ Rails.application.routes.draw do
     resources :orders
     post 'signup', to: 'riders#create'
   end
+  #========================================== End of Rider namespace for purchaser-specific functionality=========================================#
+
   mount ActionCable.server => '/cable'
 end
