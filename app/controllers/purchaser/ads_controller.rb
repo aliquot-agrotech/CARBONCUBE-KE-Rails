@@ -2,15 +2,23 @@
 class Purchaser::AdsController < ApplicationController
   before_action :set_ad, only: [:show, :vendor, :related]
 
-  # GET /purchaser/ads
-  def index
-    @ads = Ad.joins(:vendor)
-                      .where(vendors: { blocked: false })
-                      .where(flagged: false) # Exclude flagged ads
-    filter_by_category if params[:category_id].present?
-    filter_by_subcategory if params[:subcategory_id].present? # New subcategory filtering
-    render json: @ads, each_serializer: AdSerializer
-  end
+# GET /purchaser/ads
+def index
+  @ads = Ad.joins(:vendor)
+          .where(vendors: { blocked: false })
+          .where(flagged: false) # Exclude flagged ads
+
+  filter_by_category if params[:category_id].present?
+  filter_by_subcategory if params[:subcategory_id].present? # New subcategory filtering
+
+  # Pagination
+  per_page = 50 # Number of records per page
+  page = params[:page].to_i.positive? ? params[:page].to_i : 1 # Default to page 1 if not provided
+
+  @ads = @ads.limit(per_page).offset((page - 1) * per_page)
+
+  render json: @ads, each_serializer: AdSerializer
+end
 
   # GET /purchaser/ads/:id
   def show

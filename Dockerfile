@@ -1,17 +1,22 @@
-# Use Ruby 3.3.6 official image as base
+# Use an official Ruby runtime as the base image
 FROM ruby:3.3.6
 
-# Set working directory
+# Install dependencies
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs libvips
+
+# Set the working directory in the container
 WORKDIR /app
 
-# Install dependencies
+# Copy Gemfile and Gemfile.lock
 COPY Gemfile Gemfile.lock ./
+
+# Install gems
 RUN bundle install
 
-# Copy application files
+# Copy the rest of the application code
 COPY . .
 
-# Expose the port for Rails
+# Expose the port the app runs on
 EXPOSE 3001
 
 # Start the Rails server
