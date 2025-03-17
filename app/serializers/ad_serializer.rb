@@ -9,11 +9,11 @@ class AdSerializer < ActiveModel::Serializer
   has_many :reviews
 
   def media_urls
-    object.media.map { |m| m.url } # ✅ Ensure media_urls contains only URLs
+    object.media # ✅ Directly return the array of URLs
   end
 
   def first_media_url
-    object.media.first&.url # ✅ Get the first image URL safely
+    object.media.first # ✅ Return the first URL directly
   end
 
   def vendor_name
