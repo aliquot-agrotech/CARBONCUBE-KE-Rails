@@ -9,11 +9,11 @@ class AdSerializer < ActiveModel::Serializer
   has_many :reviews
 
   def media_urls
-    object.media
+    object.media.map { |m| m.url } # ✅ Ensure media_urls contains only URLs
   end
 
   def first_media_url
-    object.media.first.try(:url)
+    object.media.first&.url # ✅ Get the first image URL safely
   end
 
   def vendor_name
@@ -21,13 +21,11 @@ class AdSerializer < ActiveModel::Serializer
   end
 
   def vendor_tier
-    # Fetch the tier ID for the vendor using vendor_tier
     vendor_tier = object.vendor.vendor_tier
     vendor_tier ? vendor_tier.tier_id : nil
   end
 
   def tier_name
-    # Fetch the tier name for the vendor using the associated tier
     vendor_tier = object.vendor.vendor_tier
     vendor_tier&.tier&.name || 'Unknown'
   end
