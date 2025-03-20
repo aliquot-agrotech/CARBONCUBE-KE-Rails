@@ -88,10 +88,12 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   # Enable DNS rebinding protection and other `Host` header attacks.
-  config.hosts = [
-    "carboncube-ke.com",     # Allow requests from example.com
-    /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
-  ]
+  config.hosts << "carboncube-ke.com"
+  config.hosts << "www.carboncube-ke.com"
+  config.hosts << "backend"
+  config.hosts << "localhost"
+  config.hosts.clear # Allow all hosts (only for debugging)
+
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 

@@ -24,11 +24,11 @@ module CARBONCUBE_KE_Rails
     config.time_zone = 'Africa/Nairobi' # Example for EAT time zone
     config.active_record.default_timezone = :local
     # config.eager_load_paths << Rails.root.join("extras")
-
+    
     # CORS configuration
     config.middleware.insert_before 0, Rack::Cors do
       allow do
-        origins 'https://carboncube-ke.vercel.app', 'http://localhost:3000' # Adjust the origin as needed
+        origins 'https://carboncube-ke.vercel.app', 'http://localhost:3000', '*' # Adjust the origin as needed
         resource '*',
           headers: :any,
           methods: [:get, :post, :put, :patch, :delete, :options, :head],
