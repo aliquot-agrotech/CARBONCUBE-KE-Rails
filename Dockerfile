@@ -2,7 +2,7 @@
 FROM ruby:3.3.6
 
 # Install dependencies
-RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs libvips
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs libvips python3 python3-pip python3-opencv
 
 # Set the working directory in the container
 WORKDIR /app
