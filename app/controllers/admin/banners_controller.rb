@@ -63,30 +63,28 @@ class Admin::BannersController < ApplicationController
   end
 
   # Converts images to WebP and uploads them to Cloudinary
-  # Converts images to WebP and uploads them to Cloudinary
-def process_and_upload_images(images)
-  uploaded_urls = []
-  temp_folder = Rails.root.join("tmp/uploads/banners").to_s  # Ensure it's a string
-  FileUtils.mkdir_p(temp_folder)
+  def process_and_upload_images(images)
+    uploaded_urls = []
+    temp_folder = Rails.root.join("tmp/uploads/banners").to_s  # Ensure it's a string
+    FileUtils.mkdir_p(temp_folder)
 
-  Array(images).each do |image|
-    temp_file_path = File.join(temp_folder, image.original_filename)  # Convert Pathname to String
-    File.open(temp_file_path, "wb") { |file| file.write(image.read) }
+    Array(images).each do |image|
+      temp_file_path = File.join(temp_folder, image.original_filename)  # Convert Pathname to String
+      File.open(temp_file_path, "wb") { |file| file.write(image.read) }
 
-    # Convert to WebP
-    optimized_webp_path = optimize_and_convert_to_webp(temp_file_path.to_s)  # Ensure string
+      # Convert to WebP
+      optimized_webp_path = optimize_and_convert_to_webp(temp_file_path.to_s)  # Ensure string
 
-    # Upload to Cloudinary
-    uploaded_image = Cloudinary::Uploader.upload(optimized_webp_path, upload_preset: ENV['UPLOAD_PRESET'])
-    uploaded_urls << uploaded_image["secure_url"]
-  rescue => e
-    Rails.logger.error("Failed to process image #{image.original_filename}: #{e.message}")
+      # Upload to Cloudinary
+      uploaded_image = Cloudinary::Uploader.upload(optimized_webp_path, upload_preset: ENV['UPLOAD_PRESET'])
+      uploaded_urls << uploaded_image["secure_url"]
+    rescue => e
+      Rails.logger.error("Failed to process image #{image.original_filename}: #{e.message}")
+    end
+
+    FileUtils.rm_rf(temp_folder) # Cleanup temp folder
+    uploaded_urls
   end
-
-  FileUtils.rm_rf(temp_folder) # Cleanup temp folder
-  uploaded_urls
-end
-
 
   # Optimize image size and convert to WebP using ImageProcessing + Vips
   def optimize_and_convert_to_webp(image_path)
