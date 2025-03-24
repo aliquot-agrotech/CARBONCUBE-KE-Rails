@@ -96,6 +96,7 @@ class Vendor::AdsController < ApplicationController
   
   # Optimize image size and convert to WebP using ImageProcessing + Vips
   def optimize_and_convert_to_webp(image_path)
+    image_path = image_path.to_s # Ensure it's a string
     webp_path = image_path.sub(/\.\w+$/, ".webp")
   
     ImageProcessing::Vips
