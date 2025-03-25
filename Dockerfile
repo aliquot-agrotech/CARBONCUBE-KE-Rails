@@ -16,6 +16,12 @@ RUN bundle install
 # Copy the rest of the application code
 COPY . .
 
+# 🔹 Copy Python scripts into the container
+COPY scripts/ /app/scripts/
+
+# Ensure Python scripts are executable
+RUN chmod +x /app/scripts/*.py  
+
 # Expose the port the app runs on
 EXPOSE 3001
 

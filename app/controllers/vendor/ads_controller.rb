@@ -77,21 +77,58 @@ class Vendor::AdsController < ApplicationController
     temp_folder = Rails.root.join("tmp/uploads/#{Time.now.to_i}")
     FileUtils.mkdir_p(temp_folder)
   
-    Array(images).each do |image|
-      temp_file_path = temp_folder.join(image.original_filename)
-      File.open(temp_file_path, "wb") { |file| file.write(image.read) }
+    threads = Array(images).map do |image|
+      Thread.new do
+        begin
+          temp_file_path = temp_folder.join(image.original_filename)
+          File.binwrite(temp_file_path, image.read) # Faster than File.open
   
-      # Resize & Convert to WebP
-      optimized_webp_path = optimize_and_convert_to_webp(temp_file_path)
+          # 🔹 Check sharpness before processing
+          if !sharp_enough?(temp_file_path)
+            Rails.logger.info "📸 Image is blurry: #{temp_file_path}. Sharpening..."
+            sharpen_image(temp_file_path)
+          end
   
-      # Upload optimized WebP image
-      uploaded_image = Cloudinary::Uploader.upload(optimized_webp_path, upload_preset: ENV['UPLOAD_PRESET'])
-      
-      uploaded_urls << uploaded_image["secure_url"]
+          # Resize & Convert to WebP
+          optimized_webp_path = optimize_and_convert_to_webp(temp_file_path)
+          Rails.logger.info "📂 Optimized and converted to WebP: #{optimized_webp_path}"
+  
+          # Upload optimized WebP image in parallel
+          upload_thread = Thread.new do
+            uploaded_image = Cloudinary::Uploader.upload(optimized_webp_path, upload_preset: ENV['UPLOAD_PRESET'])
+            Rails.logger.info "🚀 Uploaded to Cloudinary: #{uploaded_image['secure_url']}"
+            uploaded_image["secure_url"]
+          end
+  
+          uploaded_urls << upload_thread.value # Wait for upload to finish
+        rescue => e
+          Rails.logger.error "❌ Error processing image: #{e.message}"
+        end
+      end
     end
   
+    threads.each(&:join) # Wait for all threads to finish
     FileUtils.rm_rf(temp_folder) # Cleanup temp folder
+    Rails.logger.info "🗑️ Temp folder removed: #{temp_folder}"
+  
     uploaded_urls
+  end
+  
+
+  # Python sharpness check with logging
+  def sharp_enough?(image_path)
+    script_path = Rails.root.join("scripts/check_sharpness.py")
+    result = `python3 "#{script_path}" "#{image_path}"`.strip  # Ensure paths are quoted
+    Rails.logger.info "📸 Checking sharpness for: #{image_path} - Result: #{result}"
+    result == "Sharp"  # Expect script to return 'Sharp' or 'Blurry'
+  end
+
+  # Python sharpening function with logging
+  def sharpen_image(image_path)
+    script_path = Rails.root.join("scripts/sharpen_image.py")
+    Rails.logger.info "🛠️ Sharpening image: #{image_path} before upload..."
+    `python3 "#{script_path}" "#{image_path}"`  # Ensure paths are quoted
+    Rails.logger.info "✅ Image sharpened: #{image_path}"
   end
   
   # Optimize image size and convert to WebP using ImageProcessing + Vips
