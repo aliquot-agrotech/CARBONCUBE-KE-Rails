@@ -83,6 +83,9 @@ gem 'faker'
 # Redis
 gem 'redis'
 
+# Parallel for image processing
+gem 'parallel'
+
 # Use hiredis to get better performance than the "redis" gem
 gem 'hiredis'
 

@@ -209,6 +209,7 @@ GEM
     nokogiri (1.18.3-x86_64-linux-musl)
       racc (~> 1.4)
     ostruct (0.6.1)
+    parallel (1.26.3)
     pg (1.5.9)
     pg_search (2.3.7)
       activerecord (>= 6.1)
@@ -343,6 +344,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   jwt
+  parallel
   pg
   pg_search
   psych (~> 5.1.0)
