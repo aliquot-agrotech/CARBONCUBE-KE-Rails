@@ -71,6 +71,9 @@ gem "vips"
 # Password manager env
 gem 'dotenv-rails', groups: [:development, :test, :production]
 
+# Gem fot httparty requests
+gem 'httparty'
+
 # Search on postgresql
 gem 'pg_search'
 
