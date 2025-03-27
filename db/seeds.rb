@@ -169,6 +169,79 @@ pricing_data.each do |tier, prices|
 end
 
 
+# Counties and Sub-Counties data
+# counties_data = [
+#   {
+#     name: "Baringo",
+#     capital: "Kabarnet",
+#     code: 30,
+#     sub_counties: [
+#       { name: "Baringo Central", code: 3001 },
+#       { name: "Baringo North", code: 3002 },
+#       { name: "Baringo South", code: 3003 },
+#       { name: "Eldama Ravine", code: 3004 },
+#       { name: "Mogotio", code: 3005 },
+#       { name: "Tiaty", code: 3006 }
+#     ]
+#   }
+#     { name: "Bomet", capital: "Bomet", county_code: 36, sub_counties: ["Bomet Central", "Bomet East", "Chepalungu", "Konoin", "Sotik"] },  
+#   { name: "Bungoma", capital: "Bungoma", county_code: 39, sub_counties: ["Bumula", "Kabuchai", "Kanduyi", "Kimilil", "Mt Elgon", "Sirisia", "Tongaren", "Webuye East", "Webuye West"] },
+#   { name: "Busia", capital: "Busia", county_code: 40, sub_counties: ["Budalangi", "Butula", "Funyula", "Nambele", "Teso North", "Teso South"] },  
+#   { name: "Elgeyo-Marakwet", capital: "Iten", county_code: 28, sub_counties: ["Keiyo North", "Keiyo South", "Marakwet East", "Marakwet West"] },  
+#   { name: "Embu", capital: "Embu", county_code: 14, sub_counties: ["Manyatta", "Mbeere North", "Mbeere South", "Runyenjes"] },  
+#   { name: "Garissa", capital: "Garissa", county_code: 7, sub_counties: ["Daadab", "Fafi", "Garissa", "Hulugho", "Ijara", "Lagdera Balambala"] },  
+#   { name: "Homa Bay", capital: "Homa Bay", county_code: 43, sub_counties: ["Homabay town", "Kabondo", "Karachwonyo", "Kasipul", "Mbita", "Ndhiwa", "Rangwe", "Suba"] },  
+#   { name: "Isiolo", capital: "Isiolo", county_code: 11, sub_counties: ["Isiolo", "Garba Tula", "Merit"] },  
+#   { name: "Kajiado", capital: "Kajiado", county_code: 34, sub_counties: ["Isinya", "Kajiado Central", "Kajiado North", "Loitokitok", "Mashuuru"] },  
+#   { name: "Kakamega", capital: "Kakamega", county_code: 37, sub_counties: ["Butere", "Kakamega Central", "Kakamega East", "Kakamega North", "Kakamega South", "Khwisero", "Lugari", "Lukuyani", "Lurambi", "Matete", "Mumias", "Mutungu", "Navakholo"] },  
+#   { name: "Kericho", capital: "Kericho", county_code: 35, sub_counties: ["Ainamoi", "Belgut", "Bureti", "Kipkelion East", "Kipkelion West", "Soin Sigowet"] },  
+#   { name: "Kiambu", capital: "Kiambu", county_code: 22, sub_counties: ["Gatundu North", "Gatundu South", "Githunguri", "Juja", "Kabete", "Kiambaa", "Kiambu", "Kikuyu", "Limuru", "Ruiru", "Thika Town", "Lari"] },  
+#   { name: "Kilifi", capital: "Kilifi", county_code: 3, sub_counties: ["Genzw", "Kaloleni", "Kilifi North", "Kilifi South", "Magarini", "Malindi", "Rabai"] },  
+#   { name: "Kirinyaga", capital: "Kutus", county_code: 20, sub_counties: ["Kirinyaga Central", "Kirinyaga East", "Kirinyaga West", "Mwea East", "Mwea West"] },  
+#   { name: "Kisii", capital: "Kisii", county_code: 45, sub_counties: ["Kisii Central", "Kitutu Chache North", "Kitutu Chache South", "Bonchari", "South Mugirango", "Nyaribari Chache", "Nyaribari Masaba", "Bobasi", "Bomachoge Borabu"] },  
+#   { name: "Kisumu", capital: "Kisumu", county_code: 42, sub_counties: ["Kisumu Central", "Kisumu East", "Kisumu West", "Mohoroni", "Nyakach", "Nyando", "Seme"] },  
+#   { name: "Kitui", capital: "Kitui", county_code: 15, sub_counties: ["Ikutha", "Katulani", "Kisasi", "Kitui Central", "Kitui West", "Lower Yatta", "Matiyani", "Migwani", "Mutitu", "Mutomo", "Muumonikyusu", "Mwingi Central", "Mwingi East", "Nzambani", "Tseikuru"] },  
+#   { name: "Kwale", capital: "Kwale", county_code: 2, sub_counties: ["Kinango", "Lungalunga", "Msambweni", "Mutuga"] },  
+#   { name: "Laikipia", capital: "Rumuruti", county_code: 31, sub_counties: ["Laikipia Central", "Laikipia East", "Laikipia North", "Laikipia West", "Nyahururu"] },  
+#   { name: "Lamu", capital: "Lamu", county_code: 5, sub_counties: ["Lamu East", "Lamu West"] },  
+#   { name: "Machakos", capital: "Machakos", county_code: 16, sub_counties: ["Kathiani", "Machakos town", "Masinga", "Matungulu", "Mavoko", "Mwala", "Yatta"] },  
+#   { name: "Makueni", capital: "Wote", county_code: 17, sub_counties: ["Kaiti", "Kibwei West", "Kibwezi East", "Kilome", "Makueni", "Mbooni"] },  
+#   { name: "Mandera", capital: "Mandera", county_code: 9, sub_counties: ["Banissa", "Lafey", "Mandera East", "Mandera North", "Mandera South", "Mandera West"] },  
+#   { name: "Marsabit", capital: "Marsabit", county_code: 10, sub_counties: ["Laisamis", "Moyale", "North Horr", "Saku"] },  
+#   { name: "Meru", capital: "Meru", county_code: 12, sub_counties: ["Buuri", "Igembe Central", "Igembe North", "Igembe South", "Imenti Central", "Imenti North", "Imenti South", "Tigania East", "Tigania West"] },  
+#   { name: "Migori", capital: "Migori", county_code: 44, sub_counties: ["Awendo", "Kuria East", "Kuria West", "Mabera", "Ntimaru", "Rongo", "Suna East", "Suna West", "Uriri"] },  
+#   { name: "Mombasa", capital: "Mombasa City", county_code: 1, sub_counties: ["Changamwe", "Jomvu", "Kisauni", "Likoni", "Mvita", "Nyali"] },  
+#   { name: "Murang'a", capital: "Murang'a", county_code: 21, sub_counties: ["Gatanga", "Kahuro", "Kandara", "Kangema", "Kigumo", "Kiharu", "Mathioya", "Murang’a South"] },  
+#   { name: "Nairobi", capital: "Nairobi City", county_code: 47, sub_counties: ["Dagoretti North", "Dagoretti South", "Embakasi Central", "Embakasi East", "Embakasi North", "Embakasi South", "Embakasi West", "Kamukunji", "Kasarani", "Kibra", "Lang'ata", "Makadara", "Mathare", "Roysambu", "Ruaraka", "Starehe", "Westlands"] },  
+#   { name: "Nakuru", capital: "Nakuru", county_code: 32, sub_counties: ["Bahati", "Gilgil", "Kuresoi North", "Kuresoi South", "Molo", "Naivasha", "Nakuru Town East", "Nakuru Town West", "Njoro", "Rongai", "Subukia"] },  
+#   { name: "Nandi", capital: "Kapsabet", county_code: 29, sub_counties: ["Aldai", "Chesumei", "Emgwen", "Mosop", "Nandi Hills", "Tindiret"] },  
+#   { name: "Narok", capital: "Narok", county_code: 33, sub_counties: ["Narok East", "Narok North", "Narok South", "Narok West", "Transmara East", "Transmara West"] },  
+#   { name: "Nyamira", capital: "Nyamira", county_code: 46, sub_counties: ["Borabu", "Manga", "Masaba North", "Nyamira North", "Nyamira South"] },  
+#   { name: "Nyandarua", capital: "Ol Kalou", county_code: 18, sub_counties: ["Kinangop", "Kipipiri", "Ndaragwa", "Ol Kalou", "Ol Joro Orok"] },  
+#   { name: "Nyeri", capital: "Nyeri", county_code: 19, sub_counties: ["Kieni East", "Kieni West", "Mathira East", "Mathira West", "Mkurweni", "Nyeri town", "Othaya", "Tetu"] },  
+#   { name: "Samburu", capital: "Maralal", county_code: 25, sub_counties: ["Samburu East", "Samburu North", "Samburu West"] },  
+#   { name: "Siaya", capital: "Siaya", county_code: 41, sub_counties: ["Alego Usonga", "Bondo", "Gem", "Rarieda", "Ugenya", "Unguja"] },  
+#   { name: "Taita-Taveta", capital: "Voi", county_code: 6, sub_counties: ["Mwatate", "Taveta", "Voi", "Wundanyi"] },  
+#   { name: "Tana River", capital: "Hola", county_code: 4, sub_counties: ["Bura", "Galole", "Garsen"] },  
+#   { name: "Tharaka-Nithi", capital: "Chuka", county_code: 13, sub_counties: ["Chuka", "Igambangobe", "Maara", "Muthambi", "Tharaka North", "Tharaka South"] },  
+#   { name: "Trans-Nzoia", capital: "Kitale", county_code: 26, sub_counties: ["Cherangany", "Endebess", "Kiminini", "Kwanza", "Saboti"] },  
+#   { name: "Turkana", capital: "Lodwar", county_code: 23, sub_counties: ["Loima", "Turkana Central", "Turkana East", "Turkana North", "Turkana South"] },  
+#   { name: "Uasin Gishu", capital: "Eldoret", county_code: 27, sub_counties: ["Ainabkoi", "Kapseret", "Kesses", "Moiben", "Soy", "Turbo"] },  
+#   { name: "Vihiga", capital: "Vihiga", county_code: 38, sub_counties: ["Emuhaya", "Hamisi", "Luanda", "Sabatia", "Vihiga"] },  
+#   { name: "Wajir", capital: "Wajir", county_code: 8, sub_counties: ["Eldas", "Tarbaj", "Wajir East", "Wajir North", "Wajir South", "Wajir West"] },  
+#   { name: "West Pokot", capital: "Kapenguria", county_code: 24, sub_counties: ["Central Pokot", "North Pokot", "Pokot South", "West Pokot"] }  
+# ]
+
+# counties_data.each do |county_data|
+#   county = County.find_or_create_by(name: county_data[:name], county_code: county_data[:county_code]) do |c|
+#     c.capital = county_data[:capital]
+#   end
+
+#   county_data[:sub_counties].each do |sub_county_name|
+#     SubCounty.find_or_create_by(name: sub_county_name, county: county)
+#   end
+# end
+
 
 # Set to keep track of used phone numbers
 used_phone_numbers = Set.new

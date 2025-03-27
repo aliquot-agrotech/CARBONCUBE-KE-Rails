@@ -15,7 +15,11 @@ class Vendor < ApplicationRecord
   has_one :category, through: :categories_vendor
   has_one :vendor_tier
   has_one :tier, through: :vendor_tier
+  belongs_to :county
+  belongs_to :sub_county
 
+  validates :county_id, presence: true
+  validates :sub_county_id, presence: true
   validates :fullname, presence: true
   validates :phone_number, presence: true
   validates :email, presence: true, uniqueness: true
