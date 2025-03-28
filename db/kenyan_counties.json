@@ -457,10 +457,9 @@
         "county_code": 46,
         "sub_counties": [
             { "name": "Borabu", "sub_county_code": 273 },
-            { "name": "Manga", "sub_county_code": 46002 },
-            { "name": "Masaba North", "sub_county_code": 46003 },
-            { "name": "Nyamira North", "sub_county_code": 46004 },
-            { "name": "Nyamira South", "sub_county_code": 46005 }
+            { "name": "Kitutu Masaba", "sub_county_code": 270 },
+            { "name": "Mugirango North", "sub_county_code": 272 },
+            { "name": "Mugirango West", "sub_county_code": 271 }
         ]
     },
     {
@@ -468,11 +467,11 @@
         "capital": "Ol Kalou",
         "county_code": 18,
         "sub_counties": [
-            { "name": "Kinangop", "sub_county_code": 18001 },
-            { "name": "Kipipiri", "sub_county_code": 18002 },
-            { "name": "Ndaragwa", "sub_county_code": 18003 },
-            { "name": "Ol Kalou", "sub_county_code": 18004 },
-            { "name": "Ol Joro Orok", "sub_county_code": 18005 }
+            { "name": "Kinangop", "sub_county_code": 89 },
+            { "name": "Kipipiri", "sub_county_code": 90 },
+            { "name": "Ndaragwa", "sub_county_code": 93 },
+            { "name": "Ol Jorok", "sub_county_code": 92 },
+            { "name": "Ol Kalou", "sub_county_code": 91 }
         ]
     },    
     {
@@ -480,14 +479,12 @@
         "capital": "Nyeri",
         "county_code": 19,
         "sub_counties": [
-            { "name": "Kieni East", "sub_county_code": 19001 },
-            { "name": "Kieni West", "sub_county_code": 19002 },
-            { "name": "Mathira East", "sub_county_code": 19003 },
-            { "name": "Mathira West", "sub_county_code": 19004 },
-            { "name": "Mukurweini", "sub_county_code": 19005 },
-            { "name": "Nyeri Town", "sub_county_code": 19006 },
-            { "name": "Othaya", "sub_county_code": 19007 },
-            { "name": "Tetu", "sub_county_code": 19008 }
+            { "name": "Kieni", "sub_county_code": 95 },
+            { "name": "Mathira", "sub_county_code": 96 },
+            { "name": "Mukurweini", "sub_county_code": 98 },
+            { "name": "Nyeri Town", "sub_county_code": 99 },
+            { "name": "Othaya", "sub_county_code": 97 },
+            { "name": "Tetu", "sub_county_code": 94 }
         ]
     },
     {
@@ -495,9 +492,9 @@
         "capital": "Maralal",
         "county_code": 25,
         "sub_counties": [
-            { "name": "Samburu East", "sub_county_code": 25001 },
-            { "name": "Samburu North", "sub_county_code": 25002 },
-            { "name": "Samburu West", "sub_county_code": 25003 }
+            { "name": "Samburu East", "sub_county_code": 135 },
+            { "name": "Samburu North", "sub_county_code": 134 },
+            { "name": "Samburu West", "sub_county_code": 133 }
         ]
     },
     {
@@ -505,12 +502,12 @@
         "capital": "Siaya",
         "county_code": 41,
         "sub_counties": [
-            { "name": "Alego Usonga", "sub_county_code": 41001 },
-            { "name": "Bondo", "sub_county_code": 41002 },
-            { "name": "Gem", "sub_county_code": 41003 },
-            { "name": "Rarieda", "sub_county_code": 41004 },
-            { "name": "Ugenya", "sub_county_code": 41005 },
-            { "name": "Ugunja", "sub_county_code": 41006 }
+            { "name": "Alego Usonga", "sub_county_code": 234 },
+            { "name": "Bondo", "sub_county_code": 236 },
+            { "name": "Gem", "sub_county_code": 235 },
+            { "name": "Rarieda", "sub_county_code": 237 },
+            { "name": "Ugenya", "sub_county_code": 232 },
+            { "name": "Ugunja", "sub_county_code": 233 }
         ]
     },    
     {
@@ -518,10 +515,10 @@
         "capital": "Voi",
         "county_code": 6,
         "sub_counties": [
-            { "name": "Mwatate", "sub_county_code": 6001 },
-            { "name": "Taveta", "sub_county_code": 6002 },
-            { "name": "Voi", "sub_county_code": 6003 },
-            { "name": "Wundanyi", "sub_county_code": 6004 }
+            { "name": "Mwatate", "sub_county_code": 25 },
+            { "name": "Taveta", "sub_county_code": 23 },
+            { "name": "Voi", "sub_county_code": 26 },
+            { "name": "Wundanyi", "sub_county_code": 26 }
         ]
     },
     {
@@ -529,9 +526,9 @@
         "capital": "Hola",
         "county_code": 4,
         "sub_counties": [
-            { "name": "Bura", "sub_county_code": 4001 },
-            { "name": "Galole", "sub_county_code": 4002 },
-            { "name": "Garsen", "sub_county_code": 4003 }
+            { "name": "Bura", "sub_county_code": 20 },
+            { "name": "Galole", "sub_county_code": 19 },
+            { "name": "Garsen", "sub_county_code": 18 }
         ]
     },
     {
@@ -539,12 +536,9 @@
         "capital": "Chuka",
         "county_code": 13,
         "sub_counties": [
-            { "name": "Chuka", "sub_county_code": 13001 },
-            { "name": "Igambang'ombe", "sub_county_code": 13002 },
-            { "name": "Maara", "sub_county_code": 13003 },
-            { "name": "Muthambi", "sub_county_code": 13004 },
-            { "name": "Tharaka North", "sub_county_code": 13005 },
-            { "name": "Tharaka South", "sub_county_code": 13006 }
+            { "name": "Chuka/Igambang'ombe", "sub_county_code": 61 },
+            { "name": "Maara", "sub_county_code": 60 },
+            { "name": "Tharaka", "sub_county_code": 62 }
         ]
     },    
     {
@@ -552,11 +546,11 @@
         "capital": "Kitale",
         "county_code": 26,
         "sub_counties": [
-            { "name": "Cherangany", "sub_county_code": 26001 },
-            { "name": "Endebess", "sub_county_code": 26002 },
-            { "name": "Kiminini", "sub_county_code": 26003 },
-            { "name": "Kwanza", "sub_county_code": 26004 },
-            { "name": "Saboti", "sub_county_code": 26005 }
+            { "name": "Cherangany", "sub_county_code": 140 },
+            { "name": "Endebess", "sub_county_code": 137 },
+            { "name": "Kiminini", "sub_county_code": 139 },
+            { "name": "Kwanza", "sub_county_code": 136 },
+            { "name": "Saboti", "sub_county_code": 138 }
         ]
     },
     {
@@ -564,11 +558,12 @@
         "capital": "Lodwar",
         "county_code": 23,
         "sub_counties": [
-            { "name": "Loima", "sub_county_code": 23001 },
-            { "name": "Turkana Central", "sub_county_code": 23002 },
-            { "name": "Turkana East", "sub_county_code": 23003 },
-            { "name": "Turkana North", "sub_county_code": 23004 },
-            { "name": "Turkana South", "sub_county_code": 23005 }
+            { "name": "Loima", "sub_county_code": 126 },
+            { "name": "Turkana Central", "sub_county_code": 125 },
+            { "name": "Turkana East", "sub_county_code": 128 },
+            { "name": "Turkana North", "sub_county_code": 123 },
+            { "name": "Turkana South", "sub_county_code": 127 },
+            { "name": "Turkana West", "sub_county_code": 124 }
         ]
     },
     {
@@ -576,12 +571,12 @@
         "capital": "Eldoret",
         "county_code": 27,
         "sub_counties": [
-            { "name": "Ainabkoi", "sub_county_code": 27001 },
-            { "name": "Kapseret", "sub_county_code": 27002 },
-            { "name": "Kesses", "sub_county_code": 27003 },
-            { "name": "Moiben", "sub_county_code": 27004 },
-            { "name": "Soy", "sub_county_code": 27005 },
-            { "name": "Turbo", "sub_county_code": 27006 }
+            { "name": "Ainabkoi", "sub_county_code": 144 },
+            { "name": "Kapseret", "sub_county_code": 145 },
+            { "name": "Kesses", "sub_county_code": 146 },
+            { "name": "Moiben", "sub_county_code": 143 },
+            { "name": "Soy", "sub_county_code": 141 },
+            { "name": "Turbo", "sub_county_code": 142 }
         ]
     },    
     {
@@ -589,11 +584,11 @@
         "capital": "Vihiga",
         "county_code": 38,
         "sub_counties": [
-            { "name": "Emuhaya", "sub_county_code": 38001 },
-            { "name": "Hamisi", "sub_county_code": 38002 },
-            { "name": "Luanda", "sub_county_code": 38003 },
-            { "name": "Sabatia", "sub_county_code": 38004 },
-            { "name": "Vihiga", "sub_county_code": 38005 }
+            { "name": "Emuhaya", "sub_county_code": 215 },
+            { "name": "Hamisi", "sub_county_code": 213 },
+            { "name": "Luanda", "sub_county_code": 214 },
+            { "name": "Sabatia", "sub_county_code": 212 },
+            { "name": "Vihiga", "sub_county_code": 211 }
         ]
     },
     {
@@ -601,12 +596,12 @@
         "capital": "Wajir",
         "county_code": 8,
         "sub_counties": [
-            { "name": "Eldas", "sub_county_code": 8001 },
-            { "name": "Tarbaj", "sub_county_code": 8002 },
-            { "name": "Wajir East", "sub_county_code": 8003 },
-            { "name": "Wajir North", "sub_county_code": 8004 },
-            { "name": "Wajir South", "sub_county_code": 8005 },
-            { "name": "Wajir West", "sub_county_code": 8006 }
+            { "name": "Eldas", "sub_county_code": 37 },
+            { "name": "Tarbaj", "sub_county_code": 35 },
+            { "name": "Wajir East", "sub_county_code": 34 },
+            { "name": "Wajir North", "sub_county_code": 33 },
+            { "name": "Wajir South", "sub_county_code": 38 },
+            { "name": "Wajir West", "sub_county_code": 36 }
         ]
     },
     {
@@ -614,10 +609,10 @@
         "capital": "Kapenguria",
         "county_code": 24,
         "sub_counties": [
-            { "name": "Central Pokot", "sub_county_code": 24001 },
-            { "name": "North Pokot", "sub_county_code": 24002 },
-            { "name": "Pokot South", "sub_county_code": 24003 },
-            { "name": "West Pokot", "sub_county_code": 24004 }
+            { "name": "Kacheliba", "sub_county_code": 131 },
+            { "name": "Kapenguria", "sub_county_code": 129 },
+            { "name": "Pokot South", "sub_county_code": 132 },
+            { "name": "Sigor", "sub_county_code": 130 }
         ]
     }
     
