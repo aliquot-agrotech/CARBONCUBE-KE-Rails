@@ -3,7 +3,7 @@ class CreateCounties < ActiveRecord::Migration[7.0]
     create_table :counties do |t|
       t.string :name, null: false, unique: true
       t.string :capital, null: false
-      t.integer :code, null: false, unique: true
+      t.integer :county_code, null: false, unique: true
 
       t.timestamps
     end
