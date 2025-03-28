@@ -1,7 +1,7 @@
 require 'httparty'
 require 'base64'
 
-class MpesaAPI
+class MpesaApi  
   BASE_URL = "https://sandbox.safaricom.co.ke" # Use live URL in production
 
   def self.get_access_token

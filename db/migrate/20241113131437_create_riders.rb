@@ -16,6 +16,8 @@ class CreateRiders < ActiveRecord::Migration[7.1]
       t.string :kin_full_name
       t.string :kin_relationship
       t.string :kin_phone_number
+      t.references :county, null: false, foreign_key: true
+      t.references :sub_county, null: false, foreign_key: true
 
       t.timestamps
     end

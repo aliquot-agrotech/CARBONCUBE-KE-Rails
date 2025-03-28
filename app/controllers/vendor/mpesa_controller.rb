@@ -1,5 +1,5 @@
 class Vendor::MpesaController < ApplicationController
-  skip_before_action :verify_authenticity_token # Allow external API calls
+  # skip_before_action :verify_authenticity_token # Allow external API calls
 
   def validate_payment
     data = JSON.parse(request.body.read)

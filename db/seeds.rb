@@ -834,8 +834,34 @@ vehicle_types.each do |type|
   VehicleType.find_or_create_by(name: type)
 end
 
-# Seed 50 Riders with 'Motorbike' as Vehicle Type
+# Ensure counties and sub-counties exist
+if County.any?
+  counties = County.includes(:sub_counties).all
+  nairobi = County.includes(:sub_counties).find_by(name: 'Nairobi') # Get Nairobi County
+  unless nairobi
+    puts "Nairobi County not found! Ensure it is present in the database."
+    exit
+  end
+else
+  puts "No counties found. Ensure migration and seeding for counties is completed first."
+  exit
+end
+
+# Helper function to assign county and sub-county
+def assign_county_and_sub_county(counties, nairobi)
+  if rand < 0.75 # 75% probability
+    county = nairobi
+  else
+    county = counties.reject { |c| c.id == nairobi.id }.sample # Pick a random county other than Nairobi
+  end
+  sub_county = county.sub_counties.sample if county.sub_counties.any?
+  [county.id, sub_county&.id]
+end
+
+# Seed 50 Riders (75% from Nairobi)
 50.times do
+  county_id, sub_county_id = assign_county_and_sub_county(counties, nairobi)
+
   Rider.find_or_create_by(email: nil) do |rider|
     full_name = Faker::Name.name
     username = full_name.downcase.gsub(/\s+/, "")
@@ -854,20 +880,19 @@ end
     rider.physical_address = Faker::Address.full_address
     rider.gender = ['Male', 'Female'].sample
 
-    # Next of Kin details
-    rider.kin_full_name = Faker::Name.name
-    rider.kin_relationship = %w[Spouse Cousin Parent Sibling Friend Colleague Other].sample
-    rider.kin_phone_number = generate_custom_phone_number(used_phone_numbers)
-    used_phone_numbers.add(rider.kin_phone_number)
+    # Assign county and sub-county
+    rider.county_id = county_id
+    rider.sub_county_id = sub_county_id
   end
 end
 
-
-# Seed purchasers data
+# Seed 100 Purchasers (75% from Nairobi)
 100.times do
+  county_id, sub_county_id = assign_county_and_sub_county(counties, nairobi)
+
   Purchaser.find_or_create_by(email: nil) do |purchaser|
     fullname = Faker::Name.name
-    username = fullname.downcase.gsub(/\s+/, "") # remove spaces and lowercase the name
+    username = fullname.downcase.gsub(/\s+/, "")
     email = "#{username}@example.com"
 
     purchaser.fullname = fullname
@@ -877,6 +902,10 @@ end
     used_phone_numbers.add(purchaser.phone_number)
     purchaser.location = Faker::Address.full_address
     purchaser.password = 'password'
+
+    # Assign county and sub-county
+    purchaser.county_id = county_id
+    purchaser.sub_county_id = sub_county_id
 
     # Additional fields
     purchaser.birthdate = Faker::Date.birthday(min_age: 18, max_age: 65)
@@ -893,12 +922,12 @@ end
   end
 end
 
-
-
-# Seed vendor data
+# Seed 50 Vendors (75% from Nairobi)
 50.times do
+  county_id, sub_county_id = assign_county_and_sub_county(counties, nairobi)
+
   fullname = Faker::Name.name
-  username = fullname.downcase.gsub(/\s+/, "") # remove spaces and lowercase the name
+  username = fullname.downcase.gsub(/\s+/, "")
   email = "#{username}@example.com"
 
   vendor = Vendor.find_or_create_by(email: email) do |vendor|
@@ -912,6 +941,10 @@ end
     vendor.location = Faker::Address.full_address
     vendor.password = 'password'
     vendor.business_registration_number = "BN/#{Faker::Number.number(digits: 4)}/#{Faker::Number.number(digits: 6)}"
+
+    # Assign county and sub-county
+    vendor.county_id = county_id
+    vendor.sub_county_id = sub_county_id
 
     # Assign random category if available
     if Category.any?
@@ -929,39 +962,12 @@ end
   end
 
   if vendor.valid?
-    puts "Vendor created: #{vendor.email}"
+    puts "Vendor created: #{vendor.email} (County ID: #{county_id}, Sub-County ID: #{sub_county_id})"
   else
     puts "Vendor validation failed for: #{vendor.email}, Errors: #{vendor.errors.full_messages}"
   end
 end
 
-# Seed vendor tier data
-tier_durations = [1, 3, 6, 12] # Define valid durations in months
-
-Vendor.all.each do |vendor|
-  # Skip if a VendorTier already exists for the vendor
-  next if VendorTier.exists?(vendor_id: vendor.id)
-
-  # Ensure there are tiers available
-  if Tier.any?
-    tier = Tier.all.sample # Assign a random tier
-    duration = tier_durations.sample # Assign a random duration
-
-    created_at_time = Faker::Time.backward(days: 30) # Randomized creation date within the last 30 days
-    updated_at_time = Faker::Time.between(from: created_at_time, to: Time.now) # Ensure updated_at is after or equal to created_at
-
-    VendorTier.create!(
-      vendor_id: vendor.id,
-      tier_id: tier.id,
-      duration_months: duration,
-      created_at: created_at_time,
-      updated_at: updated_at_time
-    )
-    puts "VendorTier created for Vendor ID: #{vendor.id}, Tier ID: #{tier.id}, Duration: #{duration} months"
-  else
-    puts "No tiers found for vendor #{vendor.email}. Skipping tier assignment."
-  end
-end
 
 puts "Starts seeding the ads of the categories..."
 

@@ -13,6 +13,8 @@ class CreatePurchasers < ActiveRecord::Migration[7.1]
       t.string :location
       t.string :profile_picture
       t.boolean :blocked, default: false
+      t.references :county, null: false, foreign_key: true
+      t.references :sub_county, null: false, foreign_key: true
       t.references :income, foreign_key: true, null: true
       t.references :employment, foreign_key: true, null: true
       t.references :education, foreign_key: true, null: true
