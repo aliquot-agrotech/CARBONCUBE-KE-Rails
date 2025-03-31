@@ -1,11 +1,11 @@
 class Vendor::MpesaController < ApplicationController
-  # skip_before_action :verify_authenticity_token # Allow external API calls
+  skip_before_action :verify_authenticity_token
 
   def validate_payment
     data = JSON.parse(request.body.read)
     account_number = data["BillRefNumber"]
 
-    # Check if account number matches either phone_number or business_registration_number
+    # Find vendor by phone_number or business_registration_number
     vendor = Vendor.find_by(phone_number: account_number) || Vendor.find_by(business_registration_number: account_number)
 
     if vendor
@@ -18,34 +18,26 @@ class Vendor::MpesaController < ApplicationController
   def confirm_payment
     data = JSON.parse(request.body.read)
     account_number = data["BillRefNumber"]
-    amount_paid = data["TransAmount"].to_f
+    amount = data["TransAmount"].to_f
 
-    # Find vendor using phone_number or business_registration_number
+    # Find the vendor by phone number or business registration number
     vendor = Vendor.find_by(phone_number: account_number) || Vendor.find_by(business_registration_number: account_number)
 
     if vendor
-      # Find the correct tier and duration based on the amount paid
-      tier_pricing = TierPricing.where("price <= ?", amount_paid).order(price: :desc).first
+      # Determine which tier the vendor paid for
+      tier = Tier.find_by(price: amount)  # Assuming `price` is stored in Tier model
 
-      if tier_pricing
-        tier = tier_pricing.tier
-        duration_months = tier_pricing.duration_months
-
-        # Find or create vendor's tier
+      if tier
+        # Update vendor tier duration
         vendor_tier = VendorTier.find_or_initialize_by(vendor_id: vendor.id)
+        vendor_tier.update(tier_id: tier.id, duration_months: tier.duration_months)
 
-        vendor_tier.update!(
-          tier_id: tier.id,
-          duration_months: duration_months
-        )
-
-        render json: { ResultCode: 0, ResultDesc: "Payment Successful", tier: tier.name, duration_months: duration_months }
+        render json: { ResultCode: 0, ResultDesc: "Success" }
       else
-        render json: { ResultCode: "C2B00014", ResultDesc: "Invalid Payment Amount" }
+        render json: { ResultCode: "C2B00013", ResultDesc: "Invalid Amount - No Matching Tier" }
       end
     else
       render json: { ResultCode: "C2B00012", ResultDesc: "Invalid Account Number" }
     end
   end
 end
-  
