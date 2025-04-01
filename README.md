@@ -19,8 +19,8 @@ Follow these steps to set up and run the application locally:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/LewKM/CARBON-Ecom-Rails.git
-cd CARBON-Ecom-Rails
+git clone https://github.com/LewKM/CARBONCUBE-KE-Rails.git
+cd CARBONCUBE-KE-Rails
 ```
 
 ### 2. Install Dependencies and Setup Database
