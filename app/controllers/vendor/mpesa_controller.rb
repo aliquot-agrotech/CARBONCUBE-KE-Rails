@@ -1,5 +1,5 @@
 class Vendor::MpesaController < ApplicationController
-  skip_before_action :verify_authenticity_token
+  # skip_before_action :verify_authenticity_token
 
   def validate_payment
     data = JSON.parse(request.body.read)
