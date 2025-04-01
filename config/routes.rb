@@ -61,6 +61,7 @@ Rails.application.routes.draw do
         patch 'restore'
       end
     end
+
     resources :cms_pages
     resources :vendors do
       member do
@@ -93,6 +94,7 @@ Rails.application.routes.draw do
     resources :conversations, only: [:index, :show, :create] do
       resources :messages, only: [:index, :create]
     end
+
     resources :analytics
     resources :reviews
     resources :abouts
@@ -116,6 +118,7 @@ Rails.application.routes.draw do
         put 'update_status', to: 'orders#update_status' # Custom route for updating order status
       end
     end
+
     resources :shipments
     resources :categories, only: [:index, :show]
     get 'categories', to: 'categories#index'
@@ -124,9 +127,11 @@ Rails.application.routes.draw do
     resources :reviews, only: [:index, :show] do
       post 'reply', on: :member
     end
+
     resource :profile, only: [:show, :update] do
       post 'change-password', to: 'profiles#change_password'
     end
+
     resources :messages
     get 'identify', to: 'vendors#identify'
     resources :notifications
@@ -148,11 +153,13 @@ Rails.application.routes.draw do
     resource :profile, only: [:show, :update] do
       post 'change-password', to: 'profiles#change_password'
     end
+
     resources :wish_lists, only: [:index, :create, :destroy] do
       member do
         post 'add_to_cart' # This route adds the ad to the cart
       end
     end
+
     resources :reviews
     resources :messages
     resources :categories
@@ -185,7 +192,7 @@ Rails.application.routes.draw do
       end
       resources :reviews, only: [:create, :index] # Nested reviews under ads
     end
-    
+
     resources :orders, only: [:index, :show, :create] do
       member do
         put  :update_status_to_delivered
