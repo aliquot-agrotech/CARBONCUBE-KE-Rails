@@ -143,6 +143,10 @@ Rails.application.routes.draw do
 
     # Custom route for vendor_id handling
     get 'vendor_tiers/:vendor_id', to: 'vendor_tiers#show'
+
+    # Mpesa payment routes
+    post "payments/validate", to: "mpesa#validate_payment"
+    post "payments/confirm", to: "mpesa#confirm_payment"
   end
 
 
