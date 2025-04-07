@@ -1,4 +1,4 @@
-class CreateSubCounties < ActiveRecord::Migration[7.0]
+class CreateSubCounties < ActiveRecord::Migration[7.1]
   def change
     create_table :sub_counties do |t|
       t.string :name, null: false

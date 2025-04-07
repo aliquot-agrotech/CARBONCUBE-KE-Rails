@@ -19,6 +19,8 @@ class Purchaser < ApplicationRecord
   belongs_to :income
   belongs_to :education
   belongs_to :employment
+  belongs_to :county
+  belongs_to :sub_county
 
   validates :fullname, presence: true
   validates :email, presence: true, uniqueness: true

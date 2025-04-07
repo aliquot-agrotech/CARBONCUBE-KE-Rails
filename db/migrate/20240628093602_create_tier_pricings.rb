@@ -1,4 +1,4 @@
-class CreateTierPricings < ActiveRecord::Migration[7.0]
+class CreateTierPricings < ActiveRecord::Migration[7.1]
   def change
     create_table :tier_pricings do |t|
       t.references :tier, null: false, foreign_key: true

@@ -286,6 +286,7 @@ counties_data = [
   },
   {
     name: "Kajiado",
+    capital: "Kajiado",
     county_code: 34,
     sub_counties: [
       { name: "Kajiado Central", sub_county_code: 184 },

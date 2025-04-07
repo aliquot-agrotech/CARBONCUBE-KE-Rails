@@ -1,4 +1,4 @@
-class CreateNotificationsWithPolymorphicAssociation < ActiveRecord::Migration[6.0]
+class CreateNotificationsWithPolymorphicAssociation < ActiveRecord::Migration[7.1]
   def change
     create_table :notifications do |t|
       t.references :notifiable, polymorphic: true, index: true

@@ -1,4 +1,4 @@
-class CreateTierFeatures < ActiveRecord::Migration[7.0]
+class CreateTierFeatures < ActiveRecord::Migration[7.1]
   def change
     create_table :tier_features do |t|
       t.references :tier, null: false, foreign_key: true
