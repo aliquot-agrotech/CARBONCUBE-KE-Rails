@@ -923,7 +923,9 @@ end
   end
 end
 
-# Seed 50 Vendors (75% from Nairobi)
+# Seed 50 Vendors (50% from Nairobi)
+tier_durations = [1, 3, 6, 12] # Define valid durations in months
+
 50.times do
   county_id, sub_county_id = assign_county_and_sub_county(counties, nairobi)
 
@@ -967,8 +969,33 @@ end
   else
     puts "Vendor validation failed for: #{vendor.email}, Errors: #{vendor.errors.full_messages}"
   end
-end
 
+  # Seed vendor tier data
+  if VendorTier.exists?(vendor_id: vendor.id)
+    puts "VendorTier already exists for Vendor ID: #{vendor.id}. Skipping."
+  else
+    # Ensure there are tiers available
+    if Tier.any?
+      tier = Tier.all.sample # Assign a random tier
+      duration = tier_durations.sample # Assign a random duration
+
+      created_at_time = Faker::Time.backward(days: 30) # Randomized creation date within the last 30 days
+      updated_at_time = Faker::Time.between(from: created_at_time, to: Time.now) # Ensure updated_at is after or equal to created_at
+
+      VendorTier.create!(
+        vendor_id: vendor.id,
+        tier_id: tier.id,
+        duration_months: duration,
+        created_at: created_at_time,
+        updated_at: updated_at_time
+      )
+      puts "VendorTier created for Vendor ID: #{vendor.id}, Tier ID: #{tier.id}, Duration: #{duration} months"
+    else
+      puts "No tiers found for vendor #{vendor.email}. Skipping tier assignment."
+    end
+  end
+end
+puts "Riders, Purchasers, and Vendors have been seeded successfully!"
 
 puts "Starts seeding the ads of the categories..."
 
@@ -1607,87 +1634,6 @@ sorted_order_data.each do |data|
   end
 end
 
-
-# # Generate 500 order data hashes
-# order_data = 500.times.map do
-#   purchaser = Purchaser.all.sample
-#   status = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned'].sample
-#   total_amount = Faker::Commerce.price(range: 50..500)
-#   def generate_mpesa_transaction_code
-#     alpha_part = Faker::Alphanumeric.unique.alpha(number: 7).upcase # Generate 7 alphabetic characters
-#     random_digits = Faker::Number.number(digits: 3) # Generate 3 random digits
-#     unique_part = Faker::Alphanumeric.unique.alpha(number: 3).upcase # Generate 3 more alphabetic characters
-  
-#     # Combine parts: insert random_digits after the second character
-#     "#{alpha_part[0..1]}#{random_digits}#{alpha_part[2..-1]}#{unique_part}"
-#   end
-  
-#   mpesa_transaction_code = generate_mpesa_transaction_code
-
-#   # Randomly select a month and date range
-#   selected_month = date_ranges.keys.sample
-#   date_range = date_ranges[selected_month]
-#   created_at = Faker::Date.between(from: date_range.begin, to: date_range.end)
-
-#   {
-#     purchaser_id: purchaser.id,
-#     status: status,
-#     total_amount: total_amount,
-#     mpesa_transaction_code: mpesa_transaction_code,
-#     created_at: created_at,
-#     updated_at: created_at,
-#     order_items: rand(1..5).times.map do
-#       ad = Ad.all.sample
-#       quantity = Faker::Number.between(from: 1, to: 10)
-#       price = ad.price
-#       total_price = price * quantity
-
-#       {
-#         ad_id: ad.id,
-#         quantity: quantity,
-#         price: price,
-#         total_price: total_price,
-#         vendor_id: ad.vendor_id
-#       }
-#     end
-#   }
-# end
-
-# # Sort the order data by created_at date
-# sorted_order_data = order_data.sort_by { |data| data[:created_at] }
-
-# # Create orders in sorted order
-# sorted_order_data.each do |data|
-#   order = Order.create!(
-#     purchaser_id: data[:purchaser_id],
-#     status: data[:status],
-#     total_amount: data[:total_amount],
-#     mpesa_transaction_code: data[:mpesa_transaction_code],
-#     created_at: data[:created_at],
-#     updated_at: data[:updated_at]
-#   )
-
-#   # Create order items
-#   data[:order_items].each do |item_data|
-#     OrderItem.create!(
-#       order_id: order.id,
-#       ad_id: item_data[:ad_id],
-#       quantity: item_data[:quantity],
-#       price: item_data[:price],
-#       total_price: item_data[:total_price],
-#       created_at: data[:created_at],
-#       updated_at: data[:updated_at]
-#     )
-
-#     # Associate the order with a vendor
-#     OrderVendor.create!(
-#       order_id: order.id,
-#       vendor_id: item_data[:vendor_id],
-#       created_at: data[:created_at],
-#       updated_at: data[:updated_at]
-#     )
-#   end
-# end
 
 puts "Starts seeding for the ad reviews"
 
