@@ -1,4 +1,4 @@
-class Vendor::MpesaController < ApplicationController
+class MpesaController < ApplicationController
   # skip_before_action :verify_authenticity_token # Uncomment if needed for external POST requests
 
   def validate_payment

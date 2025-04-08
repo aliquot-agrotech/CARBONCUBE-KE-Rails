@@ -22,6 +22,10 @@ Rails.application.routes.draw do
   resources :sectors, only: [:index]
   resources :educations, only: [:index]
   resources :employments, only: [:index]
+
+  # Mpesa payment routes
+  post "payments/validate", to: "mpesa#validate_payment"
+  post "payments/confirm", to: "mpesa#confirm_payment"
   
 
   #========================================Admin namespace for admin-specific functionality==========================================#
@@ -144,9 +148,6 @@ Rails.application.routes.draw do
     # Custom route for vendor_id handling
     get 'vendor_tiers/:vendor_id', to: 'vendor_tiers#show'
 
-    # Mpesa payment routes
-    post "payments/validate", to: "mpesa#validate_payment"
-    post "payments/confirm", to: "mpesa#confirm_payment"
   end
 
 
