@@ -1,5 +1,7 @@
 class MpesaController < ApplicationController
-  skip_before_action :verify_authenticity_token 
+
+  # Skip CSRF protection for specific actions
+  skip_before_action :verify_authenticity_token, only: [:validate_payment, :confirm_payment]
 
   def validate_payment
     data = JSON.parse(request.body.read)
