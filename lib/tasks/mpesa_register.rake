@@ -1,7 +1,8 @@
 namespace :mpesa do
-  desc "Register M-Pesa Validation and Confirmation URLs"
+  desc "Register M-Pesa C2B URLs"
   task register_urls: :environment do
-    puts "Registering M-Pesa URLs..."
-    puts MpesaApi.register_urls
+    puts "Registering M-Pesa C2B URLs..."
+    response = MpesaC2BService.register_urls
+    puts response
   end
 end
