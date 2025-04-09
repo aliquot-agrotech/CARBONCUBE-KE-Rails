@@ -11,7 +11,7 @@ class MpesaC2bService
     credentials = Base64.strict_encode64("#{ENV['MPESA_CONSUMER_KEY']}:#{ENV['MPESA_CONSUMER_SECRET']}")
     
     response = HTTParty.get(
-      "#{BASE_URL}/oauth/v1/generate?grant_type=client_credentials",
+      "#{BASE_URL_API}/oauth/v1/generate?grant_type=client_credentials",
       headers: { "Authorization" => "Basic #{credentials}" }
     )
 
