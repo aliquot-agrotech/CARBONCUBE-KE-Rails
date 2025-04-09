@@ -1,7 +1,7 @@
 require 'httparty'
 require 'base64'
 
-class MpesaC2BService
+class MpesaC2bService
   # BASE_URL_API = Rails.env.production? ? "https://api.safaricom.co.ke" : "https://sandbox.safaricom.co.ke"
   # 
 
