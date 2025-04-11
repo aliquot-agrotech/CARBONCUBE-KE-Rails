@@ -18,13 +18,12 @@ class MpesaController < ApplicationController
 
   def confirm_payment
     data = JSON.parse(request.body.read)
-
+  
     account_number = data["BillRefNumber"]
     amount = data["TransAmount"].to_f
-
-    vendor = Vendor.find_by(phone_number: account_number) || Vendor.find_by(business_registration_number: account_number)
-
-    # Save payment transaction
+  
+    vendor = Vendor.find_by(phone_number: account_number) # || Vendor.find_by(business_registration_number: account_number)
+  
     Payment.create!(
       transaction_type: data["TransactionType"],
       trans_id: data["TransID"],
@@ -40,17 +39,21 @@ class MpesaController < ApplicationController
       middle_name: data["MiddleName"],
       last_name: data["LastName"]
     )
-
+  
     if vendor
-      tier = Tier.find_by(price: amount)
-
-      if tier
+      tier_pricing = TierPricing.find_by(price: amount)
+  
+      if tier_pricing
         vendor_tier = VendorTier.find_or_initialize_by(vendor_id: vendor.id)
-        vendor_tier.update(tier_id: tier.id, duration_months: tier.duration_months)
-
+  
+        vendor_tier.update!(
+          tier_id: tier_pricing.tier_id,
+          duration_months: tier_pricing.duration_months
+        )
+  
         render json: { ResultCode: 0, ResultDesc: "Success" }
       else
-        render json: { ResultCode: "C2B00013", ResultDesc: "Invalid Amount - No Matching Tier" }
+        render json: { ResultCode: "C2B00013", ResultDesc: "Invalid Amount - No Matching Tier Pricing" }
       end
     else
       render json: { ResultCode: "C2B00012", ResultDesc: "Invalid Account Number" }
