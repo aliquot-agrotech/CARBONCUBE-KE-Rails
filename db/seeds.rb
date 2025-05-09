@@ -143,7 +143,8 @@ premium_features = [
   "Advanced promotional tools (banner ads on category pages)",
   "Access to Wishlist Statistics",
   "Access to Competitor Statistics",
-  "Ability to Post Product Videos"  
+  "Ability to Post Product Videos",
+  "Inclusive of the physical verification" 
 ]
 
 # Associate features with tiers
