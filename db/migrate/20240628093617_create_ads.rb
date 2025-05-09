@@ -10,6 +10,7 @@ class CreateAds < ActiveRecord::Migration[7.1]
       t.decimal :price, precision: 10, scale: 2
       t.integer :quantity
       t.string :brand
+      t.integer :condition, default: 0, null: false  # 0: brand new, 1: second hand
       t.string :manufacturer
       t.decimal :item_weight, precision: 10, scale: 2
       t.string :weight_unit, default: 'Grams' # Add weight unit field

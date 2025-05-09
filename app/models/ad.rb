@@ -31,6 +31,8 @@ class Ad < ApplicationRecord
   validates :item_weight, numericality: { greater_than: 0 }
   validates :weight_unit, inclusion: { in: ['Grams', 'Kilograms'] }
 
+  enum condition: { brand_new: 0, second_hand: 1 }
+
   # Ensure media can accept a string or array of strings
   serialize :media, coder: JSON
 

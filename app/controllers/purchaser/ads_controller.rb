@@ -95,6 +95,6 @@ class Purchaser::AdsController < ApplicationController
   end
 
   def ad_params
-    params.require(:ad).permit(:title, :description, { media: [] }, :subcategory_id, :category_id, :vendor_id, :price, :quantity, :brand, :manufacturer, :item_length, :item_width, :item_height, :item_weight, :weight_unit)
+    params.require(:ad).permit(:title, :description, { media: [] }, :subcategory_id, :category_id, :vendor_id, :price, :quantity, :brand, :manufacturer, :item_length, :item_width, :item_height, :item_weight, :weight_unit, :condition)
   end
 end
