@@ -3,7 +3,7 @@ class AdSerializer < ActiveModel::Serializer
              :subcategory_name, :title, :description, :price, :quantity, :brand,
              :manufacturer, :item_weight, :weight_unit, :item_length, :item_width,
              :item_height, :media_urls, :first_media_url, :mean_rating, :review_count,
-             :vendor_tier, :tier_name
+             :vendor_tier, :tier_name, :condition
 
   has_one :vendor, serializer: VendorSerializer
   has_many :reviews
