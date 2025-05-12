@@ -1,6 +1,8 @@
 class Ad < ApplicationRecord
   include PgSearch::Model
 
+  enum :condition, { brand_new: 0, second_hand: 1 }
+
   pg_search_scope :search_by_title_and_description, 
   against: [:title, :description],
   using: {
@@ -21,7 +23,6 @@ class Ad < ApplicationRecord
   has_many :purchasers, through: :bookmarks
   has_many :buy_for_me_orders
   has_many :click_events
-  
 
   accepts_nested_attributes_for :category
   accepts_nested_attributes_for :reviews
@@ -30,8 +31,6 @@ class Ad < ApplicationRecord
   validates :price, :quantity, :item_length, :item_width, :item_height, numericality: true
   validates :item_weight, numericality: { greater_than: 0 }
   validates :weight_unit, inclusion: { in: ['Grams', 'Kilograms'] }
-
-  enum condition: { brand_new: 0, second_hand: 1 }
 
   # Ensure media can accept a string or array of strings
   serialize :media, coder: JSON

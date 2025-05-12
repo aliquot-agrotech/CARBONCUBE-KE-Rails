@@ -1482,6 +1482,7 @@ category_ads.each do |category_name, ads|
       ad.item_height = Faker::Number.between(from: 10, to: 50)
       ad.item_weight = Faker::Number.decimal(l_digits: 1, r_digits: 2)
       ad.weight_unit = ['Grams', 'Kilograms'].sample
+      ad.condition = [:brand_new, :second_hand].sample
       ad.media = ad_data[:media]
       ad.created_at = created_at
       ad.updated_at = created_at

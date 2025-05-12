@@ -53,6 +53,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
     t.decimal "price", precision: 10, scale: 2
     t.integer "quantity"
     t.string "brand"
+    t.integer "condition", default: 0, null: false
     t.string "manufacturer"
     t.decimal "item_weight", precision: 10, scale: 2
     t.string "weight_unit", default: "Grams"
