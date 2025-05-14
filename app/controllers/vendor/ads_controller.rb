@@ -25,14 +25,28 @@ class Vendor::AdsController < ApplicationController
   end  
 
   def update
-    if params[:ad][:media].present?
-      params[:ad][:media] = process_and_upload_images(params[:ad][:media])
-    end
+    ad = current_vendor.ads.find(params[:id])
 
-    if @ad.update(ad_params)
-      render json: @ad.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating])
-    else
-      render json: @ad.errors, status: :unprocessable_entity
+    begin
+      # Check if new media is included in the form-data
+      uploaded_files = params[:ad][:media]
+
+      if uploaded_files.present?
+        new_uploaded_urls = process_and_upload_images(uploaded_files)
+        merged_media = (ad.media || []) | new_uploaded_urls
+        updated = ad.update(ad_params.except(:media).merge(media: merged_media))
+      else
+        updated = ad.update(ad_params.except(:media)) # Preserve existing media
+      end
+
+      if updated
+        render json: ad.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating])
+      else
+        render json: { error: ad.errors.full_messages }, status: :unprocessable_entity
+      end
+    rescue => e
+      Rails.logger.error "❌ Error updating ad: #{e.message}"
+      render json: { error: 'An error occurred while updating the ad' }, status: :internal_server_error
     end
   end
 
