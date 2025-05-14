@@ -26,29 +26,30 @@ class Vendor::AdsController < ApplicationController
 
   def update
     ad = current_vendor.ads.find(params[:id])
+    media_param = params[:ad][:media]
 
-    begin
-      # Check if new media is included in the form-data
-      uploaded_files = params[:ad][:media]
+    # Case 1: No media param at all — preserve existing media
+    if media_param.nil?
+      updated = ad.update(ad_params.except(:media))
 
-      if uploaded_files.present?
-        new_uploaded_urls = process_and_upload_images(uploaded_files)
-        merged_media = (ad.media || []) | new_uploaded_urls
-        updated = ad.update(ad_params.except(:media).merge(media: merged_media))
-      else
-        updated = ad.update(ad_params.except(:media)) # Preserve existing media
-      end
+    # Case 2: media is a list of Strings (Cloudinary URLs) — replacing media or removing some
+    elsif media_param.all? { |m| m.is_a?(String) }
+      updated = ad.update(ad_params)
 
-      if updated
-        render json: ad.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating])
-      else
-        render json: { error: ad.errors.full_messages }, status: :unprocessable_entity
-      end
-    rescue => e
-      Rails.logger.error "❌ Error updating ad: #{e.message}"
-      render json: { error: 'An error occurred while updating the ad' }, status: :internal_server_error
+    # Case 3: media includes uploaded files (ActionDispatch::Http::UploadedFile)
+    else
+      uploaded_urls = process_and_upload_images(media_param)
+      merged_media = (ad.media || []) | uploaded_urls
+      updated = ad.update(ad_params.except(:media).merge(media: merged_media))
+    end
+
+    if updated
+      render json: ad.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating])
+    else
+      render json: { error: ad.errors.full_messages }, status: :unprocessable_entity
     end
   end
+
 
   def destroy
     @ad.destroy
