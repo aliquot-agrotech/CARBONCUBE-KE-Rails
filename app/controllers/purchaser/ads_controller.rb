@@ -32,24 +32,36 @@ class Purchaser::AdsController < ApplicationController
   # GET /purchaser/ads/search
   def search
     query = params[:query].to_s.strip
-    query_words = query.split(/\s+/)
+    category_id = params[:category]
+    subcategory_id = params[:subcategory]
 
-    @ads = Ad.joins(:vendor, :category, :subcategory)
-                      .where(vendors: { blocked: false })
-                      .where(flagged: false)  # Exclude flagged ads
-                      
-    query_words.each do |word|
-      @ads = @ads.where('ads.title ILIKE :word OR ads.description ILIKE :word OR categories.name ILIKE :word OR subcategories.name ILIKE :word', 
-                                  word: "%#{word}%") # Include subcategory in search
+    ads = Ad.joins(:vendor, :category, :subcategory)
+            .where(vendors: { blocked: false })
+            .where(flagged: false) # Exclude flagged ads
+
+    if query.present?
+      query_words = query.split(/\s+/)
+      query_words.each do |word|
+        ads = ads.where(
+          'ads.title ILIKE :word OR ads.description ILIKE :word OR categories.name ILIKE :word OR subcategories.name ILIKE :word',
+          word: "%#{word}%"
+        )
+      end
     end
 
-    filter_by_category if params[:category_id].present?
-    filter_by_subcategory if params[:subcategory_id].present? # Include subcategory filtering in search
+    ads = ads.where(category_id: category_id) if category_id.present? && category_id != 'All'
+    ads = ads.where(subcategory_id: subcategory_id) if subcategory_id.present? && subcategory_id != 'All'
 
-    @ads = @ads.distinct
+    # ✅ Optimize by eager loading associated records used in AdSerializer
+    ads = ads.includes(
+      vendor: { vendor_tier: :tier },
+      category: :ads,
+      subcategory: :ads
+    ).distinct
 
-    render json: @ads
+    render json: ads, each_serializer: AdSerializer
   end
+
 
   # GET /purchaser/ads/:id/related
   def related
