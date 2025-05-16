@@ -5,13 +5,15 @@ Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
+
+  #========================================Public namespace for public-specific functionality==========================================#
+  
   get "up" => "rails/health#show", as: :rails_health_check
   post 'auth/login', to: 'authentication#login'
   resources :banners, only: [:index]
   resources :ads, only: [:index, :show] do
     get 'reviews', to: 'reviews#index', on: :member
   end
-  
 
   # Routes for logging ad searches
   resources :ad_searches, only: [:create]
@@ -27,6 +29,9 @@ Rails.application.routes.draw do
   post "payments/validate", to: "mpesa#validate_payment"
   post "payments/confirm", to: "mpesa#confirm_payment"
   
+  resources :counties, only: [:index] do
+    get 'sub_counties', on: :member # /counties/:id/sub_counties
+  end
 
   #========================================Admin namespace for admin-specific functionality==========================================#
   namespace :admin do
