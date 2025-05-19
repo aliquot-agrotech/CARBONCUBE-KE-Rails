@@ -4,7 +4,7 @@ class Purchaser::WishListsController < ApplicationController
 
   # GET /purchaser/wish_lists
   def index
-    @wish_lists = current_purchaser.wish_lists.includes(:ad)
+    @wish_lists = current_purchaser.wish_lists.includes(:ad).order(created_at: :desc)    
     
     render json: @wish_lists.as_json(include: {
       ad: {
