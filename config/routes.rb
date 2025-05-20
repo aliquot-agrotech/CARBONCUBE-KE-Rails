@@ -29,9 +29,13 @@ Rails.application.routes.draw do
   post "payments/validate", to: "mpesa#validate_payment"
   post "payments/confirm", to: "mpesa#confirm_payment"
   
+  # Routes for counties and sub_counties
   resources :counties, only: [:index] do
     get 'sub_counties', on: :member # /counties/:id/sub_counties
   end
+
+  # Routes for age_groups
+  resources :age_groups, only: [:index]
 
   #========================================Admin namespace for admin-specific functionality==========================================#
   namespace :admin do
