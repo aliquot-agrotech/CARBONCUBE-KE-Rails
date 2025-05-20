@@ -164,12 +164,27 @@ class Admin::AnalyticsController < ApplicationController
 
 #===============================================================PURCHASER ANALYTICS===============================================================#
 
-    age_group_counts = Hash.new(0)
+    purchaser_age_groups = {
+      '18-25' => 0,
+      '26-35' => 0,
+      '36-45' => 0,
+      '46-55' => 0,
+      '56-65' => 0,
+      '65+'   => 0
+    }
 
-    Purchaser.includes(:age_group).find_each do |purchaser|
-      group = purchaser.age_group&.name
-      age_group_counts[group] += 1 if group
+    Purchaser.find_each do |purchaser|
+      case purchaser.age_group_id
+      when 1 then purchaser_age_groups['18-25'] += 1
+      when 2 then purchaser_age_groups['26-35'] += 1
+      when 3 then purchaser_age_groups['36-45'] += 1
+      when 4 then purchaser_age_groups['46-55'] += 1
+      when 5 then purchaser_age_groups['56-65'] += 1
+      when 6 then purchaser_age_groups['65+']   += 1
+      end
     end
+
+    Rails.logger.info "Purchaser Age Groups Computed: #{purchaser_age_groups}"
 
     # Gender Distribution
     gender_distribution = Purchaser.group(:gender).count
@@ -196,14 +211,27 @@ class Admin::AnalyticsController < ApplicationController
 
 #================================================================VENDOR DEMOGRAPHICS===============================================================#
 
-    age_group_counts = Hash.new(0)
+    vendor_age_groups = {
+      '18-25' => 0,
+      '26-35' => 0,
+      '36-45' => 0,
+      '46-55' => 0,
+      '56-65' => 0,
+      '65+'   => 0
+    }
 
-    Vendor.includes(:age_group).find_each do |vendor|
-      group = vendor.age_group&.name
-      age_group_counts[group] += 1 if group
+    Vendor.find_each do |vendor|
+      case vendor.age_group_id
+      when 1 then vendor_age_groups['18-25'] += 1
+      when 2 then vendor_age_groups['26-35'] += 1
+      when 3 then vendor_age_groups['36-45'] += 1
+      when 4 then vendor_age_groups['46-55'] += 1
+      when 5 then vendor_age_groups['56-65'] += 1
+      when 6 then vendor_age_groups['65+']   += 1
+      end
     end
 
-    Rails.logger.info "Age Groups Computed: #{vendor_age_groups}"
+    Rails.logger.info "Vendor Age Groups Computed: #{vendor_age_groups}"
 
     # Gender Distribution
     vendor_gender_distribution = Vendor.group(:gender).count
@@ -245,13 +273,13 @@ class Admin::AnalyticsController < ApplicationController
       order_counts_by_status: order_counts_by_status,
       category_click_events: category_click_events,
       category_wishlist_data: category_wishlist_data,
-      age_groups: age_groups,
+      purchaser_age_groups: purchaser_age_groups,
+      vendor_age_groups: vendor_age_groups,
       gender_distribution: gender_distribution,
       employment_data: employment_data.map { |e| { e.status => e.total } },
       income_data: income_data.map { |i| { i.range => i.total } },
       education_data: education_data.map { |e| { e.level => e.total } },
       sector_data: sector_data.map { |s| { s.name => s.total } },
-      vendor_age_groups: vendor_age_groups,
       vendor_gender_distribution: vendor_gender_distribution,
       tier_data: tier_data.map { |t| { t['tier_name'] => t['total'] } },
       category_data: category_data.map { |c| { c['name'] => c['total'] } }
