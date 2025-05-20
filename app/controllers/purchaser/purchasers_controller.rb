@@ -53,12 +53,18 @@ class Purchaser::PurchasersController < ApplicationController
   end
 
   def purchaser_params
-    params.require(:purchaser).permit(
+    clean_params = params.require(:purchaser).permit(
       :fullname, :username, :email, :phone_number, :password, 
       :password_confirmation, :age_group_id, :zipcode, :city, :gender, 
       :location, :income_id, :sector_id, :education_id, :employment_id,
       :county_id, :sub_county_id
     )
+
+    clean_params.each do |k, v|
+      clean_params[k] = nil if v == ""
+    end
+
+    clean_params
   end
 
   def set_default_format

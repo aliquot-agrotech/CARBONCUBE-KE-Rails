@@ -32,7 +32,7 @@ class Purchaser < ApplicationRecord
   validates :city, presence: true
   validates :sub_county, presence: true
   validates :gender, inclusion: { in: %w(Male Female Other) }
-  validates :location, presence: true
+  # validates :location, presence: true
   validates :phone_number, presence: true, length: { is: 10, message: "must be exactly 10 digits" },
             format: { with: /\A\d{10}\z/, message: "should only contain numbers" }
 
