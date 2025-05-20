@@ -12,7 +12,7 @@ class CreateVendors < ActiveRecord::Migration[7.1]
       t.references :sub_county, null: false, foreign_key: true
       t.string :email
       t.string :profile_picture
-      t.datetime :birthdate
+      t.references :age_group, null: false, foreign_key: true
       t.string :zipcode
       t.string :city
       t.string :gender, default: 'Male'

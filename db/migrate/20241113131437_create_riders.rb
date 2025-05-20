@@ -3,7 +3,7 @@ class CreateRiders < ActiveRecord::Migration[7.1]
     create_table :riders do |t|
       t.string :full_name
       t.string :phone_number
-      t.date :date_of_birth
+      t.references :age_group, null: false, foreign_key: true
       t.string :email
       t.string :id_number
       t.string :driving_license

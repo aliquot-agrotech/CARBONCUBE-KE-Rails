@@ -15,8 +15,10 @@ class Vendor < ApplicationRecord
   has_one :category, through: :categories_vendor
   has_one :vendor_tier
   has_one :tier, through: :vendor_tier
+  
   belongs_to :county
   belongs_to :sub_county
+  belongs_to :age_group
 
   validates :county_id, presence: true
   validates :sub_county_id, presence: true
@@ -26,6 +28,7 @@ class Vendor < ApplicationRecord
   validates :enterprise_name, presence: true
   validates :location, presence: true
   validates :business_registration_number, presence: true
+  validates :age_group, presence: true
   # validates :tier, inclusion: { in: %w[Free Basic Standard Premium] }
 
   def calculate_mean_rating

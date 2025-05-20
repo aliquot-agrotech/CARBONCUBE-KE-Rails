@@ -21,12 +21,13 @@ class Purchaser < ApplicationRecord
   belongs_to :employment
   belongs_to :county
   belongs_to :sub_county
+  belongs_to :age_group
 
   validates :fullname, presence: true
   validates :email, presence: true, uniqueness: true
   validates :username, presence: true, uniqueness: true
   validates :password, presence: true, length: { minimum: 6 }, if: :password_required?
-  validates :birthdate, presence: true
+  validates :age_group, presence: true
   validates :zipcode, presence: true
   validates :city, presence: true
   validates :sub_county, presence: true

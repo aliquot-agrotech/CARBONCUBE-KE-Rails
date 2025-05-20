@@ -55,7 +55,7 @@ class Purchaser::PurchasersController < ApplicationController
   def purchaser_params
     params.require(:purchaser).permit(
       :fullname, :username, :email, :phone_number, :password, 
-      :password_confirmation, :birthdate, :zipcode, :city, :gender, 
+      :password_confirmation, :age_group_id, :zipcode, :city, :gender, 
       :location, :income_id, :sector_id, :education_id, :employment_id,
       :county_id, :sub_county_id
     )

@@ -41,6 +41,12 @@ education_levels.each do |level|
 end
 
 
+# Age groups
+["18-25", "26-35", "36-45", "46-55", "56-65", "65+"].each do |label|
+  AgeGroup.find_or_create_by(name: label)
+end
+
+
 # Create categories with descriptions
 categories = [
   { name: 'Automotive Parts & Accessories', description: 'Spare parts for automobiles' },
@@ -872,7 +878,7 @@ end
     rider.full_name = full_name
     rider.phone_number = generate_custom_phone_number(used_phone_numbers)
     used_phone_numbers.add(rider.phone_number)
-    rider.date_of_birth = Faker::Date.birthday(min_age: 21, max_age: 50)
+    rider.age_group_id = AgeGroup.pluck(:id).sample
     rider.email = email
     rider.id_number = Faker::Number.number(digits: 8).to_s
     rider.driving_license = Faker::DrivingLicence.british_driving_licence
@@ -910,7 +916,8 @@ end
     purchaser.sub_county_id = sub_county_id
 
     # Additional fields
-    purchaser.birthdate = Faker::Date.birthday(min_age: 18, max_age: 65)
+    # Replace birthdate with random age_group_id
+    purchaser.age_group_id = AgeGroup.pluck(:id).sample
     purchaser.zipcode = Faker::Address.zip_code
     purchaser.city = Faker::Address.city
     purchaser.gender = ['Male', 'Female'].sample
@@ -958,7 +965,7 @@ tier_durations = [1, 3, 6, 12] # Define valid durations in months
       next
     end
 
-    vendor.birthdate = Faker::Date.birthday(min_age: 18, max_age: 65)
+    vendor.age_group_id = AgeGroup.pluck(:id).sample
     vendor.zipcode = Faker::Address.zip_code
     vendor.city = Faker::Address.city
     vendor.gender = ['Male', 'Female'].sample

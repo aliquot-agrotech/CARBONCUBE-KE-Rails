@@ -164,33 +164,11 @@ class Admin::AnalyticsController < ApplicationController
 
 #===============================================================PURCHASER ANALYTICS===============================================================#
 
-    # Calculate Age Groups
-    age_groups = {
-      '18-24' => 0, '25-34' => 0, '35-44' => 0, '45-54' => 0, '55+' => 0
-    }
+    age_group_counts = Hash.new(0)
 
-    Purchaser.find_each do |purchaser|
-      # Check for valid birthdate format and ensure it's a Date object
-      if purchaser.birthdate.present?
-        # Ensure the birthdate is a Date object
-        begin
-          birthdate = purchaser.birthdate.to_date
-          age = ((Time.zone.today - birthdate) / 365).to_i
-
-          # Handle age group assignment
-          case age
-          when 18..24 then age_groups['18-24'] += 1
-          when 25..34 then age_groups['25-34'] += 1
-          when 35..44 then age_groups['35-44'] += 1
-          when 45..54 then age_groups['45-54'] += 1
-          else age_groups['55+'] += 1 if age && age >= 55
-          end
-        rescue StandardError => e
-          Rails.logger.error "Error processing purchaser #{purchaser.id}: #{e.message}"
-        end
-      else
-        Rails.logger.warn "Purchaser #{purchaser.id} has an invalid or missing birthdate"
-      end
+    Purchaser.includes(:age_group).find_each do |purchaser|
+      group = purchaser.age_group&.name
+      age_group_counts[group] += 1 if group
     end
 
     # Gender Distribution
@@ -218,30 +196,11 @@ class Admin::AnalyticsController < ApplicationController
 
 #================================================================VENDOR DEMOGRAPHICS===============================================================#
 
-    # Age Groups Calculation
-    vendor_age_groups = {
-      '18-24' => 0, '25-34' => 0, '35-44' => 0, '45-54' => 0, '55+' => 0
-    }
+    age_group_counts = Hash.new(0)
 
-    Vendor.find_each do |vendor|
-      if vendor.birthdate.present?
-        begin
-          birthdate = vendor.birthdate.to_date
-          age = ((Time.zone.today - birthdate) / 365).to_i
-
-          case age
-          when 18..24 then vendor_age_groups['18-24'] += 1
-          when 25..34 then vendor_age_groups['25-34'] += 1
-          when 35..44 then vendor_age_groups['35-44'] += 1
-          when 45..54 then vendor_age_groups['45-54'] += 1
-          else vendor_age_groups['55+'] += 1 if age && age >= 55
-          end
-        rescue StandardError => e
-          Rails.logger.error "Error processing vendor #{vendor.id}: #{e.message}"
-        end
-      else
-        Rails.logger.warn "Vendor #{vendor.id} has an invalid or missing birthdate"
-      end
+    Vendor.includes(:age_group).find_each do |vendor|
+      group = vendor.age_group&.name
+      age_group_counts[group] += 1 if group
     end
 
     Rails.logger.info "Age Groups Computed: #{vendor_age_groups}"

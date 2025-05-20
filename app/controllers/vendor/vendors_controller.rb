@@ -48,7 +48,7 @@
       end
   
       def vendor_params
-        params.require(:vendor).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :username, :birthdate, :zipcode, :city, :gender, :description, :business_registration_number, :county_id, :sub_county_id,  category_ids: [])
+        params.require(:vendor).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :username, :age_group_id, :zipcode, :city, :gender, :description, :business_registration_number, :county_id, :sub_county_id,  category_ids: [])
       end
     
       def vendor_params_with_categories

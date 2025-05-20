@@ -45,7 +45,7 @@ class Rider::RidersController < ApplicationController
     params.require(:rider).permit(
       :full_name, 
       :phone_number, 
-      :date_of_birth, 
+      :age_group_id, 
       :email, 
       :id_number, 
       :driving_license, 
