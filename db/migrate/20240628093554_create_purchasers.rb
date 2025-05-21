@@ -1,20 +1,22 @@
 class CreatePurchasers < ActiveRecord::Migration[7.1]
   def change
     create_table :purchasers do |t|
-      t.string :fullname
-      t.string :username
+      t.string :fullname, null: false
+      t.string :username, null: false
       t.string :password_digest
-      t.string :email
-      t.string :phone_number, limit: 10
+      t.string :email, null: false
+      t.string :phone_number, limit: 10, null: false
       t.references :age_group, null: false, foreign_key: true
       t.string :zipcode
-      t.string :city
-      t.string :gender, default: 'Male'
+      t.string :city, null: false
+      t.string :gender, null: false, default: 'Male'
       t.string :location
       t.string :profile_picture
       t.boolean :blocked, default: false
-      t.references :county, null: false, foreign_key: true
-      t.references :sub_county, null: false, foreign_key: true
+
+      # Optional references
+      t.references :county, null: true, foreign_key: true
+      t.references :sub_county, null: true, foreign_key: true
       t.references :income, foreign_key: true, null: true
       t.references :employment, foreign_key: true, null: true
       t.references :education, foreign_key: true, null: true
@@ -22,6 +24,7 @@ class CreatePurchasers < ActiveRecord::Migration[7.1]
 
       t.timestamps
     end
+
     add_index :purchasers, :username
     add_index :purchasers, :email
   end
