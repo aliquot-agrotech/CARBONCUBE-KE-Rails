@@ -15,22 +15,22 @@ class Purchaser < ApplicationRecord
   has_many :click_events
   has_many :ad_searches
   
-  belongs_to :sector
-  belongs_to :income
-  belongs_to :education
-  belongs_to :employment
-  belongs_to :county
-  belongs_to :sub_county
-  belongs_to :age_group
+  belongs_to :sector, optional: true
+  belongs_to :income, optional: true
+  belongs_to :education, optional: true
+  belongs_to :employment, optional: true
+  belongs_to :sub_county, optional: true
+  belongs_to :county, optional: true
+  belongs_to :age_group, optional: true
 
   validates :fullname, presence: true
   validates :email, presence: true, uniqueness: true
   validates :username, presence: true, uniqueness: true
   validates :password, presence: true, length: { minimum: 6 }, if: :password_required?
   validates :age_group, presence: true
-  validates :zipcode, presence: true
+  # validates :zipcode, presence: true
   validates :city, presence: true
-  validates :sub_county, presence: true
+  # validates :sub_county, presence: true
   validates :gender, inclusion: { in: %w(Male Female Other) }
   # validates :location, presence: true
   validates :phone_number, presence: true, length: { is: 10, message: "must be exactly 10 digits" },

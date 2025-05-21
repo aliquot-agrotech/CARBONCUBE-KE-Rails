@@ -53,19 +53,19 @@ class Purchaser::PurchasersController < ApplicationController
   end
 
   def purchaser_params
-    clean_params = params.require(:purchaser).permit(
+    permitted = params.require(:purchaser).permit(
       :fullname, :username, :email, :phone_number, :password, 
       :password_confirmation, :age_group_id, :zipcode, :city, :gender, 
       :location, :income_id, :sector_id, :education_id, :employment_id,
       :county_id, :sub_county_id
     )
 
-    clean_params.each do |k, v|
-      clean_params[k] = nil if v == ""
-    end
+    # Convert blank string values to nil
+    permitted.each { |key, value| permitted[key] = nil if value == "" }
 
-    clean_params
+    permitted
   end
+
 
   def set_default_format
     request.format = :json unless params[:format]
