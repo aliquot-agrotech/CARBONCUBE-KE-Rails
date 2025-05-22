@@ -2,11 +2,13 @@ class Conversation < ApplicationRecord
   belongs_to :admin, class_name: 'Admin', foreign_key: 'admin_id', optional: true
   belongs_to :purchaser, class_name: 'Purchaser', foreign_key: 'purchaser_id', optional: true
   belongs_to :vendor, class_name: 'Vendor', foreign_key: 'vendor_id', optional: true
+  belongs_to :ad, optional: true
 
   has_many :messages, dependent: :destroy
 
   validates :admin_id, presence: true
   validate :only_one_participant
+  validates :ad_id, uniqueness: { scope: [:purchaser_id, :vendor_id], message: "conversation already exists for this ad" }
 
   private
 

@@ -21,10 +21,12 @@ class Vendor::MessagesController < ApplicationController
   private
 
   def set_conversation
-    @conversation = current_vendor.conversations.find_by(admin_id: Admin.first.id)
-    render json: { error: 'Conversation not found' }, status: :not_found unless @conversation
+    @conversation = Conversation.find_by(id: params[:conversation_id], vendor_id: current_vendor.id)
+
+    unless @conversation
+      render json: { error: 'Conversation not found or unauthorized' }, status: :not_found
+    end
   end
-  
 
   def message_params
     params.require(:message).permit(:content)
@@ -34,7 +36,6 @@ class Vendor::MessagesController < ApplicationController
     @current_user = VendorAuthorizeApiRequest.new(request.headers).result
     render json: { error: 'Not Authorized' }, status: :unauthorized unless @current_user.is_a?(Vendor)
   end
-  
 
   def current_vendor
     @current_user

@@ -21,10 +21,12 @@ class Purchaser::MessagesController < ApplicationController
   private
 
   def set_conversation
-    @conversation = current_purchaser.conversations.find_by(admin_id: Admin.first.id)
-    render json: { error: 'Conversation not found' }, status: :not_found unless @conversation
+    @conversation = Conversation.find_by(id: params[:conversation_id], purchaser_id: current_purchaser.id)
+
+    unless @conversation
+      render json: { error: 'Conversation not found or unauthorized' }, status: :not_found
+    end
   end
-  
 
   def message_params
     params.require(:message).permit(:content)
@@ -34,7 +36,6 @@ class Purchaser::MessagesController < ApplicationController
     @current_user = PurchaserAuthorizeApiRequest.new(request.headers).result
     render json: { error: 'Not Authorized' }, status: :unauthorized unless @current_user.is_a?(Purchaser)
   end
-  
 
   def current_purchaser
     @current_user

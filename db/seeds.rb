@@ -1760,68 +1760,67 @@ About.create!(
 
 puts "Starts seeding for the Conversations"
 
-# Seed data for Conversations
+require 'faker'
+
 admin = Admin.find_by(email: 'admin@example.com')
 purchasers = Purchaser.all
 vendors = Vendor.all
+ads = Ad.all  # Assuming ads exist
 
-# Ensure there is an admin present
 raise 'Admin not found' unless admin
 
-# Create conversations between admin and each purchaser
-purchasers.each do |purchaser|
-  Conversation.find_or_create_by!(admin_id: admin.id, purchaser_id: purchaser.id) do |conversation|
-    conversation.save!
-  end
-end
-
-# Create conversations between admin and each vendor
-vendors.each do |vendor|
-  Conversation.find_or_create_by!(admin_id: admin.id, vendor_id: vendor.id) do |conversation|
-    conversation.save!
-  end
-end
-
-# Generate unique messages for each conversation
+# Helper to create messages
 def create_messages(conversation, sender, receiver)
-  20.times do |i|
+  10.times do |i|
     Message.create!(
       conversation: conversation,
       sender: sender,
-      content: Faker::Lorem.sentence(word_count: 10 + i)
+      content: Faker::Lorem.sentence(word_count: 8 + i)
     )
     Message.create!(
       conversation: conversation,
       sender: receiver,
-      content: Faker::Lorem.sentence(word_count: 10 + i)
+      content: Faker::Lorem.sentence(word_count: 8 + i)
     )
   end
 end
 
-# Generate messages for each conversation with unique content
-Conversation.all.each do |conversation|
-  if conversation.purchaser_id.present?
-    create_messages(conversation, admin, Purchaser.find(conversation.purchaser_id))
-  elsif conversation.vendor_id.present?
-    create_messages(conversation, admin, Vendor.find(conversation.vendor_id))
+# Create admin ↔ purchaser conversations
+purchasers.each do |purchaser|
+  convo = Conversation.find_or_create_by!(admin_id: admin.id, purchaser_id: purchaser.id)
+  create_messages(convo, admin, purchaser)
+end
+
+# Create admin ↔ vendor conversations
+vendors.each do |vendor|
+  convo = Conversation.find_or_create_by!(admin_id: admin.id, vendor_id: vendor.id)
+  create_messages(convo, admin, vendor)
+end
+
+# Create purchaser ↔ vendor ↔ ad conversations
+# Each purchaser can message only once per ad
+purchasers.first(5).each do |purchaser|
+  ads.sample(10).each do |ad|
+    next if ad.vendor.nil?
+
+    vendor = ad.vendor
+
+    # Skip if a conversation already exists for this purchaser and ad
+    existing_convo = Conversation.find_by(purchaser_id: purchaser.id, ad_id: ad.id)
+    next if existing_convo.present?
+
+    convo = Conversation.create!(
+      purchaser_id: purchaser.id,
+      vendor_id: vendor.id,
+      ad_id: ad.id
+    )
+
+    create_messages(convo, purchaser, vendor)
   end
 end
 
-# Example of additional conversations with varied scenarios
-additional_conversations = [
-  { admin_id: admin.id, purchaser_id: purchasers.first.id },
-  { admin_id: admin.id, vendor_id: vendors.first.id }
-]
+puts "✅ Seeded conversations and messages successfully."
 
-additional_conversations.each do |conv_data|
-  conversation = Conversation.find_or_create_by!(conv_data)
-  
-  if conversation.purchaser_id.present?
-    create_messages(conversation, admin, Purchaser.find(conversation.purchaser_id))
-  elsif conversation.vendor_id.present?
-    create_messages(conversation, admin, Vendor.find(conversation.vendor_id))
-  end
-end
 
 puts "Starts seeding for the Promotions"
 

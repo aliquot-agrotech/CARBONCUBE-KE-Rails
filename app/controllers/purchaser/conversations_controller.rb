@@ -12,19 +12,29 @@ class Purchaser::ConversationsController < ApplicationController
   end
 
   def create
-    @conversation = current_purchaser.purchaser_conversations.build(conversation_params)
+    existing_convo = Conversation.find_by(
+      purchaser_id: current_purchaser.id,
+      vendor_id: params[:conversation][:vendor_id],
+      ad_id: params[:conversation][:ad_id]
+    )
 
-    if @conversation.save
-      render json: @conversation, status: :created
+    if existing_convo
+      render json: existing_convo.as_json(include: [:admin, :vendor, :ad, messages: { include: :sender }]), status: :ok
     else
-      render json: @conversation.errors, status: :unprocessable_entity
+      @conversation = current_purchaser.purchaser_conversations.build(conversation_params)
+
+      if @conversation.save
+        render json: @conversation.as_json(include: [:admin, :vendor, :ad, messages: { include: :sender }]), status: :created
+      else
+        render json: @conversation.errors, status: :unprocessable_entity
+      end
     end
   end
 
   private
 
   def conversation_params
-    params.require(:conversation).permit(:vendor_id)
+    params.require(:conversation).permit(:vendor_id, :ad_id)
   end
 
   def authenticate_purchaser

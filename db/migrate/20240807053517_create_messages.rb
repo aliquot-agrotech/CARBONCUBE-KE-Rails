@@ -1,9 +1,8 @@
 class CreateMessages < ActiveRecord::Migration[7.1]
   def change
     create_table :messages do |t|
-      t.integer :conversation_id
-      t.integer :sender_id
-      t.string :sender_type
+      t.references :conversation, null: false, foreign_key: true
+      t.references :sender, polymorphic: true, null: false  # Handles both purchaser and vendor
       t.text :content
 
       t.timestamps

@@ -23,6 +23,7 @@ class Ad < ApplicationRecord
   has_many :purchasers, through: :bookmarks
   has_many :buy_for_me_orders
   has_many :click_events
+  has_many :conversations, dependent: :destroy
 
   accepts_nested_attributes_for :category
   accepts_nested_attributes_for :reviews
