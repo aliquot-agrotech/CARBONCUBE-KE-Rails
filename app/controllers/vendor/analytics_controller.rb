@@ -308,21 +308,24 @@ class Vendor::AnalyticsController < ApplicationController
 #================================================= WISHLISTS PURCHASER DEMOGRAPHICS =================================================#
   # Get the age group with the highest wishlists
   def top_age_group
-    data = WishList.joins("INNER JOIN purchasers ON wish_lists.purchaser_id = purchasers.id")
-                  .joins("INNER JOIN ads ON wish_lists.ad_id = ads.id")
-                  .where(ads: { vendor_id: current_vendor.id })
-                  .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5")
-                  .count
-    
-    # Rails.logger.info "Age Group Wishlist Distribution: #{data}"
+    age_group_counts = Purchaser.joins(:wishlists)
+                                .where(wishlists: { ad_id: vendor_ad_ids })
+                                .group(:age_group_id)
+                                .count
 
-    group = data.max_by { |_, count| count }
+    top_group_id, count = age_group_counts.max_by { |_, c| c }
 
-    result = group ? { age_group: "#{group[0]}–#{group[0] + 4}", wishlists: group[1] } : nil
-    # Rails.logger.info "Top Age Group: #{result}"
-    
-    result
+    if top_group_id
+      age_group = AgeGroup.find_by(id: top_group_id)
+      {
+        age_group: age_group&.name || 'Unknown',
+        count: count
+      }
+    else
+      nil
+    end
   end
+
 
   # Get the income range with the highest wishlists
   def top_income_range
