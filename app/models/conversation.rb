@@ -6,17 +6,16 @@ class Conversation < ApplicationRecord
 
   has_many :messages, dependent: :destroy
 
-  validates :admin_id, presence: true
-  validate :only_one_participant
+  # Validation for participant presence
+  validate :at_least_one_participant_present
   validates :ad_id, uniqueness: { scope: [:purchaser_id, :vendor_id], message: "conversation already exists for this ad" }
 
   private
 
-  def only_one_participant
-    if purchaser_id.present? && vendor_id.present?
-      errors.add(:base, 'Conversation can only have one participant: either purchaser or vendor')
-    elsif purchaser_id.blank? && vendor_id.blank?
-      errors.add(:base, 'Conversation must have either a purchaser or a vendor')
+  def at_least_one_participant_present
+    if admin_id.blank? && purchaser_id.blank? && vendor_id.blank?
+      errors.add(:base, 'Conversation must have at least one participant (admin, purchaser, or vendor)')
     end
   end
 end
+
