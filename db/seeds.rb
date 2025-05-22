@@ -1543,7 +1543,7 @@ end
 DELIVERY_FEE = 150
 
 # Generate order data
-order_data = 500.times.map do
+order_data = 100.times.map do
   purchaser = Purchaser.all.sample
   status = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned'].sample
   
@@ -1654,19 +1654,14 @@ puts "Seeding click_events and wish_lists..."
 
 # Click Events and Wish Lists seeding logic
 purchasers.each do |purchaser_id|
-  # Randomize number of ads (between 20 and 100 ads per purchaser)
   num_ads = rand(20..50)
-  ad_sample = ads.sample(num_ads) # Select a random sample of ads for this purchaser
+  ad_sample = ads.sample(num_ads)
 
   ad_sample.each do |ad_id|
-    # Generate a random number of events per ad for this purchaser (between 1 and 5 interactions)
     num_clicks = rand(1..5)
-    
-    num_clicks.times do
-      # Generate a random timestamp within the last 5 months (consistent for wish lists)
-      created_at_time = Faker::Time.between(from: 5.months.ago, to: Time.current)
 
-      # Generate a separate randomized timestamp for Click Events (to keep them different)
+    num_clicks.times do
+      created_at_time = Faker::Time.between(from: 5.months.ago, to: Time.current)
       click_event_time = Faker::Time.between(from: 5.months.ago, to: Time.current)
 
       # Create Click Event
@@ -1679,7 +1674,7 @@ purchasers.each do |purchaser_id|
         updated_at: click_event_time
       )
 
-      # Create Add-to-Wish-List Event with same timestamp
+      # Create Add-to-Wish-List Event
       ClickEvent.create!(
         purchaser_id: purchaser_id,
         ad_id: ad_id,
@@ -1689,7 +1684,7 @@ purchasers.each do |purchaser_id|
         updated_at: created_at_time
       )
 
-      # Create Reveal-Vendor-Details Event with click event time (can be different)
+      # Create Reveal-Vendor-Details Event
       ClickEvent.create!(
         purchaser_id: purchaser_id,
         ad_id: ad_id,
@@ -1699,24 +1694,23 @@ purchasers.each do |purchaser_id|
         updated_at: click_event_time
       )
 
-      # Ensure wish_lists table mirrors Add-to-Wish-List events 
-      WishList.create!(
+      # Create WishList entry ONLY IF it doesn't already exist
+      WishList.find_or_create_by!(
         purchaser_id: purchaser_id,
-        ad_id: ad_id,
-        created_at: created_at_time,
-        updated_at: created_at_time
-      )
+        ad_id: ad_id
+      ) do |wishlist|
+        wishlist.created_at = created_at_time
+        wishlist.updated_at = created_at_time
+      end
     end
   end
 end
-
-
 
 puts "Seeding completed successfully!"
 
 # Generate 20 reviews for each ad
 Ad.all.each do |ad|
-  20.times do
+  10.times do
     purchaser = Purchaser.all.sample
     rating = Faker::Number.between(from: 1, to: 5)
     review_text = Faker::Lorem.sentence(word_count: Faker::Number.between(from: 5, to: 10))
