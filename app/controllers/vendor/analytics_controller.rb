@@ -135,13 +135,15 @@ class Vendor::AnalyticsController < ApplicationController
 
   # Group clicks by age groups
   def group_clicks_by_age
-    ClickEvent.includes(:purchaser, :ad)
-      .where(ads: { vendor_id: current_vendor.id })
-      .group("FLOOR(DATE_PART('year', AGE(purchasers.birthdate)) / 5) * 5", :event_type)
-      .count
-      .transform_keys do |k|
-        { age_group: "#{k[0]}–#{k[0].to_i + 4}", event_type: k[1] }
-      end
+    clicks = ClickEvent.joins(purchaser: :age_group)
+                      .includes(:ad)
+                      .where(ads: { vendor_id: current_vendor.id })
+                      .group('age_groups.name', :event_type)
+                      .count
+
+    clicks.transform_keys do |(age_group_name, event_type)|
+      { age_group: age_group_name, event_type: event_type }
+    end
   end
 
   # Group clicks by income ranges
@@ -308,8 +310,8 @@ class Vendor::AnalyticsController < ApplicationController
 #================================================= WISHLISTS PURCHASER DEMOGRAPHICS =================================================#
   # Get the age group with the highest wishlists
   def top_age_group
-    age_group_counts = Purchaser.joins(:wishlists)
-                                .where(wishlists: { ad_id: vendor_ad_ids })
+    age_group_counts = Purchaser.joins(:wish_lists)
+                                .where(wish_lists: { ad_id: vendor_ad_ids })
                                 .group(:age_group_id)
                                 .count
 
@@ -532,6 +534,10 @@ class Vendor::AnalyticsController < ApplicationController
 
   def calculate_total_ads
     current_vendor.ads.count
+  end
+
+  def vendor_ad_ids
+    current_vendor.ads.pluck(:id)
   end
 
   def calculate_average_rating
