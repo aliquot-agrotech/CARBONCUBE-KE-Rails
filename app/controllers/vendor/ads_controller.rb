@@ -78,13 +78,21 @@ class Vendor::AdsController < ApplicationController
   end
 
   def ad_params
-    params.require(:ad).permit(
+    permitted = params.require(:ad).permit(
       :title, :description, :category_id, :subcategory_id, :price, 
       :quantity, :brand, :manufacturer, :item_length, :item_width, 
       :item_height, :item_weight, :weight_unit, :flagged, :condition,
-      media: [] # Allow an array of media
+      media: []
     )
+
+    # Convert empty strings to nil for optional numeric fields
+    %i[item_length item_width item_height item_weight].each do |field|
+      permitted[field] = nil if permitted[field].blank?
+    end
+
+    permitted
   end
+
 
   # Converts images to WebP and uploads them to Cloudinary
   def process_and_upload_images(images)

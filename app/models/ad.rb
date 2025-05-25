@@ -3,18 +3,14 @@ class Ad < ApplicationRecord
 
   enum :condition, { brand_new: 0, second_hand: 1 }
 
-  pg_search_scope :search_by_title_and_description, 
-  against: [:title, :description],
-  using: {
-    tsearch: { prefix: true },
-    trigram: {}
-  }
+  pg_search_scope :search_by_title_and_description, against: [:title, :description], using: { tsearch: { prefix: true }, trigram: {}}
 
   scope :all_products, -> { unscope(:where).all }
 
   belongs_to :vendor
   belongs_to :category
   belongs_to :subcategory
+  
   has_many :order_items
   has_many :orders, through: :order_items
   has_many :reviews, dependent: :destroy
@@ -28,9 +24,12 @@ class Ad < ApplicationRecord
   accepts_nested_attributes_for :category
   accepts_nested_attributes_for :reviews
 
-  validates :title, :description, :price, :quantity, :brand, :manufacturer, :item_length, :item_width, :item_height, :item_weight, presence: true
+  validates :title, :description, :price, :quantity, :brand, :manufacturer, presence: true
+  validates :price, :quantity, numericality: true
+  validates :item_length, :item_width, :item_height, numericality: true, allow_nil: true
+  validates :item_weight, numericality: { greater_than: 0 }, allow_nil: true
+
   validates :price, :quantity, :item_length, :item_width, :item_height, numericality: true
-  validates :item_weight, numericality: { greater_than: 0 }
   validates :weight_unit, inclusion: { in: ['Grams', 'Kilograms'] }
 
   # Ensure media can accept a string or array of strings
