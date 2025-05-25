@@ -20,6 +20,7 @@ class Vendor::AdsController < ApplicationController
     if @ad.save
       render json: @ad.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating]), status: :created
     else
+      Rails.logger.error "❌ Ad save failed: #{@ad.errors.full_messages.join(', ')}"
       render json: @ad.errors, status: :unprocessable_entity
     end
   end  

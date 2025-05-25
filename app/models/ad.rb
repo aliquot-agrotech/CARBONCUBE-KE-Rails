@@ -25,11 +25,12 @@ class Ad < ApplicationRecord
   accepts_nested_attributes_for :reviews
 
   validates :title, :description, :price, :quantity, :brand, :manufacturer, presence: true
-  validates :price, :quantity, numericality: true
+  validates :price, numericality: true
+  validates :quantity, numericality: { greater_than_or_equal_to: 0 }
   validates :item_length, :item_width, :item_height, numericality: true, allow_nil: true
   validates :item_weight, numericality: { greater_than: 0 }, allow_nil: true
 
-  validates :price, :quantity, :item_length, :item_width, :item_height, numericality: true
+
   validates :weight_unit, inclusion: { in: ['Grams', 'Kilograms'] }
 
   # Ensure media can accept a string or array of strings
