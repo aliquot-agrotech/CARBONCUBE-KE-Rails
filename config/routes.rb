@@ -37,6 +37,10 @@ Rails.application.routes.draw do
   # Routes for age_groups
   resources :age_groups, only: [:index]
 
+  # Routes for password OTPs
+  post '/password_resets/request_otp', to: 'password_resets#request_otp'
+  post '/password_resets/verify_otp', to: 'password_resets#verify_otp'
+
   #========================================Admin namespace for admin-specific functionality==========================================#
   namespace :admin do
     namespace :vendor do

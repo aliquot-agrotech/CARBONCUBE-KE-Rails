@@ -101,4 +101,19 @@ Rails.application.configure do
   config.cache_store = :redis_cache_store, {
     url: ENV['REDIS_URL']
   }
+
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: 'smtp-relay.brevo.com',
+    port: 587,
+    domain: 'carboncube-ke.com',
+    user_name: ENV['BREVO_SMTP_USER'],
+    password: ENV['BREVO_SMTP_PASSWORD'],
+    authentication: 'login',
+    enable_starttls_auto: true
+  }
+
+  config.action_mailer.default_options = {
+    from: ENV['BREVO_EMAIL']
+  }
 end

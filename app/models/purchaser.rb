@@ -14,7 +14,8 @@ class Purchaser < ApplicationRecord
   has_many :buy_for_me_orders
   has_many :click_events
   has_many :ad_searches
-  
+  has_many :password_otps, as: :otpable, dependent: :destroy
+
   belongs_to :sector, optional: true
   belongs_to :income, optional: true
   belongs_to :education, optional: true
