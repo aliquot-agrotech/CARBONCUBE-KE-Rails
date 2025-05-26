@@ -13,7 +13,7 @@ class PasswordOtp < ApplicationRecord
     otp_record.update!(otp_digest: otp_digest, otp_sent_at: Time.current)
 
     # Trigger mailer here, passing raw OTP for email content
-    PasswordResetMailer.with(user: user, otp: otp, user_type: user.class.name).send_otp_email.deliver_later
+    PasswordResetMailer.with(user: user, otp: otp.otp, user_type: user.class.name).send_otp_email.deliver_later
 
     otp_record
   end

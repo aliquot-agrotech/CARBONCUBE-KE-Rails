@@ -1,3 +1,5 @@
+#/app/mailers/password_reset_mailer.rb
+
 class PasswordResetMailer < ApplicationMailer
   default from: ENV['BREVO_EMAIL']
 
