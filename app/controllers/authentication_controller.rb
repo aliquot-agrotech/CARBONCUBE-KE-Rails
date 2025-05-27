@@ -2,19 +2,29 @@ class AuthenticationController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
 
   def login
-    identifier = params[:identifier]  # Use unified identifier param
+    identifier = params[:identifier]
     @user = find_user_by_identifier(identifier)
 
     if @user&.authenticate(params[:password])
+      role = determine_role(@user)
+
+      # 🚫 Pilot restriction for vendors outside Nairobi
+      if role == 'vendor' && @user.county&.county_code.to_i != 47
+        render json: {
+          errors: ['Access restricted during pilot phase. Only Nairobi-based vendors can log in.']
+        }, status: :forbidden
+        return
+      end
+
       user_response = {
         id: @user.id,
         email: @user.email,
-        role: determine_role(@user)
+        role: role
       }
       user_response[:phone_number] = @user.phone_number if @user.is_a?(Rider)
       user_response[:id_number] = @user.id_number if @user.is_a?(Rider)
 
-      token = JsonWebToken.encode(user_id: @user.id, role: determine_role(@user))
+      token = JsonWebToken.encode(user_id: @user.id, role: role)
       render json: { token: token, user: user_response }, status: :ok
     else
       render json: { errors: ['Invalid login credentials'] }, status: :unauthorized
