@@ -2,6 +2,7 @@
 class EmailOtpsController < ApplicationController
   def create
     email = params[:email]
+    fullname = params[:fullname]
     otp_code = rand.to_s[2..7] # 6-digit code
     expires_at = 10.minutes.from_now
 
@@ -10,7 +11,7 @@ class EmailOtpsController < ApplicationController
     EmailOtp.create!(email: email, otp_code: otp_code, expires_at: expires_at)
 
     # Send email (you can use ActionMailer or external provider)
-    OtpMailer.with(email: email, code: otp_code).send_otp.deliver_now
+    OtpMailer.with(email: email, code: otp_code, fullname: fullname).send_otp.deliver_now
 
     render json: { message: "OTP sent to #{email}" }, status: :ok
   end
