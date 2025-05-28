@@ -146,15 +146,9 @@ class Vendor::VendorsController < ApplicationController
 
   # Skips image processing for PDFs
   def upload_file_only(file)
-    # Example for ActiveStorage
-    blob = ActiveStorage::Blob.create_and_upload!(
-      io: file.tempfile,
-      filename: file.original_filename,
-      content_type: file.content_type
-    )
-    Rails.application.routes.url_helpers.rails_blob_url(blob, only_path: true)
-  end
-  
+    uploaded = Cloudinary::Uploader.upload(file.tempfile.path, resource_type: "raw", upload_preset: ENV['UPLOAD_PRESET'])
+    uploaded["secure_url"]
+  end 
 end
 
   
