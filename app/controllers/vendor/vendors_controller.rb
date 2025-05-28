@@ -22,30 +22,41 @@ class Vendor::VendorsController < ApplicationController
 
   # POST /vendor/signup
   def create
-    # Process the business permit before assigning to @vendor
     if params[:vendor][:business_permit].present?
-      Rails.logger.info "📎 Processing business permit upload..."
-      processed_permit_url = process_and_upload_permit(params[:vendor][:business_permit])
-      params[:vendor][:business_permit] = processed_permit_url if processed_permit_url
+      uploaded_file = params[:vendor][:business_permit]
+
+      # Validate file size (< 1MB)
+      if uploaded_file.size > 1.megabyte
+        return render json: { error: "Business permit must be less than 1MB" }, status: :unprocessable_entity
+      end
+
+      # Skip processing for PDFs
+      if uploaded_file.content_type == "application/pdf"
+        Rails.logger.info "📄 PDF detected, skipping processing..."
+        uploaded_url = upload_file_only(uploaded_file) # store and return URL
+      else
+        Rails.logger.info "🖼️ Image detected, processing..."
+        uploaded_url = process_and_upload_permit(uploaded_file)
+      end
+
+      params[:vendor][:business_permit] = uploaded_url if uploaded_url
     end
 
     @vendor = Vendor.new(vendor_params)
 
-    # Log the parameters for debugging
     Rails.logger.info "Vendor Signup Params: #{vendor_params.inspect}"
 
     if @vendor.save
-      # Assign Free Tier (tier_id: 1) automatically
       VendorTier.create(vendor_id: @vendor.id, tier_id: 1, duration_months: 0)
 
       token = JsonWebToken.encode(vendor_id: @vendor.id, role: 'Vendor')
       render json: { token: token, vendor: @vendor }, status: :created
     else
-      # Log errors if save fails
       Rails.logger.error "Vendor Signup Failed: #{@vendor.errors.full_messages.inspect}"
       render json: @vendor.errors, status: :unprocessable_entity
     end
   end
+
 
 
   private
@@ -133,6 +144,17 @@ class Vendor::VendorsController < ApplicationController
     webp_path
   end 
 
+  # Skips image processing for PDFs
+  def upload_file_only(file)
+    # Example for ActiveStorage
+    blob = ActiveStorage::Blob.create_and_upload!(
+      io: file.tempfile,
+      filename: file.original_filename,
+      content_type: file.content_type
+    )
+    Rails.application.routes.url_helpers.rails_blob_url(blob, only_path: true)
+  end
+  
 end
 
   
