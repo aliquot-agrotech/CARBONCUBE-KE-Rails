@@ -1,7 +1,6 @@
 
 Rails.application.routes.draw do
-  get "email_otps/create"
-  get "email_otps/verify"
+
 
   root to: 'application#home'
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -42,6 +41,14 @@ Rails.application.routes.draw do
   # Routes for password OTPs
   post '/password_resets/request_otp', to: 'password_resets#request_otp'
   post '/password_resets/verify_otp', to: 'password_resets#verify_otp'
+
+  # Sign-Up OTP routes
+  resources :email_otps, only: [:create] do
+    collection do
+      post :verify
+    end
+  end
+
 
   #========================================Admin namespace for admin-specific functionality==========================================#
   namespace :admin do
