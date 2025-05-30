@@ -136,19 +136,19 @@ free_features = [
 basic_features = [
   "Improved listing visibility",
   "Marketplace analytics access",
-  "Ability to create limited discount offers (up to 10% off)",
+  "Ability to create limited discount offers",
   "Dedicated technical support"
 ]
 standard_features = [
   "Priority listing in category searches",
   "Marketplace analytics access",
-  "Ability to create discount offers (up to 20% off)",
+  "Ability to create discount offers",
   "Dedicated technical support"
 ]
 premium_features = [
   "Featured listing options",
   "Marketplace analytics access",
-  "Ability to create discount offers (up to 30% off)",
+  "Ability to create discount offers",
   "Advanced promotional tools (banner ads on category pages)",
   "Access to Wishlist Statistics",
   "Access to Competitor Statistics",
