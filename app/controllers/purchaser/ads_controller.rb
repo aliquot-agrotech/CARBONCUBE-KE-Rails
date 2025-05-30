@@ -53,11 +53,22 @@ class Purchaser::AdsController < ApplicationController
     ads = ads.where(subcategory_id: subcategory_id) if subcategory_id.present? && subcategory_id != 'All'
 
     # ✅ Optimize by eager loading associated records used in AdSerializer
-    ads = ads.includes(
-      vendor: { vendor_tier: :tier },
-      category: :ads,
-      subcategory: :ads
-    ).distinct
+    ads = ads
+      .joins(vendor: { vendor_tier: :tier })
+      .select('ads.*, CASE tiers.id
+                        WHEN 4 THEN 1
+                        WHEN 3 THEN 2
+                        WHEN 2 THEN 3
+                        WHEN 1 THEN 4
+                        ELSE 5
+                      END AS tier_priority')
+      .includes(
+        vendor: { vendor_tier: :tier },
+        category: :ads,
+        subcategory: :ads
+      )
+      .order('tier_priority ASC')
+      .distinct
 
     render json: ads, each_serializer: AdSerializer
   end
