@@ -25,6 +25,7 @@ Rails.application.routes.draw do
   resources :sectors, only: [:index]
   resources :educations, only: [:index]
   resources :employments, only: [:index]
+  resources :tiers, only: [:index]
 
   # Mpesa payment routes
   post "payments/validate", to: "mpesa#validate_payment"
