@@ -1,6 +1,6 @@
 class Purchaser::PurchasersController < ApplicationController
   before_action :set_purchaser, only: [:show, :update]
-  before_action :authenticate_purchaser, only: [:identify, :show, :update]
+  before_action :authenticate_purchaser, only: [:identify, :show, :update, :destroy]
   before_action :set_default_format
 
   # GET /purchaser/identify
@@ -42,9 +42,19 @@ class Purchaser::PurchasersController < ApplicationController
 
   # DELETE /purchasers/:id
   def destroy
-    current_purchaser.destroy
-    head :no_content
+    if current_purchaser.nil?
+      Rails.logger.error("Current purchaser is nil during account deletion.")
+      render json: { error: 'Not Authorized' }, status: :unauthorized
+      return
+    end
+
+    if current_purchaser.update(deleted: true)
+      head :no_content
+    else
+      render json: { error: 'Failed to delete account' }, status: :unprocessable_entity
+    end
   end
+
 
   private
 
@@ -73,8 +83,11 @@ class Purchaser::PurchasersController < ApplicationController
 
   def authenticate_purchaser
     @current_purchaser = PurchaserAuthorizeApiRequest.new(request.headers).result
-    unless @current_purchaser
+
+    if @current_purchaser.nil?
       render json: { error: 'Not Authorized' }, status: :unauthorized
+    elsif @current_purchaser.deleted?
+      render json: { error: 'Account has been deleted' }, status: :unauthorized
     end
   end
 

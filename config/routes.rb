@@ -137,6 +137,7 @@ Rails.application.routes.draw do
   #=================================================Vendor namespace for vendor-specific functionality===============================#
   namespace :vendor do
     post 'signup', to: 'vendors#create'
+    delete 'delete_account', to: 'vendors#destroy'
     
     resources :ads
     resources :orders do
@@ -176,6 +177,7 @@ Rails.application.routes.draw do
   #==========================================Purchaser namespace for purchaser-specific functionality=========================================#
   namespace :purchaser, defaults:{ format: :json}, path: 'purchaser' do
     post 'signup', to: 'purchasers#create'
+    delete 'delete_account', to: 'purchasers#destroy'
 
     resource :profile, only: [:show, :update] do
       post 'change-password', to: 'profiles#change_password'

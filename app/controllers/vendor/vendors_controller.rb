@@ -1,6 +1,6 @@
 class Vendor::VendorsController < ApplicationController
   before_action :set_vendor, only: [:show, :update]
-  before_action :authenticate_vendor, only: [:identify, :show, :update]
+  before_action :authenticate_vendor, only: [:identify, :show, :update, :destroy]
 
   def identify
     render json: { vendor_id: current_vendor.id }
@@ -17,6 +17,21 @@ class Vendor::VendorsController < ApplicationController
       render json: current_vendor
     else
       render json: current_vendor.errors, status: :unprocessable_entity
+    end
+  end
+
+  # DELETE /vendor/:id
+  def destroy
+    if current_vendor.nil?
+      Rails.logger.error("Current vendor is nil during account deletion.")
+      render json: { error: 'Not Authorized' }, status: :unauthorized
+      return
+    end
+
+    if current_vendor.update(deleted: true)
+      head :no_content
+    else
+      render json: { error: 'Failed to delete account' }, status: :unprocessable_entity
     end
   end
 
@@ -75,8 +90,11 @@ class Vendor::VendorsController < ApplicationController
 
   def authenticate_vendor
     @current_vendor = VendorAuthorizeApiRequest.new(request.headers).result
-    unless @current_vendor
+
+    if @current_vendor.nil?
       render json: { error: 'Not Authorized' }, status: :unauthorized
+    elsif @current_vendor.deleted?
+      render json: { error: 'Account has been deleted' }, status: :unauthorized
     end
   end
 
