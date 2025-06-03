@@ -8,6 +8,12 @@ class AuthenticationController < ApplicationController
     if @user&.authenticate(params[:password])
       role = determine_role(@user)
 
+      # ❌ Block login if the user is soft-deleted
+      if (@user.is_a?(Purchaser) || @user.is_a?(Vendor)) && @user.deleted?
+        render json: { errors: ['Your account has been deleted. Please contact support.'] }, status: :unauthorized
+        return
+      end
+
       # 🚫 Pilot restriction for vendors outside Nairobi
       if role == 'vendor' && @user.county&.county_code.to_i != 47
         render json: {
