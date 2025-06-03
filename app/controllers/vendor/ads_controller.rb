@@ -150,16 +150,39 @@ class Vendor::AdsController < ApplicationController
   
   # Optimize image size and convert to WebP using ImageProcessing + Vips
   def optimize_and_convert_to_webp(image_path)
-    image_path = image_path.to_s # Ensure it's a string
-    webp_path = image_path.sub(/\.\w+$/, ".webp")
-  
-    ImageProcessing::Vips
-      .source(image_path)
-      .resize_to_limit(1080, nil) # Resize width to 1080px (height auto-adjusts)
-      .convert("webp")
-      .saver(quality: 70) # Set WebP compression quality
-      .call(destination: webp_path)
-  
-    webp_path
-  end  
+    image_path = image_path.to_s
+    base_webp_path = image_path.sub(/\.\w+$/, ".webp")
+    max_file_size = 1 * 1024 * 1024 # 1 MB
+    quality = 70
+    min_quality = 40
+    step = 10
+
+    Rails.logger.info "🧩 Starting compression for: #{File.basename(image_path)}"
+
+    loop do
+      current_webp_path = base_webp_path.sub(".webp", "_q#{quality}.webp")
+
+      ImageProcessing::Vips
+        .source(image_path)
+        .resize_to_limit(1080, nil) # Resize to width 1080px
+        .convert("webp")
+        .saver(quality: quality)
+        .call(destination: current_webp_path)
+
+      file_size = File.size(current_webp_path)
+      readable_size = (file_size / 1024.0).round(2)
+
+      Rails.logger.info "🔄 Tried quality=#{quality}: #{readable_size} KB (Path: #{current_webp_path})"
+
+      if file_size <= max_file_size
+        Rails.logger.info "✅ Compression successful under 1MB at quality=#{quality} (#{readable_size} KB)"
+        return current_webp_path
+      elsif quality <= min_quality
+        Rails.logger.warn "⚠️ Minimum quality reached (#{min_quality}). File still exceeds 1MB (#{readable_size} KB)"
+        return current_webp_path
+      else
+        quality -= step
+      end
+    end
+  end
 end
