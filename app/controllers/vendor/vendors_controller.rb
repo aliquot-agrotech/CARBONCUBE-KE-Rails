@@ -37,18 +37,22 @@ class Vendor::VendorsController < ApplicationController
 
   # POST /vendor/signup
   def create
+    vendor_email = params[:vendor][:email].downcase.strip
+
+    if Purchaser.exists?(email: vendor_email)
+      return render json: { errors: ['Email is already in use by a purchaser'] }, status: :unprocessable_entity
+    end
+
     if params[:vendor][:business_permit].present?
       uploaded_file = params[:vendor][:business_permit]
 
-      # Validate file size (< 1MB)
       if uploaded_file.size > 1.megabyte
         return render json: { error: "Business permit must be less than 1MB" }, status: :unprocessable_entity
       end
 
-      # Skip processing for PDFs
       if uploaded_file.content_type == "application/pdf"
         Rails.logger.info "📄 PDF detected, skipping processing..."
-        uploaded_url = upload_file_only(uploaded_file) # store and return URL
+        uploaded_url = upload_file_only(uploaded_file)
       else
         Rails.logger.info "🖼️ Image detected, processing..."
         uploaded_url = process_and_upload_permit(uploaded_file)
@@ -63,7 +67,6 @@ class Vendor::VendorsController < ApplicationController
 
     if @vendor.save
       VendorTier.create(vendor_id: @vendor.id, tier_id: 1, duration_months: 0)
-
       token = JsonWebToken.encode(vendor_id: @vendor.id, role: 'Vendor')
       render json: { token: token, vendor: @vendor }, status: :created
     else
@@ -71,8 +74,6 @@ class Vendor::VendorsController < ApplicationController
       render json: @vendor.errors, status: :unprocessable_entity
     end
   end
-
-
 
   private
 

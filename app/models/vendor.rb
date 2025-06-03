@@ -1,5 +1,7 @@
 # app/models/vendor.rb
 class Vendor < ApplicationRecord
+  before_validation :normalize_email
+
   has_secure_password
   has_and_belongs_to_many :categories
   has_many :ads
@@ -25,7 +27,7 @@ class Vendor < ApplicationRecord
   validates :sub_county_id, presence: true
   validates :fullname, presence: true
   validates :phone_number, presence: true
-  validates :email, presence: true, uniqueness: true
+  validates :email, presence: true, uniqueness: { case_sensitive: false }
   validates :enterprise_name, presence: true
   validates :location, presence: true
   validates :business_registration_number, presence: true
@@ -46,5 +48,11 @@ class Vendor < ApplicationRecord
     else
       update(blocked: false)
     end
+  end
+
+  private
+
+  def normalize_email
+    self.email = email.to_s.strip.downcase
   end
 end

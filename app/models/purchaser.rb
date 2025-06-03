@@ -1,6 +1,7 @@
 # app/models/purchaser.rb
-
 class Purchaser < ApplicationRecord
+  before_validation :normalize_email
+
   has_secure_password
 
   has_many :orders
@@ -25,7 +26,7 @@ class Purchaser < ApplicationRecord
   belongs_to :age_group, optional: true
 
   validates :fullname, presence: true
-  validates :email, presence: true, uniqueness: true
+  validates :email, presence: true, uniqueness: { case_sensitive: false }
   validates :username, presence: true, uniqueness: true
   validates :password, presence: true, length: { minimum: 6 }, if: :password_required?
   validates :age_group, presence: true
@@ -56,4 +57,9 @@ class Purchaser < ApplicationRecord
     new_record? || password.present?
   end
 
+  private
+
+  def normalize_email
+    self.email = email.to_s.strip.downcase
+  end
 end

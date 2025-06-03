@@ -13,21 +13,28 @@ class Purchaser::PurchasersController < ApplicationController
     render json: current_purchaser
   end
 
+  # POST /purchasers/signup
   def create
     logger.debug "Purchaser Params Received: #{purchaser_params.inspect}"
-    
-    @purchaser = Purchaser.new(purchaser_params)
-    
-    if Purchaser.exists?(email: @purchaser.email)
+
+    purchaser_email = purchaser_params[:email].downcase.strip
+
+    if Vendor.exists?(email: purchaser_email)
+      render json: { errors: ['Email is already in use by a vendor'] }, status: :unprocessable_entity
+    elsif Purchaser.exists?(email: purchaser_email)
       render json: { errors: ['Email has already been taken'] }, status: :unprocessable_entity
-    elsif Purchaser.exists?(username: @purchaser.username)
+    elsif Purchaser.exists?(username: purchaser_params[:username])
       render json: { errors: ['Username has already been taken'] }, status: :unprocessable_entity
-    elsif @purchaser.save
-      token = JsonWebToken.encode(purchaser_id: @purchaser.id, role: 'Purchaser')
-      render json: { token: token, purchaser: @purchaser }, status: :created
     else
-      logger.debug "Purchaser Errors: #{@purchaser.errors.full_messages}"
-      render json: { errors: @purchaser.errors.full_messages }, status: :unprocessable_entity
+      @purchaser = Purchaser.new(purchaser_params)
+
+      if @purchaser.save
+        token = JsonWebToken.encode(purchaser_id: @purchaser.id, role: 'Purchaser')
+        render json: { token: token, purchaser: @purchaser }, status: :created
+      else
+        logger.debug "Purchaser Errors: #{@purchaser.errors.full_messages}"
+        render json: { errors: @purchaser.errors.full_messages }, status: :unprocessable_entity
+      end
     end
   end
   
