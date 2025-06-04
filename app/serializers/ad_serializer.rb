@@ -3,7 +3,7 @@ class AdSerializer < ActiveModel::Serializer
              :subcategory_name, :title, :description, :price, :quantity, :brand,
              :manufacturer, :item_weight, :weight_unit, :item_length, :item_width,
              :item_height, :media_urls, :first_media_url, :mean_rating, :review_count,
-             :vendor_tier, :tier_name, :condition
+             :vendor_tier, :tier_name, :condition, :vendor_enterprise_name, :vendor_phone_number 
 
   has_one :vendor, serializer: VendorSerializer
   has_many :reviews
@@ -44,5 +44,13 @@ class AdSerializer < ActiveModel::Serializer
 
   def review_count
     object.reviews.count
+  end
+
+  def vendor_enterprise_name
+    object.vendor.enterprise_name
+  end
+
+  def vendor_phone_number
+    object.vendor.phone_number || "N/A"
   end
 end
