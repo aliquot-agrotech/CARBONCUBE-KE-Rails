@@ -94,6 +94,10 @@ gem 'hiredis'
 
 # Amazon Rekognition for image moderation
 # gem 'aws-sdk-rekognition', '~> 1.111'
+# 
+# Cron Job Gem
+gem 'whenever', require: false
+
 
 # Cloudinary for image hosting
 gem 'cloudinary'
