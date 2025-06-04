@@ -22,6 +22,7 @@ class Vendor < ApplicationRecord
   belongs_to :county
   belongs_to :sub_county
   belongs_to :age_group
+  belongs_to :document_type, optional: true
 
   validates :county_id, presence: true
   validates :sub_county_id, presence: true

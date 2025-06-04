@@ -82,7 +82,8 @@ class Vendor::VendorsController < ApplicationController
   end
 
   def vendor_params
-    params.require(:vendor).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :username, :age_group_id, :zipcode, :city, :gender, :description, :business_registration_number, :business_permit, :county_id, :sub_county_id,  category_ids: [])
+    params.require(:vendor).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :username, :age_group_id, :zipcode, :city, :gender, :description, :business_registration_number, :document_type_id,
+    :document_expiry_date, :document_verified, :county_id, :sub_county_id,  category_ids: [])
   end
 
   def vendor_params_with_categories

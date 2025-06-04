@@ -50,6 +50,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # Routes for document types
+  resources :document_types, only: [:index]
+
 
   #========================================Admin namespace for admin-specific functionality==========================================#
   namespace :admin do
@@ -98,6 +101,7 @@ Rails.application.routes.draw do
         get 'orders', to: 'vendors#orders'
         get 'ads'
         get 'reviews'
+        post :verify_document
       end
     end
 

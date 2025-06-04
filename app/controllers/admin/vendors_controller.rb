@@ -40,6 +40,12 @@ class Admin::VendorsController < ApplicationController
     end
   end
 
+  def verify_document
+    vendor = Vendor.find(params[:id])
+    vendor.update(document_verified: true)
+    render json: { message: 'Vendor document verified.' }, status: :ok
+  end
+
   def destroy
     @vendor.destroy
     head :no_content
