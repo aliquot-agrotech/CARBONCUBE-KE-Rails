@@ -43,8 +43,10 @@ class Vendor::VendorsController < ApplicationController
       return render json: { errors: ['Email is already in use by a purchaser'] }, status: :unprocessable_entity
     end
 
-    if params[:vendor][:business_permit].present?
-      uploaded_file = params[:vendor][:business_permit]
+    uploaded_url = nil
+
+    if params[:vendor][:document_url].present?
+      uploaded_file = params[:vendor][:document_url]
 
       if uploaded_file.size > 1.megabyte
         return render json: { error: "Business permit must be less than 1MB" }, status: :unprocessable_entity
@@ -57,11 +59,10 @@ class Vendor::VendorsController < ApplicationController
         Rails.logger.info "🖼️ Image detected, processing..."
         uploaded_url = process_and_upload_permit(uploaded_file)
       end
-
-      params[:vendor][:business_permit] = uploaded_url if uploaded_url
     end
 
     @vendor = Vendor.new(vendor_params)
+    @vendor.document_url = uploaded_url if uploaded_url
 
     Rails.logger.info "Vendor Signup Params: #{vendor_params.inspect}"
 
@@ -75,6 +76,7 @@ class Vendor::VendorsController < ApplicationController
     end
   end
 
+
   private
 
   def set_vendor
@@ -82,7 +84,7 @@ class Vendor::VendorsController < ApplicationController
   end
 
   def vendor_params
-    params.require(:vendor).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :username, :age_group_id, :zipcode, :city, :gender, :description, :business_registration_number, :document_type_id,
+    params.require(:vendor).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :username, :age_group_id, :zipcode, :city, :gender, :description, :business_registration_number, :document_url, :document_type_id,
     :document_expiry_date, :document_verified, :county_id, :sub_county_id,  category_ids: [])
   end
 
