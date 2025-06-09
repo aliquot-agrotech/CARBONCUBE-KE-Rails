@@ -4,7 +4,10 @@ class Admin::ConversationsController < ApplicationController
 
   # GET /admin/conversations
   def index
-    @conversations = Conversation.includes(:admin, :purchaser, :vendor, messages: :sender).all
+    @conversations = Conversation
+      .includes(:admin, :purchaser, :vendor)
+      .where(admin_id: current_admin.id)
+    
     render json: @conversations, each_serializer: ConversationSerializer
   end
 
