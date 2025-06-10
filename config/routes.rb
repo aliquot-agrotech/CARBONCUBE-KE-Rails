@@ -164,7 +164,9 @@ Rails.application.routes.draw do
       post 'change-password', to: 'profiles#change_password'
     end
 
-    resources :messages
+    resources :conversations, only: [:index, :show, :create] do
+    resources :messages, only: [:index, :create]
+  end
     get 'identify', to: 'vendors#identify'
     resources :notifications
 
