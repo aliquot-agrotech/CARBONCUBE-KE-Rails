@@ -1,7 +1,7 @@
 class Ad < ApplicationRecord
   include PgSearch::Model
 
-  enum :condition, { brand_new: 0, second_hand: 1 }
+  enum :condition, { brand_new: 0, second_hand: 1, refurbished: 2 }
 
   pg_search_scope :search_by_title_and_description, against: [:title, :description], using: { tsearch: { prefix: true }, trigram: {}}
 

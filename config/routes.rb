@@ -165,8 +165,10 @@ Rails.application.routes.draw do
     end
 
     resources :conversations, only: [:index, :show, :create] do
-    resources :messages, only: [:index, :create]
-  end
+      # Messages are nested under conversations
+      resources :messages, only: [:index, :create]
+    end
+
     get 'identify', to: 'vendors#identify'
     resources :notifications
 

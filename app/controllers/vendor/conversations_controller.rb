@@ -2,18 +2,34 @@ class Vendor::ConversationsController < ApplicationController
   before_action :authenticate_vendor
 
   def index
-    # Fetch conversations where current vendor is the vendor
+    # Fetch ONLY conversations where current vendor is the vendor
     @conversations = Conversation.where(vendor_id: current_vendor.id)
-                                .includes(:admin, :purchaser, :ad, messages: { include: :sender })
+                                .includes(:admin, :purchaser, :ad, :messages)
+                                .order(updated_at: :desc)
     
-    render json: @conversations.as_json(
-      include: [
-        :admin, 
-        :purchaser, 
-        :ad,
-        messages: { include: :sender }
-      ]
-    )
+    # Debug: Log the vendor ID and conversations found
+    Rails.logger.info "Current Vendor ID: #{current_vendor.id}"
+    Rails.logger.info "Conversations found: #{@conversations.count}"
+    @conversations.each do |conv|
+      Rails.logger.info "Conversation ID: #{conv.id}, Vendor ID: #{conv.vendor_id}"
+    end
+    
+    # Simple JSON without complex includes to avoid method errors
+    conversations_data = @conversations.map do |conversation|
+      {
+        id: conversation.id,
+        vendor_id: conversation.vendor_id, # Include this to verify
+        created_at: conversation.created_at,
+        updated_at: conversation.updated_at,
+        admin: conversation.admin,
+        purchaser: conversation.purchaser,
+        ad: conversation.ad,
+        messages_count: conversation.messages.count,
+        last_message: conversation.messages.last&.content
+      }
+    end
+    
+    render json: conversations_data
   end
 
   def show
@@ -24,14 +40,26 @@ class Vendor::ConversationsController < ApplicationController
       return
     end
     
-    render json: @conversation.as_json(
-      include: [
-        :admin, 
-        :purchaser, 
-        :ad,
-        messages: { include: :sender }
-      ]
-    )
+    # Simple JSON response to avoid method errors
+    conversation_data = {
+      id: @conversation.id,
+      created_at: @conversation.created_at,
+      updated_at: @conversation.updated_at,
+      admin: @conversation.admin,
+      purchaser: @conversation.purchaser,
+      ad: @conversation.ad,
+      messages: @conversation.messages.includes(:sender).map do |message|
+        {
+          id: message.id,
+          content: message.content,
+          created_at: message.created_at,
+          sender_type: message.sender.class.name,
+          sender_id: message.sender.id
+        }
+      end
+    }
+    
+    render json: conversation_data
   end
 
   def create
@@ -79,7 +107,15 @@ class Vendor::ConversationsController < ApplicationController
 
   def authenticate_vendor
     @current_user = VendorAuthorizeApiRequest.new(request.headers).result
-    render json: { error: 'Not Authorized' }, status: :unauthorized unless @current_user&.is_a?(Vendor)
+    
+    # Debug logging
+    Rails.logger.info "Authenticated user: #{@current_user.inspect}"
+    Rails.logger.info "Is Vendor?: #{@current_user&.is_a?(Vendor)}"
+    Rails.logger.info "User ID: #{@current_user&.id}"
+    
+    unless @current_user&.is_a?(Vendor)
+      render json: { error: 'Not Authorized' }, status: :unauthorized
+    end
   end
 
   def current_vendor
