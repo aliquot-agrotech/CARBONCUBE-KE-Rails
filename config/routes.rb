@@ -199,7 +199,10 @@ Rails.application.routes.draw do
     end
 
     resources :reviews
-    resources :messages
+    resources :conversations, only: [:index, :show, :create] do
+      # Messages are nested under conversations
+      resources :messages, only: [:index, :create]
+    end
     resources :categories
     resources :notifications
     resources :subcategories
