@@ -63,7 +63,6 @@ class Purchaser::ConversationsController < ApplicationController
   end
 
   def create
-    # Check if conversation already exists for this purchaser, purchaser, and ad
     existing_convo = Conversation.find_by(
       purchaser_id: current_purchaser.id,
       vendor_id: params[:conversation][:vendor_id],
@@ -71,29 +70,45 @@ class Purchaser::ConversationsController < ApplicationController
     )
 
     if existing_convo
+      # If conversation exists and there's a new message, add it
+      if params[:message].present? && params[:message].strip.length > 0
+        message = existing_convo.messages.create(
+          sender: current_purchaser,
+          content: params[:message].strip
+        )
+        Rails.logger.info "Added message to existing conversation: #{message.inspect}"
+      end
+      
       render json: existing_convo.as_json(
-        include: [
-          :admin, 
-          :vendor, 
-          :ad, 
-          messages: { include: :sender }
-        ]
+        include: [:admin, :vendor, :ad, messages: { include: :sender }]
       ), status: :ok
     else
-      # Create new conversation with purchaser as the purchaser (not creator, since purchaser creates)
       @conversation = Conversation.new(conversation_params)
       @conversation.purchaser_id = current_purchaser.id
 
       if @conversation.save
+        Rails.logger.info "Created new conversation: #{@conversation.id}"
+        
+        # Create initial message if provided
+        if params[:message].present? && params[:message].strip.length > 0
+          message = @conversation.messages.create(
+            sender: current_purchaser,
+            content: params[:message].strip
+          )
+          Rails.logger.info "Created initial message: #{message.inspect}"
+          
+          if message.errors.any?
+            Rails.logger.error "Message creation failed: #{message.errors.full_messages}"
+          end
+        else
+          Rails.logger.warn "No message provided or message was empty"
+        end
+
         render json: @conversation.as_json(
-          include: [
-            :admin, 
-            :vendor, 
-            :ad, 
-            messages: { include: :sender }
-          ]
+          include: [:admin, :vendor, :ad, messages: { include: :sender }]
         ), status: :created
       else
+        Rails.logger.error "Conversation creation failed: #{@conversation.errors.full_messages}"
         render json: @conversation.errors, status: :unprocessable_entity
       end
     end
