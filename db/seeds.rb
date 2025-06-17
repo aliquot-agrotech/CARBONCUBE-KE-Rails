@@ -121,9 +121,9 @@ end
 puts "Starts seeding Vendors, Riders and Purchasers"
 
 # Seed Tiers
-free_tier = Tier.create!(name: "Free", ads_limit: 2)
-basic_tier = Tier.create!(name: "Basic", ads_limit: 10)
-standard_tier = Tier.create!(name: "Standard", ads_limit: 50)
+free_tier = Tier.create!(name: "Free", ads_limit: 10)
+basic_tier = Tier.create!(name: "Basic", ads_limit: 100)
+standard_tier = Tier.create!(name: "Standard", ads_limit: 400)
 premium_tier = Tier.create!(name: "Premium", ads_limit: 2000) # Unlimited ads
 
 # Seed Features
@@ -168,8 +168,8 @@ end
 pricing_data = {
   free_tier => { 1 => 0.00, 3 => 0.00, 6 => 0.00, 12 => 0.00 },
   basic_tier => { 1 => 3000.00, 3 => 8550.00, 6 => 16200.00, 12 => 30600.00 },
-  standard_tier => { 1 => 10000.00, 3 => 28500.00, 6 => 54000.00, 12 => 102000.00 },
-  premium_tier => { 1 => 20000.00, 3 => 57000.00, 6 => 108000.00, 12 => 204000.00 }
+  standard_tier => { 1 => 7500.00, 3 => 21375.00, 6 => 40500.00, 12 => 76500.00 },
+  premium_tier => { 1 => 15000.00, 3 => 42750.00, 6 => 81000.00, 12 => 153000.00 }
 }
 
 # Associate pricing with tiers
