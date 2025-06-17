@@ -5,9 +5,9 @@ class Admin::AdSearchesController < ApplicationController
   def index
     @ad_searches = AdSearch.all
 
-    # Optional: Filtering by search_term or purchaser_id
+    # Optional: Filtering by search_term or buyer_id
     @ad_searches = @ad_searches.where("search_term ILIKE ?", "%#{params[:search_term]}%") if params[:search_term].present?
-    @ad_searches = @ad_searches.where(purchaser_id: params[:purchaser_id]) if params[:purchaser_id].present?
+    @ad_searches = @ad_searches.where(buyer_id: params[:buyer_id]) if params[:buyer_id].present?
 
     # Use ActiveModelSerializers for rendering
     render json: @ad_searches, each_serializer: AdSearchSerializer, status: :ok

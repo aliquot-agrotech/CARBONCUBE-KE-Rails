@@ -2,8 +2,8 @@ class Admin::AnalyticsController < ApplicationController
   before_action :authenticate_admin
 
   def index
-    @total_vendors = Vendor.count
-    @total_purchasers = Purchaser.count
+    @total_vendors = Seller.count
+    @total_buyers = Buyer.count
     @total_ads = Ad.count
     @total_reviews = Review.count
 
@@ -31,23 +31,23 @@ class Admin::AnalyticsController < ApplicationController
     # Get selected metric from query parameter, default to 'Total Click Events' if none provided
     selected_metric = params[:metric] || 'Total Wishlists'
 
-    # Calculate purchaser total wishlists
-    purchasers_by_wishlists = Purchaser.joins(:wish_lists)
-                              .select('purchasers.id AS purchaser_id, purchasers.fullname, COUNT(wish_lists.id) AS total_wishlists')
-                              .group('purchasers.id')
+    # Calculate buyer total wishlists
+    buyers_by_wishlists = Buyer.joins(:wish_lists)
+                              .select('buyers.id AS buyer_id, buyers.fullname, COUNT(wish_lists.id) AS total_wishlists')
+                              .group('buyers.id')
                               .order('total_wishlists DESC')
 
-    # Calculate purchaser total click events (sum of all click types)
-    purchasers_by_clicks = Purchaser.joins(:click_events)
-                              .select('purchasers.id AS purchaser_id, purchasers.fullname, COUNT(click_events.id) AS total_clicks')
-                              .group('purchasers.id')
+    # Calculate buyer total click events (sum of all click types)
+    buyers_by_clicks = Buyer.joins(:click_events)
+                              .select('buyers.id AS buyer_id, buyers.fullname, COUNT(click_events.id) AS total_clicks')
+                              .group('buyers.id')
                               .order('total_clicks DESC')
 
-    # Dynamically select the purchasers' insights based on the metric
-    purchasers_insights = case selected_metric
-      when 'Total Wishlists' then purchasers_by_wishlists
-      when 'Total Click Events' then purchasers_by_clicks
-      else purchasers_by_clicks
+    # Dynamically select the buyers' insights based on the metric
+    buyers_insights = case selected_metric
+      when 'Total Wishlists' then buyers_by_wishlists
+      when 'Total Click Events' then buyers_by_clicks
+      else buyers_by_clicks
     end.limit(10)
 
 #=============================================================VENDOR INSIGHTS=============================================================#
@@ -56,26 +56,26 @@ class Admin::AnalyticsController < ApplicationController
     selected_metric = params[:metric] || 'Rating'
 
     # Calculate vendor mean rating
-    vendors_by_rating = Vendor.joins(ads: :reviews)
+    vendors_by_rating = Seller.joins(ads: :reviews)
                         .select('vendors.id, vendors.fullname, COALESCE(AVG(reviews.rating), 0) AS mean_rating')
                         .group('vendors.id')
                         .order('mean_rating DESC')
 
     # Calculate vendor total ads
-    vendors_by_ads = Vendor.joins(:ads)
+    vendors_by_ads = Seller.joins(:ads)
                         .select('vendors.id, vendors.fullname, COUNT(ads.id) AS total_ads')
                         .group('vendors.id')
                         .order('total_ads DESC')
 
     # Calculate vendor total reveal clicks
-    vendors_by_reveal_clicks = Vendor.joins(ads: :click_events)
-                        .where(click_events: { event_type: 'Reveal-Vendor-Details' })
+    vendors_by_reveal_clicks = Seller.joins(ads: :click_events)
+                        .where(click_events: { event_type: 'Reveal-Seller-Details' })
                         .select('vendors.id, vendors.fullname, COUNT(click_events.id) AS reveal_clicks')
                         .group('vendors.id')
                         .order('reveal_clicks DESC')
 
     # Calculate vendor total ad clicks
-    vendors_by_ad_clicks = Vendor.joins(ads: :click_events)
+    vendors_by_ad_clicks = Seller.joins(ads: :click_events)
                         .where(click_events: { event_type: 'Ad-Click' })
                         .select('vendors.id, vendors.fullname, COUNT(click_events.id) AS total_ad_clicks')
                         .group('vendors.id')
@@ -119,7 +119,7 @@ class Admin::AnalyticsController < ApplicationController
                             .select('categories.name AS category_name, 
                                     SUM(CASE WHEN click_events.event_type = \'Ad-Click\' THEN 1 ELSE 0 END) AS ad_clicks,
                                     SUM(CASE WHEN click_events.event_type = \'Add-to-Wish-List\' THEN 1 ELSE 0 END) AS wish_list_clicks,
-                                    SUM(CASE WHEN click_events.event_type = \'Reveal-Vendor-Details\' THEN 1 ELSE 0 END) AS reveal_clicks')
+                                    SUM(CASE WHEN click_events.event_type = \'Reveal-Seller-Details\' THEN 1 ELSE 0 END) AS reveal_clicks')
                             .group('categories.id')
                             .order('category_name')
                             .map { |record| 
@@ -164,7 +164,7 @@ class Admin::AnalyticsController < ApplicationController
 
 #===============================================================PURCHASER ANALYTICS===============================================================#
 
-    purchaser_age_groups = {
+    buyer_age_groups = {
       '18-25' => 0,
       '26-35' => 0,
       '36-45' => 0,
@@ -173,40 +173,40 @@ class Admin::AnalyticsController < ApplicationController
       '65+'   => 0
     }
 
-    Purchaser.find_each do |purchaser|
-      case purchaser.age_group_id
-      when 1 then purchaser_age_groups['18-25'] += 1
-      when 2 then purchaser_age_groups['26-35'] += 1
-      when 3 then purchaser_age_groups['36-45'] += 1
-      when 4 then purchaser_age_groups['46-55'] += 1
-      when 5 then purchaser_age_groups['56-65'] += 1
-      when 6 then purchaser_age_groups['65+']   += 1
+    Buyer.find_each do |buyer|
+      case buyer.age_group_id
+      when 1 then buyer_age_groups['18-25'] += 1
+      when 2 then buyer_age_groups['26-35'] += 1
+      when 3 then buyer_age_groups['36-45'] += 1
+      when 4 then buyer_age_groups['46-55'] += 1
+      when 5 then buyer_age_groups['56-65'] += 1
+      when 6 then buyer_age_groups['65+']   += 1
       end
     end
 
-    Rails.logger.info "Purchaser Age Groups Computed: #{purchaser_age_groups}"
+    Rails.logger.info "Buyer Age Groups Computed: #{buyer_age_groups}"
 
     # Gender Distribution
-    gender_distribution = Purchaser.group(:gender).count
+    gender_distribution = Buyer.group(:gender).count
 
     # Employment Breakdown
-    employment_data = Employment.joins(:purchasers)
-                                      .select('employments.status, COUNT(purchasers.id) AS total')
+    employment_data = Employment.joins(:buyers)
+                                      .select('employments.status, COUNT(buyers.id) AS total')
                                       .group('employments.status')
 
     # Income Distribution
-    income_data = Income.joins(:purchasers)
-                            .select('incomes.range, COUNT(purchasers.id) AS total')
+    income_data = Income.joins(:buyers)
+                            .select('incomes.range, COUNT(buyers.id) AS total')
                             .group('incomes.range')
 
     # Education Breakdown
-    education_data = Education.joins(:purchasers)
-                                  .select('educations.level, COUNT(purchasers.id) AS total')
+    education_data = Education.joins(:buyers)
+                                  .select('educations.level, COUNT(buyers.id) AS total')
                                   .group('educations.level')
 
     # Sector Breakdown
-    sector_data = Sector.joins(:purchasers)
-                        .select('sectors.name, COUNT(purchasers.id) AS total')
+    sector_data = Sector.joins(:buyers)
+                        .select('sectors.name, COUNT(buyers.id) AS total')
                         .group('sectors.name')
 
 #================================================================VENDOR DEMOGRAPHICS===============================================================#
@@ -220,7 +220,7 @@ class Admin::AnalyticsController < ApplicationController
       '65+'   => 0
     }
 
-    Vendor.find_each do |vendor|
+    Seller.find_each do |vendor|
       case vendor.age_group_id
       when 1 then vendor_age_groups['18-25'] += 1
       when 2 then vendor_age_groups['26-35'] += 1
@@ -231,49 +231,49 @@ class Admin::AnalyticsController < ApplicationController
       end
     end
 
-    Rails.logger.info "Vendor Age Groups Computed: #{vendor_age_groups}"
+    Rails.logger.info "Seller Age Groups Computed: #{vendor_age_groups}"
 
     # Gender Distribution
-    vendor_gender_distribution = Vendor.group(:gender).count
+    vendor_gender_distribution = Seller.group(:gender).count
     Rails.logger.info "Gender Distribution Computed: #{vendor_gender_distribution}"
 
-    # Vendor Tier Breakdown
+    # Seller Tier Breakdown
     # Corrected query
-    tier_data = VendorTier.joins(:vendor)
+    tier_data = SellerTier.joins(:vendor)
                 .joins(:tier)
                 .select('tiers.name AS tier_name, COUNT(vendor_tiers.vendor_id) AS total')
                 .group('tiers.name')
                 .as_json
 
-    Rails.logger.info "Vendor Tier Data: #{tier_data}"
+    Rails.logger.info "Seller Tier Data: #{tier_data}"
 
-    # Vendor Category Breakdown
-    category_data = CategoriesVendor.joins(:vendor)
+    # Seller Category Breakdown
+    category_data = CategoriesSeller.joins(:vendor)
                                 .joins(:category)
                                 .select('categories.name, COUNT(categories_vendors.vendor_id) AS total')
                                 .group('categories.name')
                                 .as_json
 
-    Rails.logger.info "Vendor Category Data: #{category_data}"
+    Rails.logger.info "Seller Category Data: #{category_data}"
 
 
 #================================================================RENDER SECTION===============================================================#
 
     render json: {
       total_vendors: @total_vendors,
-      total_purchasers: @total_purchasers,
+      total_buyers: @total_buyers,
       total_ads: @total_ads,
       total_reviews: @total_reviews,
       top_wishlisted_ads: top_wishlisted_ads,
       total_ads_wish_listed: total_ads_wish_listed,
-      purchasers_insights: purchasers_insights,
+      buyers_insights: buyers_insights,
       vendors_insights: vendors_insights,
       sales_performance: sales_performance,
       ads_per_category: ads_per_category,
       order_counts_by_status: order_counts_by_status,
       category_click_events: category_click_events,
       category_wishlist_data: category_wishlist_data,
-      purchaser_age_groups: purchaser_age_groups,
+      buyer_age_groups: buyer_age_groups,
       vendor_age_groups: vendor_age_groups,
       gender_distribution: gender_distribution,
       employment_data: employment_data.map { |e| { e.status => e.total } },

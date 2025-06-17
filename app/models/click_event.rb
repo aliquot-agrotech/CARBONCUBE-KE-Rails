@@ -1,5 +1,5 @@
 class ClickEvent < ApplicationRecord
-  belongs_to :purchaser, optional: true
+  belongs_to :buyer, optional: true
   belongs_to :ad, optional: true
 
   EVENT_TYPES = %w[Ad-Click Reveal-Vendor-Details Add-to-Cart Add-to-Wish-List].freeze

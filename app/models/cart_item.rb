@@ -1,7 +1,7 @@
 # app/models/cart_item.rb
 
 class CartItem < ApplicationRecord
-  belongs_to :purchaser
+  belongs_to :buyer
   belongs_to :ad
 
   validates :quantity, numericality: { greater_than_or_equal_to: 1 }

@@ -5,16 +5,16 @@ class Admin::OrdersController < ApplicationController
   # app/controllers/admin/orders_controller.rb
   def index
     if params[:search_query].present?
-      @orders = Order.joins(:purchaser)
-                    .where("vendors.phone_number = :query OR purchasers.phone_number = :query OR orders.id = :query", query: params[:search_query])
-                    .includes(:purchaser, order_items: { ad: :vendor })
+      @orders = Order.joins(:buyer)
+                    .where("vendors.phone_number = :query OR buyers.phone_number = :query OR orders.id = :query", query: params[:search_query])
+                    .includes(:buyer, order_items: { ad: :vendor })
     else
-      @orders = Order.includes(:purchaser, order_items: { ad: :vendor }).all
+      @orders = Order.includes(:buyer, order_items: { ad: :vendor }).all
     end
   
     render json: @orders.as_json(
       include: {
-        purchaser: { only: [:fullname] },
+        buyer: { only: [:fullname] },
         order_items: {
           include: {
             ad: {
@@ -30,7 +30,7 @@ class Admin::OrdersController < ApplicationController
   def show
     render json: @order.as_json(
       include: {
-        purchaser: { only: [:fullname] },
+        buyer: { only: [:fullname] },
         order_items: {
           include: {
             ad: {
@@ -48,7 +48,7 @@ class Admin::OrdersController < ApplicationController
     if @order.update(status: params[:status])
       render json: @order.as_json(
         include: {
-          purchaser: { only: [:fullname] },
+          buyer: { only: [:fullname] },
           order_items: {
             include: {
               ad: {
@@ -76,7 +76,7 @@ class Admin::OrdersController < ApplicationController
   end
 
   def order_params
-    params.require(:order).permit(:purchaser_id, :status, :total_amount)
+    params.require(:order).permit(:buyer_id, :status, :total_amount)
   end
   
   def authenticate_admin

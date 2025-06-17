@@ -1,4 +1,4 @@
 class Sector < ApplicationRecord
-  has_many :purchasers
+  has_many :buyers
   validates :name, presence: true, uniqueness: true
 end

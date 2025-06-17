@@ -1,11 +1,11 @@
 class AdSerializer < ActiveModel::Serializer
-  attributes :id, :vendor_id, :category_id, :subcategory_id, :category_name,
+  attributes :id, :seller_id, :category_id, :subcategory_id, :category_name,
              :subcategory_name, :title, :description, :price, :quantity, :brand,
              :manufacturer, :item_weight, :weight_unit, :item_length, :item_width,
              :item_height, :media_urls, :first_media_url, :mean_rating, :review_count,
-             :vendor_tier, :tier_name, :condition, :vendor_enterprise_name, :vendor_phone_number 
+             :seller_tier, :tier_name, :condition, :seller_enterprise_name, :seller_phone_number 
 
-  has_one :vendor, serializer: VendorSerializer
+  has_one :seller, serializer: SellerSerializer
   has_many :reviews
 
   def media_urls
@@ -16,18 +16,18 @@ class AdSerializer < ActiveModel::Serializer
     object.media.first # ✅ Return the first URL directly
   end
 
-  def vendor_name
-    object.vendor.name
+  def seller_name
+    object.seller.name
   end
 
-  def vendor_tier
-    vendor_tier = object.vendor.vendor_tier
-    vendor_tier ? vendor_tier.tier_id : nil
+  def seller_tier
+    seller_tier = object.seller.seller_tier
+    seller_tier ? seller_tier.tier_id : nil
   end
 
   def tier_name
-    vendor_tier = object.vendor.vendor_tier
-    vendor_tier&.tier&.name || 'Unknown'
+    seller_tier = object.seller.seller_tier
+    seller_tier&.tier&.name || 'Unknown'
   end
 
   def category_name
@@ -46,11 +46,11 @@ class AdSerializer < ActiveModel::Serializer
     object.reviews.count
   end
 
-  def vendor_enterprise_name
-    object.vendor.enterprise_name
+  def seller_enterprise_name
+    object.seller.enterprise_name
   end
 
-  def vendor_phone_number
-    object.vendor.phone_number || "N/A"
+  def seller_phone_number
+    object.seller.phone_number || "N/A"
   end
 end

@@ -5,10 +5,10 @@ class Admin::ClickEventsController < ApplicationController
   def index
     @click_events = ClickEvent.all
 
-    # Optional: Filtering by event_type, ad_id, or purchaser_id
+    # Optional: Filtering by event_type, ad_id, or buyer_id
     @click_events = @click_events.where(event_type: params[:event_type]) if params[:event_type].present?
     @click_events = @click_events.where(ad_id: params[:ad_id]) if params[:ad_id].present?
-    @click_events = @click_events.where(purchaser_id: params[:purchaser_id]) if params[:purchaser_id].present?
+    @click_events = @click_events.where(buyer_id: params[:buyer_id]) if params[:buyer_id].present?
 
     # Use ActiveModelSerializers for rendering
     render json: @click_events, each_serializer: ClickEventSerializer, status: :ok

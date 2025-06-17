@@ -56,16 +56,16 @@ Rails.application.routes.draw do
 
   #========================================Admin namespace for admin-specific functionality==========================================#
   namespace :admin do
-    namespace :vendor do
-      get ':vendor_id/profile', to: 'profiles#show'
-      get ':vendor_id/ads', to: 'ads#index'
-      get ':vendor_id/ads/:ad_id/reviews', to: 'reviews#index'
-      get ':vendor_id/orders', to: 'orders#index_for_vendor'
+    namespace :seller do
+      get ':seller_id/profile', to: 'profiles#show'
+      get ':seller_id/ads', to: 'ads#index'
+      get ':seller_id/ads/:ad_id/reviews', to: 'reviews#index'
+      get ':seller_id/orders', to: 'orders#index_for_seller'
     end
 
-    namespace :purchaser do
-      get ':purchaser_id/profile', to: 'profiles#show'
-      get ':purchaser_id/orders', to: 'orders#index_for_purchaser'
+    namespace :buyer do
+      get ':buyer_id/profile', to: 'profiles#show'
+      get ':buyer_id/orders', to: 'orders#index_for_buyer'
     end
 
     namespace :rider do
@@ -93,19 +93,19 @@ Rails.application.routes.draw do
     end
 
     resources :cms_pages
-    resources :vendors do
+    resources :sellers do
       member do
         put 'block'
         put 'unblock'
         get 'analytics'
-        get 'orders', to: 'vendors#orders'
+        get 'orders', to: 'sellers#orders'
         get 'ads'
         get 'reviews'
         post :verify_document
       end
     end
 
-    resources :purchasers do
+    resources :buyers do
       member do
         put 'block'
         put 'unblock'
@@ -139,10 +139,10 @@ Rails.application.routes.draw do
     resources :tiers, only: [:index, :show, :create, :update, :destroy]
   end
 
-  #=================================================Vendor namespace for vendor-specific functionality===============================#
-  namespace :vendor do
-    post 'signup', to: 'vendors#create'
-    delete 'delete_account', to: 'vendors#destroy'
+  #=================================================Seller namespace for seller-specific functionality===============================#
+  namespace :seller do
+    post 'signup', to: 'sellers#create'
+    delete 'delete_account', to: 'sellers#destroy'
     
     resources :ads
     resources :orders do
@@ -169,24 +169,24 @@ Rails.application.routes.draw do
       resources :messages, only: [:index, :create]
     end
 
-    get 'identify', to: 'vendors#identify'
+    get 'identify', to: 'sellers#identify'
     resources :notifications
 
-    # Vendor Tiers
-    resources :vendor_tiers, only: [:index, :show] do
+    # Seller Tiers
+    resources :seller_tiers, only: [:index, :show] do
       patch 'update_tier', on: :collection
     end
 
-    # Custom route for vendor_id handling
-    get 'vendor_tiers/:vendor_id', to: 'vendor_tiers#show'
+    # Custom route for seller_id handling
+    get 'seller_tiers/:seller_id', to: 'seller_tiers#show'
 
   end
 
 
-  #==========================================Purchaser namespace for purchaser-specific functionality=========================================#
-  namespace :purchaser, defaults:{ format: :json}, path: 'purchaser' do
-    post 'signup', to: 'purchasers#create'
-    delete 'delete_account', to: 'purchasers#destroy'
+  #==========================================Buyer namespace for buyer-specific functionality=========================================#
+  namespace :buyer, defaults:{ format: :json}, path: 'buyer' do
+    post 'signup', to: 'buyers#create'
+    delete 'delete_account', to: 'buyers#destroy'
 
     resource :profile, only: [:show, :update] do
       post 'change-password', to: 'profiles#change_password'
@@ -229,7 +229,7 @@ Rails.application.routes.draw do
         post 'add_to_cart'
         post 'add_to_buy_for_me_order_cart'
         get 'related', to: 'ads#related'
-        get 'vendor', to: 'ads#vendor'
+        get 'seller', to: 'ads#seller'
       end
       resources :reviews, only: [:create, :index] # Nested reviews under ads
     end
@@ -242,16 +242,16 @@ Rails.application.routes.draw do
 
     resources :buy_for_me_orders, only: [:index, :show, :create]
 
-    get 'identify', to: 'purchasers#identify'
+    get 'identify', to: 'buyers#identify'
   end
 
-  #==========================================Rider namespace for purchaser-specific functionality=========================================#
+  #==========================================Rider namespace for buyer-specific functionality=========================================#
   namespace :rider do
     resources :riders
     resources :orders
     post 'signup', to: 'riders#create'
   end
-  #========================================== End of Rider namespace for purchaser-specific functionality=========================================#
+  #========================================== End of Rider namespace for buyer-specific functionality=========================================#
 
   mount ActionCable.server => '/cable'
 end

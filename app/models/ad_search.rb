@@ -1,5 +1,5 @@
 class AdSearch < ApplicationRecord
-  belongs_to :purchaser, optional: true
+  belongs_to :buyer, optional: true
 
   validates :search_term, presence: true
 

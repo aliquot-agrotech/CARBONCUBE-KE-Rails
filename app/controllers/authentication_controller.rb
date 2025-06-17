@@ -9,15 +9,15 @@ class AuthenticationController < ApplicationController
       role = determine_role(@user)
 
       # ❌ Block login if the user is soft-deleted
-      if (@user.is_a?(Purchaser) || @user.is_a?(Vendor)) && @user.deleted?
+      if (@user.is_a?(Buyer) || @user.is_a?(Seller)) && @user.deleted?
         render json: { errors: ['Your account has been deleted. Please contact support.'] }, status: :unauthorized
         return
       end
 
-      # 🚫 Pilot restriction for vendors outside Nairobi
-      if role == 'vendor' && @user.county&.county_code.to_i != 47
+      # 🚫 Pilot restriction for sellers outside Nairobi
+      if role == 'seller' && @user.county&.county_code.to_i != 47
         render json: {
-          errors: ['Access restricted during pilot phase. Only Nairobi-based vendors can log in.']
+          errors: ['Access restricted during pilot phase. Only Nairobi-based sellers can log in.']
         }, status: :forbidden
         return
       end
@@ -42,8 +42,8 @@ class AuthenticationController < ApplicationController
   def find_user_by_identifier(identifier)
     if identifier.include?('@')
       # Assume it's an email if it contains '@'
-      Purchaser.find_by(email: identifier) ||
-      Vendor.find_by(email: identifier) ||
+      Buyer.find_by(email: identifier) ||
+      Seller.find_by(email: identifier) ||
       Admin.find_by(email: identifier) ||
       Rider.find_by(email: identifier)
     elsif identifier.match?(/\A\d{10}\z/)
@@ -57,8 +57,8 @@ class AuthenticationController < ApplicationController
 
   def determine_role(user)
     case user
-    when Purchaser then 'purchaser'
-    when Vendor then 'vendor'
+    when Buyer then 'buyer'
+    when Seller then 'seller'
     when Admin then 'admin'
     when Rider then 'rider'
     else 'unknown'

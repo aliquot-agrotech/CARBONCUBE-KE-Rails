@@ -38,6 +38,6 @@ class PasswordResetsController < ApplicationController
   private
 
   def find_user_by_email(email)
-    Purchaser.find_by(email: email) || Vendor.find_by(email: email) || Admin.find_by(email: email)
+    Buyer.find_by(email: email) || Seller.find_by(email: email) || Admin.find_by(email: email)
   end
 end

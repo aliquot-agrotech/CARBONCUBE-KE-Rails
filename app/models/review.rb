@@ -1,7 +1,7 @@
 class Review < ApplicationRecord
   belongs_to :ad
-  belongs_to :purchaser
-  after_save :check_vendor_rating
+  belongs_to :buyer
+  after_save :check_seller_rating
 
 
   validates :rating, presence: true, inclusion: { in: 1..5 }
@@ -9,7 +9,7 @@ class Review < ApplicationRecord
 
   private
 
-  def check_vendor_rating
-    ad.vendor.check_and_block
+  def check_seller_rating
+    ad.seller.check_and_block
   end
 end

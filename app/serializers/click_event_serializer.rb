@@ -1,9 +1,9 @@
 class ClickEventSerializer < ActiveModel::Serializer
-  attributes :id, :event_type, :ad_id, :purchaser_id, :metadata, :created_at, :updated_at
+  attributes :id, :event_type, :ad_id, :buyer_id, :metadata, :created_at, :updated_at
 
   # Optional: Include associated ad and user details
   belongs_to :ad, if: -> { object.ad.present? }
-  belongs_to :purchaser, if: -> { object.purchaser.present? }
+  belongs_to :buyer, if: -> { object.buyer.present? }
 
   # Example of custom serialization for metadata
   attribute :metadata do

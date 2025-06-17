@@ -1,4 +1,4 @@
 # app/models/document_type.rb
 class DocumentType < ApplicationRecord
-  has_many :vendors
+  has_many :sellers
 end

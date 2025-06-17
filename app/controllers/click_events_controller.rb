@@ -1,12 +1,12 @@
 class ClickEventsController < ApplicationController
-  before_action :authenticate_purchaser, only: [:create]
+  before_action :authenticate_buyer, only: [:create]
 
   def create
     # Create click event with all available parameters
     click_event = ClickEvent.new(click_event_params)
 
-    # Set purchaser_id to nil if authentication failed
-    click_event.purchaser_id = @current_user&.id
+    # Set buyer_id to nil if authentication failed
+    click_event.buyer_id = @current_user&.id
 
     if click_event.save
       render json: { message: 'Click logged successfully' }, status: :created
@@ -17,9 +17,9 @@ class ClickEventsController < ApplicationController
 
   private
 
-  # Attempt to authenticate the purchaser, but do not halt the request
-  def authenticate_purchaser
-    @current_user = PurchaserAuthorizeApiRequest.new(request.headers).result
+  # Attempt to authenticate the buyer, but do not halt the request
+  def authenticate_buyer
+    @current_user = BuyerAuthorizeApiRequest.new(request.headers).result
   rescue ExceptionHandler::InvalidToken
     @current_user = nil
   end

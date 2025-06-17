@@ -27,7 +27,7 @@ class Admin::AdsController < ApplicationController
   
 
   def show
-    @ad = Ad.includes(:vendor, :category, :subcategory, :reviews => :purchaser)
+    @ad = Ad.includes(:vendor, :category, :subcategory, :reviews => :buyer)
                       .find(params[:id])
                       .tap do |ad|
                         ad.define_singleton_method(:quantity_sold) do
@@ -45,7 +45,7 @@ class Admin::AdsController < ApplicationController
         subcategory: { only: [:name] },
         reviews: {
           include: {
-            purchaser: { only: [:fullname] }
+            buyer: { only: [:fullname] }
           },
           only: [:rating, :review]
         }

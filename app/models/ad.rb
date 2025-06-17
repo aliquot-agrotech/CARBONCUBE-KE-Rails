@@ -7,7 +7,7 @@ class Ad < ApplicationRecord
 
   scope :all_products, -> { unscope(:where).all }
 
-  belongs_to :vendor
+  belongs_to :seller
   belongs_to :category
   belongs_to :subcategory
   
@@ -16,7 +16,7 @@ class Ad < ApplicationRecord
   has_many :reviews, dependent: :destroy
   has_many :cart_items, dependent: :destroy
   has_many :wish_lists, dependent: :destroy
-  has_many :purchasers, through: :bookmarks
+  has_many :buyers, through: :bookmarks
   has_many :buy_for_me_orders
   has_many :click_events
   has_many :conversations, dependent: :destroy

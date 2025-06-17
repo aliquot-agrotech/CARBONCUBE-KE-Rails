@@ -1,4 +1,4 @@
 class Employment < ApplicationRecord
-  has_many :purchasers
+  has_many :buyers
   validates :status, presence: true, uniqueness: true
 end

@@ -1,6 +1,6 @@
 class AgeGroup < ApplicationRecord
-  has_many :purchasers
-  has_many :vendors
+  has_many :buyers
+  has_many :sellers
 
   validates :name, presence: true, uniqueness: true
 end

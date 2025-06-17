@@ -7,9 +7,9 @@ class MpesaController < ApplicationController
     data = JSON.parse(request.body.read)
     account_number = data["BillRefNumber"]
 
-    vendor = Vendor.find_by(phone_number: account_number) || Vendor.find_by(business_registration_number: account_number)
+    seller = Seller.find_by(phone_number: account_number) || Seller.find_by(business_registration_number: account_number)
 
-    if vendor
+    if seller
       render json: { ResultCode: 0, ResultDesc: "Accepted" }
     else
       render json: { ResultCode: "C2B00012", ResultDesc: "Invalid Account Number" }
@@ -22,7 +22,7 @@ class MpesaController < ApplicationController
     account_number = data["BillRefNumber"]
     amount = data["TransAmount"].to_f
   
-    vendor = Vendor.find_by(phone_number: account_number) # || Vendor.find_by(business_registration_number: account_number)
+    seller = Seller.find_by(phone_number: account_number) # || Seller.find_by(business_registration_number: account_number)
   
     Payment.create!(
       transaction_type: data["TransactionType"],
@@ -40,13 +40,13 @@ class MpesaController < ApplicationController
       last_name: data["LastName"]
     )
   
-    if vendor
+    if seller
       tier_pricing = TierPricing.find_by(price: amount)
   
       if tier_pricing
-        vendor_tier = VendorTier.find_or_initialize_by(vendor_id: vendor.id)
+        seller_tier = SellerTier.find_or_initialize_by(seller_id: seller.id)
   
-        vendor_tier.update!(
+        seller_tier.update!(
           tier_id: tier_pricing.tier_id,
           duration_months: tier_pricing.duration_months
         )

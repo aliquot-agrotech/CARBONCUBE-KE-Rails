@@ -1,6 +1,6 @@
 # app/serializers/order_item_serializer.rb
 class OrderItemSerializer < ActiveModel::Serializer
-  attributes :id, :order_id, :ad_id, :quantity, :ad_name, :price, :vendor_name
+  attributes :id, :order_id, :ad_id, :quantity, :ad_name, :price, :seller_name
 
   belongs_to :order
   belongs_to :ad, serializer: AdSerializer
@@ -13,7 +13,7 @@ class OrderItemSerializer < ActiveModel::Serializer
     object.ad&.price || 0
   end
 
-  def vendor_name
-    object.ad&.vendor&.fullname || 'Unknown Vendor'
+  def seller_name
+    object.ad&.seller&.fullname || 'Unknown Vendor'
   end
 end

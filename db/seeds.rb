@@ -902,36 +902,36 @@ end
 100.times do
   county_id, sub_county_id = assign_county_and_sub_county(counties, nairobi)
 
-  Purchaser.find_or_create_by(email: nil) do |purchaser|
+  Buyer.find_or_create_by(email: nil) do |buyer|
     fullname = Faker::Name.name
     username = fullname.downcase.gsub(/\s+/, "")
     email = "#{username}@example.com"
 
-    purchaser.fullname = fullname
-    purchaser.username = username
-    purchaser.email = email
-    purchaser.phone_number = generate_custom_phone_number(used_phone_numbers)
-    used_phone_numbers.add(purchaser.phone_number)
-    purchaser.location = Faker::Address.full_address
-    purchaser.password = 'password'
+    buyer.fullname = fullname
+    buyer.username = username
+    buyer.email = email
+    buyer.phone_number = generate_custom_phone_number(used_phone_numbers)
+    used_phone_numbers.add(buyer.phone_number)
+    buyer.location = Faker::Address.full_address
+    buyer.password = 'password'
 
     # Assign county and sub-county
-    purchaser.county_id = county_id
-    purchaser.sub_county_id = sub_county_id
+    buyer.county_id = county_id
+    buyer.sub_county_id = sub_county_id
 
     # Additional fields
     # Replace birthdate with random age_group_id
-    purchaser.age_group_id = AgeGroup.pluck(:id).sample
-    purchaser.zipcode = Faker::Address.zip_code
-    purchaser.city = Faker::Address.city
-    purchaser.gender = ['Male', 'Female'].sample
-    purchaser.profile_picture = Faker::Avatar.image
+    buyer.age_group_id = AgeGroup.pluck(:id).sample
+    buyer.zipcode = Faker::Address.zip_code
+    buyer.city = Faker::Address.city
+    buyer.gender = ['Male', 'Female'].sample
+    buyer.profile_picture = Faker::Avatar.image
 
     # Assign new attributes
-    purchaser.income_id = Income.all.sample.id
-    purchaser.employment_id = Employment.all.sample.id
-    purchaser.education_id = Education.all.sample.id
-    purchaser.sector_id = Sector.all.sample.id
+    buyer.income_id = Income.all.sample.id
+    buyer.employment_id = Employment.all.sample.id
+    buyer.education_id = Education.all.sample.id
+    buyer.sector_id = Sector.all.sample.id
   end
 end
 
@@ -945,46 +945,46 @@ tier_durations = [1, 3, 6, 12] # Define valid durations in months
   username = fullname.downcase.gsub(/\s+/, "")
   email = "#{username}@example.com"
 
-  vendor = Vendor.find_or_create_by(email: email) do |vendor|
-    vendor.fullname = fullname
-    vendor.username = username
-    vendor.email = email
-    vendor.phone_number = generate_custom_phone_number(used_phone_numbers)
-    used_phone_numbers.add(vendor.phone_number)
-    vendor.enterprise_name = "#{Faker::Company.name} #{Faker::Company.suffix}"
-    vendor.description = Faker::Company.bs
-    vendor.location = Faker::Address.full_address
-    vendor.password = 'password'
-    vendor.business_registration_number = "BN/#{Faker::Number.number(digits: 4)}/#{Faker::Number.number(digits: 6)}"
+  seller = Seller.find_or_create_by(email: email) do |seller|
+    seller.fullname = fullname
+    seller.username = username
+    seller.email = email
+    seller.phone_number = generate_custom_phone_number(used_phone_numbers)
+    used_phone_numbers.add(seller.phone_number)
+    seller.enterprise_name = "#{Faker::Company.name} #{Faker::Company.suffix}"
+    seller.description = Faker::Company.bs
+    seller.location = Faker::Address.full_address
+    seller.password = 'password'
+    seller.business_registration_number = "BN/#{Faker::Number.number(digits: 4)}/#{Faker::Number.number(digits: 6)}"
 
     # Assign county and sub-county
-    vendor.county_id = county_id
-    vendor.sub_county_id = sub_county_id
+    seller.county_id = county_id
+    seller.sub_county_id = sub_county_id
 
     # Assign random category if available
     if Category.any?
-      vendor.category_ids = [Category.all.sample.id]
+      seller.category_ids = [Category.all.sample.id]
     else
-      puts "No categories found for vendor #{email}. Skipping vendor."
+      puts "No categories found for seller #{email}. Skipping seller."
       next
     end
 
-    vendor.age_group_id = AgeGroup.pluck(:id).sample
-    vendor.zipcode = Faker::Address.zip_code
-    vendor.city = Faker::Address.city
-    vendor.gender = ['Male', 'Female'].sample
-    vendor.profile_picture = Faker::Avatar.image
+    seller.age_group_id = AgeGroup.pluck(:id).sample
+    seller.zipcode = Faker::Address.zip_code
+    seller.city = Faker::Address.city
+    seller.gender = ['Male', 'Female'].sample
+    seller.profile_picture = Faker::Avatar.image
   end
 
-  if vendor.valid?
-    puts "Vendor created: #{vendor.email} (County ID: #{county_id}, Sub-County ID: #{sub_county_id})"
+  if seller.valid?
+    puts "Seller created: #{seller.email} (County ID: #{county_id}, Sub-County ID: #{sub_county_id})"
   else
-    puts "Vendor validation failed for: #{vendor.email}, Errors: #{vendor.errors.full_messages}"
+    puts "Seller validation failed for: #{seller.email}, Errors: #{seller.errors.full_messages}"
   end
 
-  # Seed vendor tier data
-  if VendorTier.exists?(vendor_id: vendor.id)
-    puts "VendorTier already exists for Vendor ID: #{vendor.id}. Skipping."
+  # Seed seller tier data
+  if VendorTier.exists?(vendor_id: seller.id)
+    puts "VendorTier already exists for Seller ID: #{seller.id}. Skipping."
   else
     # Ensure there are tiers available
     if Tier.any?
@@ -995,15 +995,15 @@ tier_durations = [1, 3, 6, 12] # Define valid durations in months
       updated_at_time = Faker::Time.between(from: created_at_time, to: Time.now) # Ensure updated_at is after or equal to created_at
 
       VendorTier.create!(
-        vendor_id: vendor.id,
+        vendor_id: seller.id,
         tier_id: tier.id,
         duration_months: duration,
         created_at: created_at_time,
         updated_at: updated_at_time
       )
-      puts "VendorTier created for Vendor ID: #{vendor.id}, Tier ID: #{tier.id}, Duration: #{duration} months"
+      puts "VendorTier created for Seller ID: #{seller.id}, Tier ID: #{tier.id}, Duration: #{duration} months"
     else
-      puts "No tiers found for vendor #{vendor.email}. Skipping tier assignment."
+      puts "No tiers found for seller #{seller.email}. Skipping tier assignment."
     end
   end
 end
@@ -1455,7 +1455,7 @@ category_ads.each do |category_name, ads|
   # Initialize a counter to track subcategory assignment
   subcategory_index = 0
   
-  eligible_vendors = Vendor.joins("INNER JOIN categories_vendors ON categories_vendors.vendor_id = vendors.id")
+  eligible_vendors = Seller.joins("INNER JOIN categories_vendors ON categories_vendors.vendor_id = vendors.id")
                          .where(categories_vendors: { category_id: category.id })
 
   ads.each do |ad_data|
@@ -1464,8 +1464,8 @@ category_ads.each do |category_name, ads|
       next
     end
     
-    # Select a random vendor from eligible vendors
-    vendor = eligible_vendors.sample
+    # Select a random seller from eligible vendors
+    seller = eligible_vendors.sample
     
     # Assign the subcategory in a round-robin manner
     assigned_subcategory = subcategories[subcategory_index]
@@ -1483,7 +1483,7 @@ category_ads.each do |category_name, ads|
       ad.description = ad_data[:description]
       ad.category_id = category.id
       ad.subcategory_id = assigned_subcategory.id if assigned_subcategory.present?
-      ad.vendor_id = vendor.id # Assign vendor_id from the eligible vendor
+      ad.vendor_id = seller.id # Assign vendor_id from the eligible seller
       ad.price = Faker::Commerce.price(range: 200..10000)
       ad.quantity = Faker::Number.between(from: 30, to: 100)
       ad.brand = Faker::Company.name
@@ -1498,7 +1498,7 @@ category_ads.each do |category_name, ads|
       ad.created_at = created_at
       ad.updated_at = created_at
       ad.save!
-      puts "Ad created for Vendor ID: #{vendor.id}, Ad Title: #{ad.title}"
+      puts "Ad created for Seller ID: #{seller.id}, Ad Title: #{ad.title}"
     else
       puts "Ad already exists: #{ad.title}. Skipping ad."
     end
@@ -1548,7 +1548,7 @@ DELIVERY_FEE = 150
 
 # Generate order data
 order_data = 100.times.map do
-  purchaser = Purchaser.all.sample
+  buyer = Buyer.all.sample
   status = ['Processing', 'Dispatched', 'In-Transit', 'Delivered', 'Cancelled', 'Returned'].sample
   
   # Create order items first to calculate fees
@@ -1587,7 +1587,7 @@ order_data = 100.times.map do
 
   # Return the order data
   {
-    purchaser_id: purchaser.id,
+    purchaser_id: buyer.id,
     status: status,
     processing_fee: total_processing_fee.round(2),  # Round total processing fee
     delivery_fee: DELIVERY_FEE,                    # Fixed delivery fee
@@ -1632,7 +1632,7 @@ sorted_order_data.each do |data|
       updated_at: data[:updated_at]
     )
 
-    # Add vendor to set of unique vendors
+    # Add seller to set of unique vendors
     order_vendors.add(item_data[:vendor_id])
   end
 
@@ -1650,8 +1650,8 @@ end
 
 puts "Starts seeding for the ad reviews"
 
-# Fetch all purchaser and ad IDs
-purchasers = Purchaser.pluck(:id)
+# Fetch all buyer and ad IDs
+purchasers = Buyer.pluck(:id)
 ads = Ad.pluck(:id)
 
 puts "Seeding click_events and wish_lists..."
@@ -1688,11 +1688,11 @@ purchasers.each do |purchaser_id|
         updated_at: created_at_time
       )
 
-      # Create Reveal-Vendor-Details Event
+      # Create Reveal-Seller-Details Event
       ClickEvent.create!(
         purchaser_id: purchaser_id,
         ad_id: ad_id,
-        event_type: "Reveal-Vendor-Details",
+        event_type: "Reveal-Seller-Details",
         metadata: nil,
         created_at: click_event_time,
         updated_at: click_event_time
@@ -1715,13 +1715,13 @@ puts "Seeding completed successfully!"
 # Generate 20 reviews for each ad
 Ad.all.each do |ad|
   10.times do
-    purchaser = Purchaser.all.sample
+    buyer = Buyer.all.sample
     rating = Faker::Number.between(from: 1, to: 5)
     review_text = Faker::Lorem.sentence(word_count: Faker::Number.between(from: 5, to: 10))
 
     Review.create!(
       ad_id: ad.id,
-      purchaser_id: purchaser.id,
+      purchaser_id: buyer.id,
       rating: rating,
       review: review_text
     )
@@ -1761,8 +1761,8 @@ puts "Starts seeding for the Conversations"
 require 'faker'
 
 admin = Admin.find_by(email: 'admin@example.com')
-purchasers = Purchaser.all
-vendors = Vendor.all
+purchasers = Buyer.all
+vendors = Seller.all
 ads = Ad.all  # Assuming ads exist
 
 raise 'Admin not found' unless admin
@@ -1783,37 +1783,37 @@ def create_messages(conversation, sender, receiver)
   end
 end
 
-# Create admin ↔ purchaser conversations
-purchasers.each do |purchaser|
-  convo = Conversation.find_or_create_by!(admin_id: admin.id, purchaser_id: purchaser.id)
-  create_messages(convo, admin, purchaser)
+# Create admin ↔ buyer conversations
+purchasers.each do |buyer|
+  convo = Conversation.find_or_create_by!(admin_id: admin.id, purchaser_id: buyer.id)
+  create_messages(convo, admin, buyer)
 end
 
-# Create admin ↔ vendor conversations
-vendors.each do |vendor|
-  convo = Conversation.find_or_create_by!(admin_id: admin.id, vendor_id: vendor.id)
-  create_messages(convo, admin, vendor)
+# Create admin ↔ seller conversations
+vendors.each do |seller|
+  convo = Conversation.find_or_create_by!(admin_id: admin.id, vendor_id: seller.id)
+  create_messages(convo, admin, seller)
 end
 
-# Create purchaser ↔ vendor ↔ ad conversations
-# Each purchaser can message only once per ad
-purchasers.first(5).each do |purchaser|
+# Create buyer ↔ seller ↔ ad conversations
+# Each buyer can message only once per ad
+purchasers.first(5).each do |buyer|
   ads.sample(10).each do |ad|
-    next if ad.vendor.nil?
+    next if ad.seller.nil?
 
-    vendor = ad.vendor
+    seller = ad.seller
 
-    # Skip if a conversation already exists for this purchaser and ad
-    existing_convo = Conversation.find_by(purchaser_id: purchaser.id, ad_id: ad.id)
+    # Skip if a conversation already exists for this buyer and ad
+    existing_convo = Conversation.find_by(purchaser_id: buyer.id, ad_id: ad.id)
     next if existing_convo.present?
 
     convo = Conversation.create!(
-      purchaser_id: purchaser.id,
-      vendor_id: vendor.id,
+      purchaser_id: buyer.id,
+      vendor_id: seller.id,
       ad_id: ad.id
     )
 
-    create_messages(convo, purchaser, vendor)
+    create_messages(convo, buyer, seller)
   end
 end
 

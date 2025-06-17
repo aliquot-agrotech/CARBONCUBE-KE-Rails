@@ -1,5 +1,5 @@
 class SubCounty < ApplicationRecord
   belongs_to :county
-  has_many :vendors
+  has_many :sellers
   # validates :name, presence: true
 end

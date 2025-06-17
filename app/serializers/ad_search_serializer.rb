@@ -1,8 +1,8 @@
 class AdSearchSerializer < ActiveModel::Serializer
-  attributes :id, :search_term, :purchaser_id, :created_at, :updated_at
+  attributes :id, :search_term, :buyer_id, :created_at, :updated_at
 
   # Optional: Include user details if associated
-  belongs_to :purchaser, if: -> { object.purchaser.present? }
+  belongs_to :buyer, if: -> { object.buyer.present? }
 
   # Example of custom formatting for `created_at`
   attribute :formatted_created_at do

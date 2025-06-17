@@ -5,16 +5,16 @@ class Admin::BuyForMeOrdersController < ApplicationController
   # app/controllers/admin/buy_for_me_orders_controller.rb
   def index
     if params[:search_query].present?
-      @buy_for_me_orders = BuyForMeOrder.joins(:purchaser)
-                    .where("vendors.phone_number = :query OR purchasers.phone_number = :query OR buy_for_me_orders.id = :query", query: params[:search_query])
-                    .includes(:purchaser, buy_for_me_order_items: { ad: :vendor })
+      @buy_for_me_orders = BuyForMeOrder.joins(:buyer)
+                    .where("vendors.phone_number = :query OR buyers.phone_number = :query OR buy_for_me_orders.id = :query", query: params[:search_query])
+                    .includes(:buyer, buy_for_me_order_items: { ad: :vendor })
     else
-      @buy_for_me_orders = BuyForMeOrder.includes(:purchaser, buy_for_me_order_items: { ad: :vendor }).all
+      @buy_for_me_orders = BuyForMeOrder.includes(:buyer, buy_for_me_order_items: { ad: :vendor }).all
     end
   
     render json: @buy_for_me_orders.as_json(
       include: {
-        purchaser: { only: [:fullname] },
+        buyer: { only: [:fullname] },
         buy_for_me_order_items: {
           include: {
             ad: {
@@ -30,7 +30,7 @@ class Admin::BuyForMeOrdersController < ApplicationController
   def show
     render json: @buy_for_me_order.as_json(
       include: {
-        purchaser: { only: [:fullname] },
+        buyer: { only: [:fullname] },
         buy_for_me_order_items: {
           include: {
             ad: {
@@ -48,7 +48,7 @@ class Admin::BuyForMeOrdersController < ApplicationController
     if @buy_for_me_order.update(status: params[:status])
       render json: @buy_for_me_order.as_json(
         include: {
-          purchaser: { only: [:fullname] },
+          buyer: { only: [:fullname] },
           buy_for_me_order_items: {
             include: {
               ad: {
@@ -76,7 +76,7 @@ class Admin::BuyForMeOrdersController < ApplicationController
   end
 
   def buy_for_me_order_params
-    params.require(:buy_for_me_order).permit(:purchaser_id, :status, :total_amount)
+    params.require(:buy_for_me_order).permit(:buyer_id, :status, :total_amount)
   end
   
   def authenticate_admin
