@@ -10,6 +10,8 @@ class Seller::ReviewsController < ApplicationController
         id: review.id,
         rating: review.rating,
         review: review.review,
+        seller_reply: review.seller_reply,
+        created_at: review.created_at,
         buyer_id: review.buyer_id,
         buyer_name: review.buyer.fullname || review.buyer.name || "Buyer ##{review.buyer.id}"
       }
@@ -24,8 +26,11 @@ class Seller::ReviewsController < ApplicationController
   # POST /seller/reviews/:id/reply
   def reply
     @review = Review.find(params[:id])
-    @review.update(reply: params[:reply])  # Ensure 'reply' matches the attribute name in your Review model
-    render json: @review
+    if @review.update(seller_reply: params[:seller_reply])
+      render json: @review
+    else
+      render json: { error: 'Update failed' }, status: 422
+    end
   end
 
   private
