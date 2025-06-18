@@ -14,16 +14,31 @@ class Seller::AdsController < ApplicationController
   end
 
   def create
+    seller_tier = current_seller.seller_tier
+
+    unless seller_tier && seller_tier.tier
+      return render json: { error: "You do not have an active subscription tier. Please upgrade your account to post ads." }, status: :forbidden
+    end
+
+    ad_limit = seller_tier.tier.ads_limit || 0
+      Rails.logger.info "🔍 Current seller tier: #{seller_tier.tier.name} with ad limit: #{ad_limit}"
+    current_ads_count = current_seller.ads.count
+
+    if current_ads_count >= ad_limit
+      return render json: { error: "Ad creation limit reached for your current tier (#{ad_limit} ads max)." }, status: :forbidden
+    end
+
     params[:ad][:media] = process_and_upload_images(params[:ad][:media]) if params[:ad][:media].present?
-    
+
     @ad = current_seller.ads.build(ad_params)
+
     if @ad.save
       render json: @ad.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating]), status: :created
     else
       Rails.logger.error "❌ Ad save failed: #{@ad.errors.full_messages.join(', ')}"
       render json: @ad.errors, status: :unprocessable_entity
     end
-  end  
+  end
 
   def update
     ad = current_seller.ads.find(params[:id])
