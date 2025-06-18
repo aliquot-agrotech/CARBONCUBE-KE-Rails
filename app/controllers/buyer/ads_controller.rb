@@ -32,12 +32,12 @@ class Buyer::AdsController < ApplicationController
   # GET /buyer/ads/search
   def search
     query = params[:query].to_s.strip
-    category_id = params[:category]
-    subcategory_id = params[:subcategory]
+    category_param = params[:category]
+    subcategory_param = params[:subcategory]
 
     ads = Ad.joins(:seller, :category, :subcategory)
             .where(sellers: { blocked: false })
-            .where(flagged: false) # Exclude flagged ads
+            .where(flagged: false)
 
     if query.present?
       query_words = query.split(/\s+/)
@@ -49,10 +49,16 @@ class Buyer::AdsController < ApplicationController
       end
     end
 
-    ads = ads.where(category_id: category_id) if category_id.present? && category_id != 'All'
-    ads = ads.where(subcategory_id: subcategory_id) if subcategory_id.present? && subcategory_id != 'All'
+    if category_param.present? && category_param != 'All'
+      category = Category.find_by(name: category_param)
+      ads = ads.where(category_id: category.id) if category
+    end
 
-    # ✅ Optimize by eager loading associated records used in AdSerializer
+    if subcategory_param.present? && subcategory_param != 'All'
+      subcategory = Subcategory.find_by(name: subcategory_param)
+      ads = ads.where(subcategory_id: subcategory.id) if subcategory
+    end
+
     ads = ads
       .joins(seller: { seller_tier: :tier })
       .select('ads.*, CASE tiers.id
@@ -72,7 +78,6 @@ class Buyer::AdsController < ApplicationController
 
     render json: ads, each_serializer: AdSerializer
   end
-
 
   # GET /buyer/ads/:id/related
   def related
