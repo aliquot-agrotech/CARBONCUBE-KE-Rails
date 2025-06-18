@@ -1,24 +1,24 @@
 class Seller::ConversationsController < ApplicationController
-  before_action :authenticate_vendor
+  before_action :authenticate_seller
 
   def index
-    # Fetch ONLY conversations where current vendor is the vendor
-    @conversations = Conversation.where(vendor_id: current_vendor.id)
+    # Fetch ONLY conversations where current seller is the seller
+    @conversations = Conversation.where(seller_id: current_seller.id)
                                 .includes(:admin, :buyer, :ad, :messages)
                                 .order(updated_at: :desc)
     
-    # Debug: Log the vendor ID and conversations found
-    Rails.logger.info "Current Seller ID: #{current_vendor.id}"
+    # Debug: Log the seller ID and conversations found
+    Rails.logger.info "Current Seller ID: #{current_seller.id}"
     Rails.logger.info "Conversations found: #{@conversations.count}"
     @conversations.each do |conv|
-      Rails.logger.info "Conversation ID: #{conv.id}, Seller ID: #{conv.vendor_id}"
+      Rails.logger.info "Conversation ID: #{conv.id}, Seller ID: #{conv.seller_id}"
     end
     
     # Simple JSON without complex includes to avoid method errors
     conversations_data = @conversations.map do |conversation|
       {
         id: conversation.id,
-        vendor_id: conversation.vendor_id, # Include this to verify
+        seller_id: conversation.seller_id, # Include this to verify
         created_at: conversation.created_at,
         updated_at: conversation.updated_at,
         admin: conversation.admin,
@@ -33,7 +33,7 @@ class Seller::ConversationsController < ApplicationController
   end
 
   def show
-    @conversation = Conversation.find_by(id: params[:id], vendor_id: current_vendor.id)
+    @conversation = Conversation.find_by(id: params[:id], seller_id: current_seller.id)
     
     unless @conversation
       render json: { error: 'Conversation not found or unauthorized' }, status: :not_found
@@ -63,9 +63,9 @@ class Seller::ConversationsController < ApplicationController
   end
 
   def create
-    # Check if conversation already exists for this vendor, buyer, and ad
+    # Check if conversation already exists for this seller, buyer, and ad
     existing_convo = Conversation.find_by(
-      vendor_id: current_vendor.id,
+      seller_id: current_seller.id,
       buyer_id: params[:conversation][:buyer_id],
       ad_id: params[:conversation][:ad_id]
     )
@@ -80,9 +80,9 @@ class Seller::ConversationsController < ApplicationController
         ]
       ), status: :ok
     else
-      # Create new conversation with vendor as the vendor (not creator, since buyer creates)
+      # Create new conversation with seller as the seller (not creator, since buyer creates)
       @conversation = Conversation.new(conversation_params)
-      @conversation.vendor_id = current_vendor.id
+      @conversation.seller_id = current_seller.id
 
       if @conversation.save
         render json: @conversation.as_json(
@@ -105,7 +105,7 @@ class Seller::ConversationsController < ApplicationController
     params.require(:conversation).permit(:buyer_id, :ad_id)
   end
 
-  def authenticate_vendor
+  def authenticate_seller
     @current_user = SellerAuthorizeApiRequest.new(request.headers).result
     
     # Debug logging
@@ -118,7 +118,7 @@ class Seller::ConversationsController < ApplicationController
     end
   end
 
-  def current_vendor
+  def current_seller
     @current_user
   end
 end

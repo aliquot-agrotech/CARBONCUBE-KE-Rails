@@ -1,32 +1,32 @@
 class Seller::ProfilesController < ApplicationController
-  before_action :authenticate_vendor
-  before_action :set_vendor, only: [:show, :update]
+  before_action :authenticate_seller
+  before_action :set_seller, only: [:show, :update]
 
-  # GET /vendor/profile
+  # GET /seller/profile
   def show
-    render json: @vendor
+    render json: @seller
   end
 
-  # PATCH/PUT /vendor/profile
+  # PATCH/PUT /seller/profile
   def update
-    if @vendor.update(vendor_params)
-      render json: @vendor
+    if @seller.update(seller_params)
+      render json: @seller
     else
-      render json: @vendor.errors, status: :unprocessable_entity
+      render json: @seller.errors, status: :unprocessable_entity
     end
   end
 
-  # POST /vendor/change-password
+  # POST /seller/change-password
   def change_password
     # Check if the current password is correct
-    if current_vendor.authenticate(params[:currentPassword])
+    if current_seller.authenticate(params[:currentPassword])
       # Check if new password matches confirmation
       if params[:newPassword] == params[:confirmPassword]
         # Update the password
-        if current_vendor.update(password: params[:newPassword])
+        if current_seller.update(password: params[:newPassword])
           render json: { message: 'Password updated successfully' }, status: :ok
         else
-          render json: { errors: current_vendor.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: current_seller.errors.full_messages }, status: :unprocessable_entity
         end
       else
         render json: { error: 'New password and confirmation do not match' }, status: :unprocessable_entity
@@ -38,22 +38,22 @@ class Seller::ProfilesController < ApplicationController
 
   private
 
-  def set_vendor
-    @vendor = current_vendor
+  def set_seller
+    @seller = current_seller
   end
 
-  def vendor_params
+  def seller_params
     params.permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :business_registration_number, :gender, :city, :birthdate, :zipcode, :username)
   end
 
-  def authenticate_vendor
-    @current_vendor = SellerAuthorizeApiRequest.new(request.headers).result
-    unless @current_vendor && @current_vendor.is_a?(Seller)
+  def authenticate_seller
+    @current_seller = SellerAuthorizeApiRequest.new(request.headers).result
+    unless @current_seller && @current_seller.is_a?(Seller)
       render json: { error: 'Not Authorized' }, status: :unauthorized
     end
   end
 
-  def current_vendor
-    @current_vendor
+  def current_seller
+    @current_seller
   end
 end

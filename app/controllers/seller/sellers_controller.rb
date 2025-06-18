@@ -1,52 +1,52 @@
 class Seller::SellersController < ApplicationController
-  before_action :set_vendor, only: [:show, :update]
-  before_action :authenticate_vendor, only: [:identify, :show, :update, :destroy]
+  before_action :set_seller, only: [:show, :update]
+  before_action :authenticate_seller, only: [:identify, :show, :update, :destroy]
 
   def identify
-    render json: { vendor_id: current_vendor.id }
+    render json: { seller_id: current_seller.id }
   end
   
-  # GET /vendor/profile
+  # GET /seller/profile
   def show
-    render json: current_vendor
+    render json: current_seller
   end
 
-  # PATCH/PUT /vendor/profile
+  # PATCH/PUT /seller/profile
   def update
-    if current_vendor.update(vendor_params)
-      render json: current_vendor
+    if current_seller.update(seller_params)
+      render json: current_seller
     else
-      render json: current_vendor.errors, status: :unprocessable_entity
+      render json: current_seller.errors, status: :unprocessable_entity
     end
   end
 
-  # DELETE /vendor/:id
+  # DELETE /seller/:id
   def destroy
-    if current_vendor.nil?
-      Rails.logger.error("Current vendor is nil during account deletion.")
+    if current_seller.nil?
+      Rails.logger.error("Current seller is nil during account deletion.")
       render json: { error: 'Not Authorized' }, status: :unauthorized
       return
     end
 
-    if current_vendor.update(deleted: true)
+    if current_seller.update(deleted: true)
       head :no_content
     else
       render json: { error: 'Failed to delete account' }, status: :unprocessable_entity
     end
   end
 
-  # POST /vendor/signup
+  # POST /seller/signup
   def create
-    vendor_email = params[:vendor][:email].downcase.strip
+    seller_email = params[:seller][:email].downcase.strip
 
-    if Buyer.exists?(email: vendor_email)
+    if Buyer.exists?(email: seller_email)
       return render json: { errors: ['Email is already in use by a buyer'] }, status: :unprocessable_entity
     end
 
     uploaded_url = nil
 
-    if params[:vendor][:document_url].present?
-      uploaded_file = params[:vendor][:document_url]
+    if params[:seller][:document_url].present?
+      uploaded_file = params[:seller][:document_url]
 
       if uploaded_file.size > 1.megabyte
         return render json: { error: "Business permit must be less than 1MB" }, status: :unprocessable_entity
@@ -61,49 +61,49 @@ class Seller::SellersController < ApplicationController
       end
     end
 
-    @vendor = Seller.new(vendor_params)
-    @vendor.document_url = uploaded_url if uploaded_url
+    @seller = Seller.new(seller_params)
+    @seller.document_url = uploaded_url if uploaded_url
 
-    Rails.logger.info "Seller Signup Params: #{vendor_params.inspect}"
+    Rails.logger.info "Seller Signup Params: #{seller_params.inspect}"
 
-    if @vendor.save
-      SellerTier.create(vendor_id: @vendor.id, tier_id: 1, duration_months: 0)
-      token = JsonWebToken.encode(vendor_id: @vendor.id, role: 'Seller')
-      render json: { token: token, vendor: @vendor }, status: :created
+    if @seller.save
+      SellerTier.create(seller_id: @seller.id, tier_id: 1, duration_months: 0)
+      token = JsonWebToken.encode(seller_id: @seller.id, role: 'Seller')
+      render json: { token: token, seller: @seller }, status: :created
     else
-      Rails.logger.error "Seller Signup Failed: #{@vendor.errors.full_messages.inspect}"
-      render json: @vendor.errors, status: :unprocessable_entity
+      Rails.logger.error "Seller Signup Failed: #{@seller.errors.full_messages.inspect}"
+      render json: @seller.errors, status: :unprocessable_entity
     end
   end
 
 
   private
 
-  def set_vendor
-    @vendor = Seller.find(params[:id])
+  def set_seller
+    @seller = Seller.find(params[:id])
   end
 
-  def vendor_params
-    params.require(:vendor).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :username, :age_group_id, :zipcode, :city, :gender, :description, :business_registration_number, :document_url, :document_type_id,
+  def seller_params
+    params.require(:seller).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :username, :age_group_id, :zipcode, :city, :gender, :description, :business_registration_number, :document_url, :document_type_id,
     :document_expiry_date, :document_verified, :county_id, :sub_county_id,  category_ids: [])
   end
 
-  def vendor_params_with_categories
-    params.require(:vendor).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :business_registration_number, category_ids: [])
+  def seller_params_with_categories
+    params.require(:seller).permit(:fullname, :phone_number, :email, :enterprise_name, :location, :password, :password_confirmation, :business_registration_number, category_ids: [])
   end
 
-  def authenticate_vendor
-    @current_vendor = SellerAuthorizeApiRequest.new(request.headers).result
+  def authenticate_seller
+    @current_seller = SellerAuthorizeApiRequest.new(request.headers).result
 
-    if @current_vendor.nil?
+    if @current_seller.nil?
       render json: { error: 'Not Authorized' }, status: :unauthorized
-    elsif @current_vendor.deleted?
+    elsif @current_seller.deleted?
       render json: { error: 'Account has been deleted' }, status: :unauthorized
     end
   end
 
-  def current_vendor
-    @current_vendor
+  def current_seller
+    @current_seller
   end
 
   def process_and_upload_permit(image)

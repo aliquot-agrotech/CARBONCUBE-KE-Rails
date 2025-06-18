@@ -1,15 +1,15 @@
 class Seller::NotificationsController < ApplicationController
-  before_action :authenticate_vendor
+  before_action :authenticate_seller
 
   def index
-    notifications = current_vendor.notifications.order(created_at: :desc)
+    notifications = current_seller.notifications.order(created_at: :desc)
     render json: notifications
   end
 
   def create
     notification = Notification.create!(notification_params)
     NotificationsChannel.broadcast_to(
-      current_vendor,
+      current_seller,
       notification: notification.as_json
     )
     head :ok
@@ -17,7 +17,7 @@ class Seller::NotificationsController < ApplicationController
 
   private
 
-  def authenticate_vendor
+  def authenticate_seller
     @current_user = SellerAuthorizeApiRequest.new(request.headers).result
     unless @current_user && @current_user.is_a?(Seller)
       render json: { error: 'Not Authorized' }, status: :unauthorized
@@ -29,7 +29,7 @@ class Seller::NotificationsController < ApplicationController
           .merge(notifiable: @current_user)
   end
 
-  def current_vendor
+  def current_seller
     @current_user
   end
 end
