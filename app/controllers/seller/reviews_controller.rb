@@ -3,8 +3,17 @@ class Seller::ReviewsController < ApplicationController
   before_action :current_seller
 
   def index
-    @reviews = Review.joins(:ad).where(ads: { seller_id: @current_seller.id })
-    render json: @reviews
+    @reviews = Review.joins(:ad).where(ads: { seller_id: @current_seller.id }).includes(:buyer)
+
+    render json: @reviews.map { |review|
+      {
+        id: review.id,
+        rating: review.rating,
+        review: review.review,
+        buyer_id: review.buyer_id,
+        buyer_name: review.buyer.fullname || review.buyer.name || "Buyer ##{review.buyer.id}"
+      }
+    }
   end
 
   def show
