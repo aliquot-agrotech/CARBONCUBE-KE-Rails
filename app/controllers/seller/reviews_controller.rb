@@ -3,7 +3,7 @@ class Seller::ReviewsController < ApplicationController
   before_action :current_seller
 
   def index
-    @reviews = Review.joins(:ad).where(ads: { seller_id: @current_seller.id }).includes(:buyer)
+    @reviews = Review.joins(:ad).where(ads: { seller_id: @current_seller.id }).includes(:buyer).order(updated_at: :desc)
 
     render json: @reviews.map { |review|
       {
@@ -12,6 +12,7 @@ class Seller::ReviewsController < ApplicationController
         review: review.review,
         seller_reply: review.seller_reply,
         created_at: review.created_at,
+        updated_at: review.updated_at,
         buyer_id: review.buyer_id,
         buyer_name: review.buyer.fullname || review.buyer.name || "Buyer ##{review.buyer.id}"
       }
