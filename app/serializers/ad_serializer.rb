@@ -1,9 +1,10 @@
 class AdSerializer < ActiveModel::Serializer
-  attributes :id, :seller_id, :category_id, :subcategory_id, :category_name,
-             :subcategory_name, :title, :description, :price, :quantity, :brand,
-             :manufacturer, :item_weight, :weight_unit, :item_length, :item_width,
-             :item_height, :media_urls, :first_media_url, :mean_rating, :review_count,
-             :seller_tier, :tier_name, :condition, :seller_enterprise_name, :seller_phone_number 
+    attributes  :id, :seller_id, :category_id, :subcategory_id, :category_name,
+                :subcategory_name, :title, :description, :price, :quantity, :brand,
+                :manufacturer, :item_weight, :weight_unit, :item_length, :item_width,
+                :item_height, :media_urls, :first_media_url, :mean_rating, :review_count,
+                :seller_tier, :tier_name, :condition, :seller_enterprise_name, :seller_phone_number,
+                :seller_profile_picture, :seller_name
 
   has_one :seller, serializer: SellerSerializer
   has_many :reviews
@@ -17,7 +18,7 @@ class AdSerializer < ActiveModel::Serializer
   end
 
   def seller_name
-    object.seller.name
+    object.seller.fullname
   end
 
   def seller_tier
@@ -48,6 +49,10 @@ class AdSerializer < ActiveModel::Serializer
 
   def seller_enterprise_name
     object.seller.enterprise_name
+  end
+
+  def seller_profile_picture
+    object.seller.profile_picture
   end
 
   def seller_phone_number

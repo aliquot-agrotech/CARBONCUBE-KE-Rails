@@ -50,6 +50,12 @@ Rails.application.routes.draw do
     end
   end
 
+  # Route for seller ads viewing
+  # This route allows viewing ads for a specific seller
+  resources :sellers, only: [] do
+    get 'ads', to: 'sellers#ads'
+  end
+
   # Routes for document types
   resources :document_types, only: [:index]
 
