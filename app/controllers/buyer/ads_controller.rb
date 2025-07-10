@@ -50,13 +50,21 @@ class Buyer::AdsController < ApplicationController
     end
 
     if category_param.present? && category_param != 'All'
-      category = Category.find_by(name: category_param)
-      ads = ads.where(category_id: category.id) if category
+      if category_param.to_s.match?(/\A\d+\z/)
+        ads = ads.where(category_id: category_param.to_i)
+      else
+        category = Category.find_by(name: category_param)
+        ads = ads.where(category_id: category.id) if category
+      end
     end
 
     if subcategory_param.present? && subcategory_param != 'All'
-      subcategory = Subcategory.find_by(name: subcategory_param)
-      ads = ads.where(subcategory_id: subcategory.id) if subcategory
+      if subcategory_param.to_s.match?(/\A\d+\z/)
+        ads = ads.where(subcategory_id: subcategory_param.to_i)
+      else
+        subcategory = Subcategory.find_by(name: subcategory_param)
+        ads = ads.where(subcategory_id: subcategory.id) if subcategory
+      end
     end
 
     ads = ads
@@ -73,7 +81,7 @@ class Buyer::AdsController < ApplicationController
         category: :ads,
         subcategory: :ads
       )
-      .order('tier_priority ASC')
+      .order('tier_priority ASC, ads.created_at DESC')
       .distinct
 
     render json: ads, each_serializer: AdSerializer
