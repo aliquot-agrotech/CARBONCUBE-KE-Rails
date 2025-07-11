@@ -7,7 +7,7 @@ class Buyer::AdsController < ApplicationController
     per_page = params[:per_page]&.to_i || 500  # ✅ Default to fetching all ads if not specified
     page = params[:page].to_i.positive? ? params[:page].to_i : 1
 
-    @ads = Ad.joins(:seller)
+    @ads = Ad.active.joins(:seller)
             .where(sellers: { blocked: false })
             .where(flagged: false)
 
@@ -35,7 +35,7 @@ class Buyer::AdsController < ApplicationController
     category_param = params[:category]
     subcategory_param = params[:subcategory]
 
-    ads = Ad.joins(:seller, :category, :subcategory)
+    ads = Ad.active.joins(:seller, :category, :subcategory)
             .where(sellers: { blocked: false })
             .where(flagged: false)
 

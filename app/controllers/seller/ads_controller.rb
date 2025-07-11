@@ -4,9 +4,15 @@ class Seller::AdsController < ApplicationController
 
   require "image_processing/vips"
 
+  # app/controllers/seller/ads_controller.rb
   def index
-    @ads = current_seller.ads.includes(:category, :reviews)
-    render json: @ads.to_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating])
+    active_ads = current_seller.ads.active.includes(:category, :reviews)
+    deleted_ads = current_seller.ads.deleted.includes(:category, :reviews)
+
+    render json: {
+      active_ads: active_ads.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating]),
+      deleted_ads: deleted_ads.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating])
+    }
   end
 
   def show
@@ -66,10 +72,12 @@ class Seller::AdsController < ApplicationController
     end
   end
 
-
   def destroy
-    @ad.destroy
-    head :no_content
+    if @ad.update(deleted: true)
+      head :no_content
+    else
+      render json: { error: 'Unable to delete ad' }, status: :unprocessable_entity
+    end
   end
 
   private

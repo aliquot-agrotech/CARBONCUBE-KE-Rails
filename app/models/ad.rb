@@ -7,6 +7,9 @@ class Ad < ApplicationRecord
 
   scope :all_products, -> { unscope(:where).all }
 
+  scope :active, -> { where(deleted: false) }
+  scope :deleted, -> { where(deleted: true) }
+
   belongs_to :seller
   belongs_to :category
   belongs_to :subcategory
