@@ -48,7 +48,7 @@ class Seller::SellersController < ApplicationController
     if params[:seller][:document_url].present?
       uploaded_file = params[:seller][:document_url]
 
-      if uploaded_file.size > 1.megabyte
+      if uploaded_file.size > 5.megabyte
         return render json: { error: "Business permit must be less than 1MB" }, status: :unprocessable_entity
       end
 
