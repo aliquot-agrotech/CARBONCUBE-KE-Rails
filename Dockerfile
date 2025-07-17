@@ -1,5 +1,5 @@
 # Use an official Ruby runtime as the base image
-FROM ruby:3.3.6
+FROM ruby:3.4.4
 
 # Install dependencies
 RUN apt-get update -qq && apt-get install -y \
