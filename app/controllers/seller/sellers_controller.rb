@@ -37,8 +37,10 @@ class Seller::SellersController < ApplicationController
   # POST /seller/signup
   def create
     seller_email = params[:seller][:email].downcase.strip
+    Rails.logger.info "🔍 Checking if buyer exists with email: #{seller_email}"
 
     if Buyer.exists?(email: seller_email)
+      Rails.logger.error "❌ Email already used by buyer: #{seller_email}"
       return render json: { errors: ['Email is already in use by a buyer'] }, status: :unprocessable_entity
     end
 
@@ -47,7 +49,10 @@ class Seller::SellersController < ApplicationController
 
     if params[:seller][:document_url].present?
       doc = params[:seller][:document_url]
+      Rails.logger.info "📤 Processing business document: #{doc.original_filename}"
+
       if doc.content_type == "application/pdf"
+        Rails.logger.info "📄 PDF detected. Skipping image processing."
         uploaded_document_url = upload_file_only(doc)
       else
         uploaded_document_url = handle_upload(
@@ -58,11 +63,19 @@ class Seller::SellersController < ApplicationController
           processing_method: :process_and_upload_permit
         )
       end
-      return render json: { error: "Failed to upload document" }, status: :unprocessable_entity if uploaded_document_url.nil?
+
+      if uploaded_document_url.nil?
+        Rails.logger.error "❌ Document upload failed"
+        return render json: { error: "Failed to upload document" }, status: :unprocessable_entity
+      end
+
+      Rails.logger.info "✅ Document uploaded successfully: #{uploaded_document_url}"
     end
 
     if params[:seller][:profile_picture].present?
       pic = params[:seller][:profile_picture]
+      Rails.logger.info "📸 Processing profile picture: #{pic.original_filename}"
+
       uploaded_profile_picture_url = handle_upload(
         file: pic,
         type: :profile_picture,
@@ -70,21 +83,34 @@ class Seller::SellersController < ApplicationController
         accepted_types: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
         processing_method: :process_and_upload_profile_picture
       )
-      return render json: { error: "Failed to upload profile picture" }, status: :unprocessable_entity if uploaded_profile_picture_url.nil?
+
+      if uploaded_profile_picture_url.nil?
+        Rails.logger.error "❌ Profile picture upload failed"
+        return render json: { error: "Failed to upload profile picture" }, status: :unprocessable_entity
+      end
+
+      Rails.logger.info "✅ Profile picture uploaded successfully: #{uploaded_profile_picture_url}"
     end
 
     @seller = Seller.new(seller_params)
     @seller.document_url = uploaded_document_url if uploaded_document_url
     @seller.profile_picture = uploaded_profile_picture_url if uploaded_profile_picture_url
 
+    Rails.logger.info "📝 Seller Params: #{seller_params.to_h.except(:password, :password_confirmation).inspect}"
+    Rails.logger.info "📂 Document URL: #{@seller.document_url}"
+    Rails.logger.info "🖼️ Profile Picture URL: #{@seller.profile_picture}"
+
     if @seller.save
       SellerTier.create(seller_id: @seller.id, tier_id: 1, duration_months: 0)
       token = JsonWebToken.encode(seller_id: @seller.id, role: 'Seller')
+      Rails.logger.info "✅ Seller created successfully: #{@seller.id}"
       render json: { token: token, seller: @seller }, status: :created
     else
+      Rails.logger.error "❌ Seller creation failed: #{@seller.errors.full_messages.inspect}"
       render json: @seller.errors, status: :unprocessable_entity
     end
   end
+
 
   private
 
