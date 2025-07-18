@@ -1,6 +1,8 @@
 source "https://rubygems.org"
 
-ruby "3.4.4"
+
+# Specify your gem's dependencies in backend/Gemfile
+ruby "3.4.4" 
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails" , "~> 8.0.2"
