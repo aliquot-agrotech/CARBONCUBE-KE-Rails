@@ -80,6 +80,22 @@ class Seller::AdsController < ApplicationController
     end
   end
 
+  # app/controllers/seller/ads_controller.rb
+  def restore
+    ad = current_seller.ads.deleted.find_by(id: params[:id])
+
+    if ad.nil?
+      return render json: { error: "Ad not found or not deleted" }, status: :not_found
+    end
+
+    if ad.update(deleted: false)
+      render json: ad.as_json(include: [:category, :reviews], methods: [:quantity_sold, :mean_rating]), status: :ok
+    else
+      render json: { error: ad.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+
   private
 
   def authenticate_seller

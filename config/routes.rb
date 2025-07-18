@@ -150,7 +150,11 @@ Rails.application.routes.draw do
     post 'signup', to: 'sellers#create'
     delete 'delete_account', to: 'sellers#destroy'
     
-    resources :ads
+    resources :ads do
+      member do
+        put 'restore'
+      end
+    end
     resources :orders do
       member do
         put 'update_status', to: 'orders#update_status' # Custom route for updating order status
