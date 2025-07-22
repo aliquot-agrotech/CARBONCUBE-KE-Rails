@@ -2,7 +2,7 @@ class Admin::AnalyticsController < ApplicationController
   before_action :authenticate_admin
 
   def index
-    @total_vendors = Seller.count
+    @total_sellers = Seller.count
     @total_buyers = Buyer.count
     @total_ads = Ad.count
     @total_reviews = Review.count
