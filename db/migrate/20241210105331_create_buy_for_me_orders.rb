@@ -1,7 +1,7 @@
 class CreateBuyForMeOrders < ActiveRecord::Migration[7.1]
   def change
     create_table :buy_for_me_orders do |t|
-      t.references :purchaser, null: false, foreign_key: true
+      t.references :buyer, null: false, foreign_key: true
       # t.string :status, default: 'Processing'  # Default status is 'processing'
       t.decimal :total_amount, precision: 10, scale: 2
       t.decimal :processing_fee, precision: 10, scale: 2  # New column for processing fee

@@ -1,6 +1,6 @@
-class AddDeletedToVendorsAndPurchasers < ActiveRecord::Migration[8.0]
+class AddDeletedToSellersAndBuyers < ActiveRecord::Migration[8.0]
   def change
-    add_column :vendors, :deleted, :boolean, default: false, null: false
-    add_column :purchasers, :deleted, :boolean, default: false, null: false
+    add_column :sellers, :deleted, :boolean, default: false, null: false
+    add_column :buyers, :deleted, :boolean, default: false, null: false
   end
 end

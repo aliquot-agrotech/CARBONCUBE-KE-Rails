@@ -1,6 +1,6 @@
-class CreatePurchasers < ActiveRecord::Migration[7.1]
+class CreateBuyers < ActiveRecord::Migration[7.1]
   def change
-    create_table :purchasers do |t|
+    create_table :buyers do |t|
       t.string :fullname, null: false
       t.string :username, null: false
       t.string :password_digest
@@ -25,7 +25,7 @@ class CreatePurchasers < ActiveRecord::Migration[7.1]
       t.timestamps
     end
 
-    add_index :purchasers, :username
-    add_index :purchasers, :email
+    add_index :buyers, :username
+    add_index :buyers, :email
   end
 end

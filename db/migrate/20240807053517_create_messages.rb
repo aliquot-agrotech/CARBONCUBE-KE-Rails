@@ -2,7 +2,7 @@ class CreateMessages < ActiveRecord::Migration[7.1]
   def change
     create_table :messages do |t|
       t.references :conversation, null: false, foreign_key: true
-      t.references :sender, polymorphic: true, null: false  # Handles both purchaser and vendor
+      t.references :sender, polymorphic: true, null: false  # Handles both buyer and seller
       t.text :content
 
       t.timestamps

@@ -1,6 +1,6 @@
-class CreateVendors < ActiveRecord::Migration[7.1]
+class CreateSellers < ActiveRecord::Migration[7.1]
   def change
-    create_table :vendors do |t|
+    create_table :sellers do |t|
       t.string :fullname
       t.string :username
       t.string :description
