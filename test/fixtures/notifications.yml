@@ -2,12 +2,12 @@
 
 one:
   product: one
-  vendor: one
+  seller: one
   options: MyText
   notes: MyText
 
 two:
   product: two
-  vendor: two
+  seller: two
   options: MyText
   notes: MyText

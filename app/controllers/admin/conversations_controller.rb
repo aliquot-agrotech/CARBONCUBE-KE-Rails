@@ -5,7 +5,7 @@ class Admin::ConversationsController < ApplicationController
   # GET /admin/conversations
   def index
     @conversations = Conversation
-      .includes(:admin, :buyer, :vendor)
+      .includes(:admin, :buyer, :seller)
       .where(admin_id: current_admin.id)
     
     render json: @conversations, each_serializer: ConversationSerializer
@@ -31,7 +31,7 @@ class Admin::ConversationsController < ApplicationController
   private
 
   def conversation_params
-    params.require(:conversation).permit(:buyer_id, :vendor_id)
+    params.require(:conversation).permit(:buyer_id, :seller_id)
   end
 
   def authenticate_admin
@@ -46,7 +46,7 @@ class Admin::ConversationsController < ApplicationController
   end
 
   def set_conversation
-    @conversation = Conversation.includes(:admin, :buyer, :vendor, messages: :sender).find(params[:id])
+    @conversation = Conversation.includes(:admin, :buyer, :seller, messages: :sender).find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Conversation not found" }, status: :not_found
   end

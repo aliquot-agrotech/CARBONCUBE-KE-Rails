@@ -50,44 +50,44 @@ class Admin::AnalyticsController < ApplicationController
       else buyers_by_clicks
     end.limit(10)
 
-#=============================================================VENDOR INSIGHTS=============================================================#
+#=============================================================SELLER INSIGHTS=============================================================#
 
     # Get selected metric from query parameter, default to 'Rating' if none provided
     selected_metric = params[:metric] || 'Rating'
 
-    # Calculate vendor mean rating
-    vendors_by_rating = Seller.joins(ads: :reviews)
-                        .select('vendors.id, vendors.fullname, COALESCE(AVG(reviews.rating), 0) AS mean_rating')
-                        .group('vendors.id')
+    # Calculate seller mean rating
+    sellers_by_rating = Seller.joins(ads: :reviews)
+                        .select('sellers.id, sellers.fullname, COALESCE(AVG(reviews.rating), 0) AS mean_rating')
+                        .group('sellers.id')
                         .order('mean_rating DESC')
 
-    # Calculate vendor total ads
-    vendors_by_ads = Seller.joins(:ads)
-                        .select('vendors.id, vendors.fullname, COUNT(ads.id) AS total_ads')
-                        .group('vendors.id')
+    # Calculate seller total ads
+    sellers_by_ads = Seller.joins(:ads)
+                        .select('sellers.id, sellers.fullname, COUNT(ads.id) AS total_ads')
+                        .group('sellers.id')
                         .order('total_ads DESC')
 
-    # Calculate vendor total reveal clicks
-    vendors_by_reveal_clicks = Seller.joins(ads: :click_events)
+    # Calculate seller total reveal clicks
+    sellers_by_reveal_clicks = Seller.joins(ads: :click_events)
                         .where(click_events: { event_type: 'Reveal-Seller-Details' })
-                        .select('vendors.id, vendors.fullname, COUNT(click_events.id) AS reveal_clicks')
-                        .group('vendors.id')
+                        .select('sellers.id, sellers.fullname, COUNT(click_events.id) AS reveal_clicks')
+                        .group('sellers.id')
                         .order('reveal_clicks DESC')
 
-    # Calculate vendor total ad clicks
-    vendors_by_ad_clicks = Seller.joins(ads: :click_events)
+    # Calculate seller total ad clicks
+    sellers_by_ad_clicks = Seller.joins(ads: :click_events)
                         .where(click_events: { event_type: 'Ad-Click' })
-                        .select('vendors.id, vendors.fullname, COUNT(click_events.id) AS total_ad_clicks')
-                        .group('vendors.id')
+                        .select('sellers.id, sellers.fullname, COUNT(click_events.id) AS total_ad_clicks')
+                        .group('sellers.id')
                         .order('total_ad_clicks DESC')
 
-    # Dynamically select the vendors' insights based on the metric
-    vendors_insights = case selected_metric
-      when 'Rating' then vendors_by_rating
-      when 'Total Ads' then vendors_by_ads
-      when 'Reveal Clicks' then vendors_by_reveal_clicks
-      when 'Ad Clicks' then vendors_by_ad_clicks
-      else vendors_by_rating
+    # Dynamically select the sellers' insights based on the metric
+    sellers_insights = case selected_metric
+      when 'Rating' then sellers_by_rating
+      when 'Total Ads' then sellers_by_ads
+      when 'Reveal Clicks' then sellers_by_reveal_clicks
+      when 'Ad Clicks' then sellers_by_ad_clicks
+      else sellers_by_rating
     end.limit(10)
 
     # # Total Revenue
@@ -209,9 +209,9 @@ class Admin::AnalyticsController < ApplicationController
                         .select('sectors.name, COUNT(buyers.id) AS total')
                         .group('sectors.name')
 
-#================================================================VENDOR DEMOGRAPHICS===============================================================#
+#================================================================SELLER DEMOGRAPHICS===============================================================#
 
-    vendor_age_groups = {
+    seller_age_groups = {
       '18-25' => 0,
       '26-35' => 0,
       '36-45' => 0,
@@ -220,37 +220,37 @@ class Admin::AnalyticsController < ApplicationController
       '65+'   => 0
     }
 
-    Seller.find_each do |vendor|
-      case vendor.age_group_id
-      when 1 then vendor_age_groups['18-25'] += 1
-      when 2 then vendor_age_groups['26-35'] += 1
-      when 3 then vendor_age_groups['36-45'] += 1
-      when 4 then vendor_age_groups['46-55'] += 1
-      when 5 then vendor_age_groups['56-65'] += 1
-      when 6 then vendor_age_groups['65+']   += 1
+    Seller.find_each do |seller|
+      case seller.age_group_id
+      when 1 then seller_age_groups['18-25'] += 1
+      when 2 then seller_age_groups['26-35'] += 1
+      when 3 then seller_age_groups['36-45'] += 1
+      when 4 then seller_age_groups['46-55'] += 1
+      when 5 then seller_age_groups['56-65'] += 1
+      when 6 then seller_age_groups['65+']   += 1
       end
     end
 
-    Rails.logger.info "Seller Age Groups Computed: #{vendor_age_groups}"
+    Rails.logger.info "Seller Age Groups Computed: #{seller_age_groups}"
 
     # Gender Distribution
-    vendor_gender_distribution = Seller.group(:gender).count
-    Rails.logger.info "Gender Distribution Computed: #{vendor_gender_distribution}"
+    seller_gender_distribution = Seller.group(:gender).count
+    Rails.logger.info "Gender Distribution Computed: #{seller_gender_distribution}"
 
     # Seller Tier Breakdown
     # Corrected query
-    tier_data = SellerTier.joins(:vendor)
+    tier_data = SellerTier.joins(:seller)
                 .joins(:tier)
-                .select('tiers.name AS tier_name, COUNT(vendor_tiers.vendor_id) AS total')
+                .select('tiers.name AS tier_name, COUNT(seller_tiers.seller_id) AS total')
                 .group('tiers.name')
                 .as_json
 
     Rails.logger.info "Seller Tier Data: #{tier_data}"
 
     # Seller Category Breakdown
-    category_data = CategoriesSeller.joins(:vendor)
+    category_data = CategoriesSeller.joins(:seller)
                                 .joins(:category)
-                                .select('categories.name, COUNT(categories_vendors.vendor_id) AS total')
+                                .select('categories.name, COUNT(categories_sellers.seller_id) AS total')
                                 .group('categories.name')
                                 .as_json
 
@@ -260,27 +260,27 @@ class Admin::AnalyticsController < ApplicationController
 #================================================================RENDER SECTION===============================================================#
 
     render json: {
-      total_vendors: @total_vendors,
+      total_sellers: @total_sellers,
       total_buyers: @total_buyers,
       total_ads: @total_ads,
       total_reviews: @total_reviews,
       top_wishlisted_ads: top_wishlisted_ads,
       total_ads_wish_listed: total_ads_wish_listed,
       buyers_insights: buyers_insights,
-      vendors_insights: vendors_insights,
+      sellers_insights: sellers_insights,
       sales_performance: sales_performance,
       ads_per_category: ads_per_category,
       order_counts_by_status: order_counts_by_status,
       category_click_events: category_click_events,
       category_wishlist_data: category_wishlist_data,
       buyer_age_groups: buyer_age_groups,
-      vendor_age_groups: vendor_age_groups,
+      seller_age_groups: seller_age_groups,
       gender_distribution: gender_distribution,
       employment_data: employment_data.map { |e| { e.status => e.total } },
       income_data: income_data.map { |i| { i.range => i.total } },
       education_data: education_data.map { |e| { e.level => e.total } },
       sector_data: sector_data.map { |s| { s.name => s.total } },
-      vendor_gender_distribution: vendor_gender_distribution,
+      seller_gender_distribution: seller_gender_distribution,
       tier_data: tier_data.map { |t| { t['tier_name'] => t['total'] } },
       category_data: category_data.map { |c| { c['name'] => c['total'] } }
     }

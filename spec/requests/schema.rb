@@ -28,10 +28,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
 
   create_table "ad_searches", force: :cascade do |t|
     t.string "search_term", null: false
-    t.bigint "purchaser_id"
+    t.bigint "buyer_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["purchaser_id"], name: "index_ad_searches_on_purchaser_id"
+    t.index ["buyer_id"], name: "index_ad_searches_on_buyer_id"
   end
 
   create_table "admins", force: :cascade do |t|
@@ -44,7 +44,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
   end
 
   create_table "ads", force: :cascade do |t|
-    t.bigint "vendor_id", null: false
+    t.bigint "seller_id", null: false
     t.bigint "category_id", null: false
     t.bigint "subcategory_id", null: false
     t.string "title"
@@ -67,7 +67,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
     t.index ["description"], name: "index_ads_on_description", opclass: :gin_trgm_ops, using: :gin
     t.index ["subcategory_id"], name: "index_ads_on_subcategory_id"
     t.index ["title"], name: "index_ads_on_title", opclass: :gin_trgm_ops, using: :gin
-    t.index ["vendor_id"], name: "index_ads_on_vendor_id"
+    t.index ["seller_id"], name: "index_ads_on_seller_id"
   end
 
   create_table "analytics", force: :cascade do |t|
@@ -84,14 +84,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
   end
 
   create_table "buy_for_me_order_cart_items", force: :cascade do |t|
-    t.bigint "purchaser_id", null: false
+    t.bigint "buyer_id", null: false
     t.bigint "ad_id", null: false
     t.integer "quantity", default: 1, null: false
     t.decimal "price", precision: 10, scale: 2, default: "0.0", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["ad_id"], name: "index_buy_for_me_order_cart_items_on_ad_id"
-    t.index ["purchaser_id"], name: "index_buy_for_me_order_cart_items_on_purchaser_id"
+    t.index ["buyer_id"], name: "index_buy_for_me_order_cart_items_on_buyer_id"
   end
 
   create_table "buy_for_me_order_items", force: :cascade do |t|
@@ -106,35 +106,35 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
     t.index ["buy_for_me_order_id"], name: "index_buy_for_me_order_items_on_buy_for_me_order_id"
   end
 
-  create_table "buy_for_me_order_vendors", force: :cascade do |t|
+  create_table "buy_for_me_order_sellers", force: :cascade do |t|
     t.bigint "buy_for_me_order_id", null: false
-    t.bigint "vendor_id", null: false
+    t.bigint "seller_id", null: false
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.index ["buy_for_me_order_id"], name: "index_buy_for_me_order_vendors_on_buy_for_me_order_id"
-    t.index ["vendor_id"], name: "index_buy_for_me_order_vendors_on_vendor_id"
+    t.index ["buy_for_me_order_id"], name: "index_buy_for_me_order_sellers_on_buy_for_me_order_id"
+    t.index ["seller_id"], name: "index_buy_for_me_order_sellers_on_seller_id"
   end
 
   create_table "buy_for_me_orders", force: :cascade do |t|
-    t.bigint "purchaser_id", null: false
+    t.bigint "buyer_id", null: false
     t.decimal "total_amount", precision: 10, scale: 2
     t.decimal "processing_fee", precision: 10, scale: 2
     t.decimal "delivery_fee", precision: 10, scale: 2
     t.string "mpesa_transaction_code"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.index ["purchaser_id"], name: "index_buy_for_me_orders_on_purchaser_id"
+    t.index ["buyer_id"], name: "index_buy_for_me_orders_on_buyer_id"
   end
 
   create_table "cart_items", force: :cascade do |t|
-    t.bigint "purchaser_id", null: false
+    t.bigint "buyer_id", null: false
     t.bigint "ad_id", null: false
     t.integer "quantity", default: 1, null: false
     t.decimal "price", precision: 10, scale: 2, default: "0.0", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["ad_id"], name: "index_cart_items_on_ad_id"
-    t.index ["purchaser_id"], name: "index_cart_items_on_purchaser_id"
+    t.index ["buyer_id"], name: "index_cart_items_on_buyer_id"
   end
 
   create_table "categories", force: :cascade do |t|
@@ -145,22 +145,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
     t.index ["name"], name: "index_categories_on_name"
   end
 
-  create_table "categories_vendors", id: false, force: :cascade do |t|
-    t.bigint "vendor_id", null: false
+  create_table "categories_sellers", id: false, force: :cascade do |t|
+    t.bigint "seller_id", null: false
     t.bigint "category_id", null: false
-    t.index ["category_id", "vendor_id"], name: "index_categories_vendors_on_category_id_and_vendor_id"
-    t.index ["vendor_id", "category_id"], name: "index_categories_vendors_on_vendor_id_and_category_id"
+    t.index ["category_id", "seller_id"], name: "index_categories_sellers_on_category_id_and_seller_id"
+    t.index ["seller_id", "category_id"], name: "index_categories_sellers_on_seller_id_and_category_id"
   end
 
   create_table "click_events", force: :cascade do |t|
-    t.bigint "purchaser_id"
+    t.bigint "buyer_id"
     t.bigint "ad_id"
     t.string "event_type", null: false
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["ad_id"], name: "index_click_events_on_ad_id"
-    t.index ["purchaser_id"], name: "index_click_events_on_purchaser_id"
+    t.index ["buyer_id"], name: "index_click_events_on_buyer_id"
   end
 
   create_table "cms_pages", force: :cascade do |t|
@@ -172,13 +172,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
 
   create_table "conversations", force: :cascade do |t|
     t.bigint "admin_id"
-    t.bigint "purchaser_id"
-    t.bigint "vendor_id"
+    t.bigint "buyer_id"
+    t.bigint "seller_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["admin_id"], name: "index_conversations_on_admin_id"
-    t.index ["purchaser_id"], name: "index_conversations_on_purchaser_id"
-    t.index ["vendor_id"], name: "index_conversations_on_vendor_id"
+    t.index ["buyer_id"], name: "index_conversations_on_buyer_id"
+    t.index ["seller_id"], name: "index_conversations_on_seller_id"
   end
 
   create_table "counties", force: :cascade do |t|
@@ -250,17 +250,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
     t.index ["order_id"], name: "index_order_items_on_order_id"
   end
 
-  create_table "order_vendors", force: :cascade do |t|
+  create_table "order_sellers", force: :cascade do |t|
     t.bigint "order_id", null: false
-    t.bigint "vendor_id", null: false
+    t.bigint "seller_id", null: false
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.index ["order_id"], name: "index_order_vendors_on_order_id"
-    t.index ["vendor_id"], name: "index_order_vendors_on_vendor_id"
+    t.index ["order_id"], name: "index_order_sellers_on_order_id"
+    t.index ["seller_id"], name: "index_order_sellers_on_seller_id"
   end
 
   create_table "orders", force: :cascade do |t|
-    t.bigint "purchaser_id", null: false
+    t.bigint "buyer_id", null: false
     t.string "status", default: "Processing"
     t.decimal "total_amount", precision: 10, scale: 2
     t.decimal "processing_fee", precision: 10, scale: 2
@@ -268,7 +268,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
     t.string "mpesa_transaction_code"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.index ["purchaser_id"], name: "index_orders_on_purchaser_id"
+    t.index ["buyer_id"], name: "index_orders_on_buyer_id"
   end
 
   create_table "payments", force: :cascade do |t|
@@ -300,7 +300,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "purchasers", force: :cascade do |t|
+  create_table "buyers", force: :cascade do |t|
     t.string "fullname"
     t.string "username"
     t.string "password_digest"
@@ -321,26 +321,26 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
     t.bigint "sector_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["county_id"], name: "index_purchasers_on_county_id"
-    t.index ["education_id"], name: "index_purchasers_on_education_id"
-    t.index ["email"], name: "index_purchasers_on_email"
-    t.index ["employment_id"], name: "index_purchasers_on_employment_id"
-    t.index ["income_id"], name: "index_purchasers_on_income_id"
-    t.index ["sector_id"], name: "index_purchasers_on_sector_id"
-    t.index ["sub_county_id"], name: "index_purchasers_on_sub_county_id"
-    t.index ["username"], name: "index_purchasers_on_username"
+    t.index ["county_id"], name: "index_buyers_on_county_id"
+    t.index ["education_id"], name: "index_buyers_on_education_id"
+    t.index ["email"], name: "index_buyers_on_email"
+    t.index ["employment_id"], name: "index_buyers_on_employment_id"
+    t.index ["income_id"], name: "index_buyers_on_income_id"
+    t.index ["sector_id"], name: "index_buyers_on_sector_id"
+    t.index ["sub_county_id"], name: "index_buyers_on_sub_county_id"
+    t.index ["username"], name: "index_buyers_on_username"
   end
 
   create_table "reviews", force: :cascade do |t|
     t.bigint "ad_id", null: false
-    t.bigint "purchaser_id", null: false
+    t.bigint "buyer_id", null: false
     t.integer "rating", limit: 2, null: false
     t.text "review"
     t.text "reply"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["ad_id"], name: "index_reviews_on_ad_id"
-    t.index ["purchaser_id"], name: "index_reviews_on_purchaser_id"
+    t.index ["buyer_id"], name: "index_reviews_on_buyer_id"
   end
 
   create_table "riders", force: :cascade do |t|
@@ -430,17 +430,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "vendor_tiers", force: :cascade do |t|
-    t.bigint "vendor_id", null: false
+  create_table "seller_tiers", force: :cascade do |t|
+    t.bigint "seller_id", null: false
     t.bigint "tier_id", null: false
     t.integer "duration_months", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["tier_id"], name: "index_vendor_tiers_on_tier_id"
-    t.index ["vendor_id"], name: "index_vendor_tiers_on_vendor_id"
+    t.index ["tier_id"], name: "index_seller_tiers_on_tier_id"
+    t.index ["seller_id"], name: "index_seller_tiers_on_seller_id"
   end
 
-  create_table "vendors", force: :cascade do |t|
+  create_table "sellers", force: :cascade do |t|
     t.string "fullname"
     t.string "username"
     t.string "description"
@@ -460,60 +460,60 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_071100) do
     t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["county_id"], name: "index_vendors_on_county_id"
-    t.index ["sub_county_id"], name: "index_vendors_on_sub_county_id"
+    t.index ["county_id"], name: "index_sellers_on_county_id"
+    t.index ["sub_county_id"], name: "index_sellers_on_sub_county_id"
   end
 
   create_table "wish_lists", force: :cascade do |t|
-    t.bigint "purchaser_id", null: false
+    t.bigint "buyer_id", null: false
     t.bigint "ad_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["ad_id"], name: "index_wish_lists_on_ad_id"
-    t.index ["purchaser_id"], name: "index_wish_lists_on_purchaser_id"
+    t.index ["buyer_id"], name: "index_wish_lists_on_buyer_id"
   end
 
-  add_foreign_key "ad_searches", "purchasers"
+  add_foreign_key "ad_searches", "buyers"
   add_foreign_key "ads", "categories"
   add_foreign_key "ads", "subcategories"
-  add_foreign_key "ads", "vendors"
+  add_foreign_key "ads", "sellers"
   add_foreign_key "buy_for_me_order_cart_items", "ads"
-  add_foreign_key "buy_for_me_order_cart_items", "purchasers"
+  add_foreign_key "buy_for_me_order_cart_items", "buyers"
   add_foreign_key "buy_for_me_order_items", "ads"
   add_foreign_key "buy_for_me_order_items", "buy_for_me_orders"
-  add_foreign_key "buy_for_me_order_vendors", "buy_for_me_orders"
-  add_foreign_key "buy_for_me_order_vendors", "vendors"
-  add_foreign_key "buy_for_me_orders", "purchasers"
+  add_foreign_key "buy_for_me_order_sellers", "buy_for_me_orders"
+  add_foreign_key "buy_for_me_order_sellers", "sellers"
+  add_foreign_key "buy_for_me_orders", "buyers"
   add_foreign_key "cart_items", "ads"
-  add_foreign_key "cart_items", "purchasers"
+  add_foreign_key "cart_items", "buyers"
   add_foreign_key "click_events", "ads"
-  add_foreign_key "click_events", "purchasers"
+  add_foreign_key "click_events", "buyers"
   add_foreign_key "conversations", "admins"
-  add_foreign_key "conversations", "purchasers"
-  add_foreign_key "conversations", "vendors"
+  add_foreign_key "conversations", "buyers"
+  add_foreign_key "conversations", "sellers"
   add_foreign_key "order_items", "ads"
   add_foreign_key "order_items", "orders"
-  add_foreign_key "order_vendors", "orders"
-  add_foreign_key "order_vendors", "vendors"
-  add_foreign_key "orders", "purchasers"
-  add_foreign_key "purchasers", "counties"
-  add_foreign_key "purchasers", "educations"
-  add_foreign_key "purchasers", "employments"
-  add_foreign_key "purchasers", "incomes"
-  add_foreign_key "purchasers", "sectors"
-  add_foreign_key "purchasers", "sub_counties"
+  add_foreign_key "order_sellers", "orders"
+  add_foreign_key "order_sellers", "sellers"
+  add_foreign_key "orders", "buyers"
+  add_foreign_key "buyers", "counties"
+  add_foreign_key "buyers", "educations"
+  add_foreign_key "buyers", "employments"
+  add_foreign_key "buyers", "incomes"
+  add_foreign_key "buyers", "sectors"
+  add_foreign_key "buyers", "sub_counties"
   add_foreign_key "reviews", "ads"
-  add_foreign_key "reviews", "purchasers"
+  add_foreign_key "reviews", "buyers"
   add_foreign_key "riders", "counties"
   add_foreign_key "riders", "sub_counties"
   add_foreign_key "shipments", "orders"
   add_foreign_key "sub_counties", "counties"
   add_foreign_key "tier_features", "tiers"
   add_foreign_key "tier_pricings", "tiers"
-  add_foreign_key "vendor_tiers", "tiers"
-  add_foreign_key "vendor_tiers", "vendors"
-  add_foreign_key "vendors", "counties"
-  add_foreign_key "vendors", "sub_counties"
+  add_foreign_key "seller_tiers", "tiers"
+  add_foreign_key "seller_tiers", "sellers"
+  add_foreign_key "sellers", "counties"
+  add_foreign_key "sellers", "sub_counties"
   add_foreign_key "wish_lists", "ads"
-  add_foreign_key "wish_lists", "purchasers"
+  add_foreign_key "wish_lists", "buyers"
 end

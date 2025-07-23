@@ -3,10 +3,10 @@ class Admin::AdsController < ApplicationController
   
   # GET /admin/ads
   def index
-    @ads = Ad.joins(vendor: :vendor_tier) # Join vendor_tiers through vendor
+    @ads = Ad.joins(seller: :seller_tier) # Join seller_tiers through seller
          .joins(:category, :subcategory)
-         .where(vendors: { blocked: false })
-         .select('ads.*, vendor_tiers.tier_id AS vendor_tier')  # Select tier_id from vendor_tiers
+         .where(sellers: { blocked: false })
+         .select('ads.*, seller_tiers.tier_id AS seller_tier')  # Select tier_id from seller_tiers
 
     if params[:category_id].present?
       @ads = @ads.where(category_id: params[:category_id])
@@ -20,14 +20,14 @@ class Admin::AdsController < ApplicationController
     non_flagged_ads = @ads.reject { |ad| ad.flagged }
 
     render json: {
-      flagged: flagged_ads.as_json(methods: :vendor_tier),
-      non_flagged: non_flagged_ads.as_json(methods: :vendor_tier)
+      flagged: flagged_ads.as_json(methods: :seller_tier),
+      non_flagged: non_flagged_ads.as_json(methods: :seller_tier)
     }
   end
   
 
   def show
-    @ad = Ad.includes(:vendor, :category, :subcategory, :reviews => :buyer)
+    @ad = Ad.includes(:seller, :category, :subcategory, :reviews => :buyer)
                       .find(params[:id])
                       .tap do |ad|
                         ad.define_singleton_method(:quantity_sold) do
@@ -40,7 +40,7 @@ class Admin::AdsController < ApplicationController
                       end
     render json: @ad.as_json(
       include: {
-        vendor: { only: [:fullname] },
+        seller: { only: [:fullname] },
         category: { only: [:name] },
         subcategory: { only: [:name] },
         reviews: {
@@ -96,16 +96,16 @@ class Admin::AdsController < ApplicationController
   end
 
   # POST /admin/ads/:id/notify
-  def notify_vendor
+  def notify_seller
     @ad = Ad.find(params[:id])
 
     if @ad
-      # Here you would implement the logic to notify the vendor, e.g., sending an email
+      # Here you would implement the logic to notify the seller, e.g., sending an email
       # For simplicity, let's assume we are saving notification data in a Notification model.
 
       notification_params = {
         ad_id: @ad.id,
-        vendor_id: @ad.vendor_id,
+        seller_id: @ad.seller_id,
         options: params[:options],
         notes: params[:notes]
       }
@@ -128,25 +128,25 @@ def search
       "(LOWER(ads.title) LIKE ? OR LOWER(ads.description) LIKE ?)"
     end.join(" AND ")
 
-    title_description_search = Ad.joins(:vendor)
-                                      .where(vendors: { blocked: false })
+    title_description_search = Ad.joins(:seller)
+                                      .where(sellers: { blocked: false })
                                       .where(title_description_conditions, *search_terms.flat_map { |term| ["%#{term}%", "%#{term}%"] })
 
-    category_search = Ad.joins(:vendor, :category)
-                             .where(vendors: { blocked: false })
+    category_search = Ad.joins(:seller, :category)
+                             .where(sellers: { blocked: false })
                              .where('LOWER(categories.name) ILIKE ?', "%#{params[:query].downcase}%")
                              .select('ads.*')
 
-    subcategory_search = Ad.joins(:vendor, :subcategory)
-                                .where(vendors: { blocked: false })
+    subcategory_search = Ad.joins(:seller, :subcategory)
+                                .where(sellers: { blocked: false })
                                 .where('LOWER(subcategories.name) ILIKE ?', "%#{params[:query].downcase}%")
                                 .select('ads.*')
 
     # Combine results and remove duplicates
     @ads = (title_description_search.to_a + category_search.to_a + subcategory_search.to_a).uniq
   else
-    @ads = Ad.joins(:vendor)
-                       .where(vendors: { blocked: false })
+    @ads = Ad.joins(:seller)
+                       .where(sellers: { blocked: false })
   end
 
   render json: @ads
@@ -157,7 +157,7 @@ end
   private
 
   def ad_params
-    params.require(:ad).permit(:title, :description, :price, :quantity, :category_id, :brand, :manufacturer, :package_dimensions, :package_weight, :vendor_id, :condition)
+    params.require(:ad).permit(:title, :description, :price, :quantity, :category_id, :brand, :manufacturer, :package_dimensions, :package_weight, :seller_id, :condition)
   end
 
   def authenticate_admin

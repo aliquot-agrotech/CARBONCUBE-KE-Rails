@@ -118,7 +118,7 @@ Admin.find_or_create_by(email: 'admin@example.com') do |admin|
   admin.password = '@admin#password123'
 end
 
-puts "Starts seeding Vendors, Riders and Purchasers"
+puts "Starts seeding Sellers, Riders and Buyers"
 
 # Seed Tiers
 free_tier = Tier.create!(name: "Free", ads_limit: 10)
@@ -898,7 +898,7 @@ end
   end
 end
 
-# Seed 100 Purchasers (75% from Nairobi)
+# Seed 100 Buyers (75% from Nairobi)
 100.times do
   county_id, sub_county_id = assign_county_and_sub_county(counties, nairobi)
 
@@ -935,7 +935,7 @@ end
   end
 end
 
-# Seed 50 Vendors (50% from Nairobi)
+# Seed 50 Sellers (50% from Nairobi)
 tier_durations = [1, 3, 6, 12] # Define valid durations in months
 
 50.times do
@@ -983,8 +983,8 @@ tier_durations = [1, 3, 6, 12] # Define valid durations in months
   end
 
   # Seed seller tier data
-  if VendorTier.exists?(vendor_id: seller.id)
-    puts "VendorTier already exists for Seller ID: #{seller.id}. Skipping."
+  if SellerTier.exists?(seller_id: seller.id)
+    puts "SellerTier already exists for Seller ID: #{seller.id}. Skipping."
   else
     # Ensure there are tiers available
     if Tier.any?
@@ -994,20 +994,20 @@ tier_durations = [1, 3, 6, 12] # Define valid durations in months
       created_at_time = Faker::Time.backward(days: 30) # Randomized creation date within the last 30 days
       updated_at_time = Faker::Time.between(from: created_at_time, to: Time.now) # Ensure updated_at is after or equal to created_at
 
-      VendorTier.create!(
-        vendor_id: seller.id,
+      SellerTier.create!(
+        seller_id: seller.id,
         tier_id: tier.id,
         duration_months: duration,
         created_at: created_at_time,
         updated_at: updated_at_time
       )
-      puts "VendorTier created for Seller ID: #{seller.id}, Tier ID: #{tier.id}, Duration: #{duration} months"
+      puts "SellerTier created for Seller ID: #{seller.id}, Tier ID: #{tier.id}, Duration: #{duration} months"
     else
       puts "No tiers found for seller #{seller.email}. Skipping tier assignment."
     end
   end
 end
-puts "Riders, Purchasers, and Vendors have been seeded successfully!"
+puts "Riders, Buyers, and Sellers have been seeded successfully!"
 
 puts "Starts seeding the ads of the categories..."
 
@@ -1442,7 +1442,7 @@ category_ads = {
 # Define the date range for April
 april_range = (Date.new(2024, 4, 1)..Date.new(2024, 4, 30))
 
-# Seed ads with vendors restricted to their categories
+# Seed ads with sellers restricted to their categories
 category_ads.each do |category_name, ads|
   # Find the category by name
   category = Category.find_by(name: category_name)
@@ -1455,17 +1455,17 @@ category_ads.each do |category_name, ads|
   # Initialize a counter to track subcategory assignment
   subcategory_index = 0
   
-  eligible_vendors = Seller.joins("INNER JOIN categories_vendors ON categories_vendors.vendor_id = vendors.id")
-                         .where(categories_vendors: { category_id: category.id })
+  eligible_sellers = Seller.joins("INNER JOIN categories_sellers ON categories_sellers.seller_id = sellers.id")
+                         .where(categories_sellers: { category_id: category.id })
 
   ads.each do |ad_data|
-    if eligible_vendors.empty?
-      puts "No vendors available in category: #{category.name} to assign to this ad: #{ad_data[:title]}. Skipping ad."
+    if eligible_sellers.empty?
+      puts "No sellers available in category: #{category.name} to assign to this ad: #{ad_data[:title]}. Skipping ad."
       next
     end
     
-    # Select a random seller from eligible vendors
-    seller = eligible_vendors.sample
+    # Select a random seller from eligible sellers
+    seller = eligible_sellers.sample
     
     # Assign the subcategory in a round-robin manner
     assigned_subcategory = subcategories[subcategory_index]
@@ -1483,7 +1483,7 @@ category_ads.each do |category_name, ads|
       ad.description = ad_data[:description]
       ad.category_id = category.id
       ad.subcategory_id = assigned_subcategory.id if assigned_subcategory.present?
-      ad.vendor_id = seller.id # Assign vendor_id from the eligible seller
+      ad.seller_id = seller.id # Assign seller_id from the eligible seller
       ad.price = Faker::Commerce.price(range: 200..10000)
       ad.quantity = Faker::Number.between(from: 30, to: 100)
       ad.brand = Faker::Company.name
@@ -1567,7 +1567,7 @@ order_data = 100.times.map do
       price: price.round(2),                     # Round price to two decimal places
       total_price: total_price.round(2),         # Round total price to two decimal places
       processing_fee: ad_processing_fee,    # Store processing fee per ad
-      vendor_id: ad.vendor_id
+      seller_id: ad.seller_id
     }
   end
 
@@ -1587,7 +1587,7 @@ order_data = 100.times.map do
 
   # Return the order data
   {
-    purchaser_id: buyer.id,
+    buyer_id: buyer.id,
     status: status,
     processing_fee: total_processing_fee.round(2),  # Round total processing fee
     delivery_fee: DELIVERY_FEE,                    # Fixed delivery fee
@@ -1607,7 +1607,7 @@ sorted_order_data = order_data.sort_by { |data| data[:created_at] }
 sorted_order_data.each do |data|
   # Create the order with all fees
   order = Order.create!(
-    purchaser_id: data[:purchaser_id],
+    buyer_id: data[:buyer_id],
     status: data[:status],
     processing_fee: data[:processing_fee],    # Total processing fee from all ads
     delivery_fee: data[:delivery_fee],        # Fixed delivery fee
@@ -1617,10 +1617,10 @@ sorted_order_data.each do |data|
     updated_at: data[:updated_at]
   )
 
-  # Track unique vendors for this order
-  order_vendors = Set.new
+  # Track unique sellers for this order
+  order_sellers = Set.new
 
-  # Create order items and collect unique vendors
+  # Create order items and collect unique sellers
   data[:order_items].each do |item_data|
     OrderItem.create!(
       order_id: order.id,
@@ -1632,15 +1632,15 @@ sorted_order_data.each do |data|
       updated_at: data[:updated_at]
     )
 
-    # Add seller to set of unique vendors
-    order_vendors.add(item_data[:vendor_id])
+    # Add seller to set of unique sellers
+    order_sellers.add(item_data[:seller_id])
   end
 
-  # Create OrderVendor associations for unique vendors only
-  order_vendors.each do |vendor_id|
-    OrderVendor.create!(
+  # Create OrderSeller associations for unique sellers only
+  order_sellers.each do |seller_id|
+    OrderSeller.create!(
       order_id: order.id,
-      vendor_id: vendor_id,
+      seller_id: seller_id,
       created_at: data[:created_at],
       updated_at: data[:updated_at]
     )
@@ -1651,13 +1651,13 @@ end
 puts "Starts seeding for the ad reviews"
 
 # Fetch all buyer and ad IDs
-purchasers = Buyer.pluck(:id)
+buyers = Buyer.pluck(:id)
 ads = Ad.pluck(:id)
 
 puts "Seeding click_events and wish_lists..."
 
 # Click Events and Wish Lists seeding logic
-purchasers.each do |purchaser_id|
+buyers.each do |buyer_id|
   num_ads = rand(20..50)
   ad_sample = ads.sample(num_ads)
 
@@ -1670,7 +1670,7 @@ purchasers.each do |purchaser_id|
 
       # Create Click Event
       ClickEvent.create!(
-        purchaser_id: purchaser_id,
+        buyer_id: buyer_id,
         ad_id: ad_id,
         event_type: "Ad-Click",
         metadata: nil,
@@ -1680,7 +1680,7 @@ purchasers.each do |purchaser_id|
 
       # Create Add-to-Wish-List Event
       ClickEvent.create!(
-        purchaser_id: purchaser_id,
+        buyer_id: buyer_id,
         ad_id: ad_id,
         event_type: "Add-to-Wish-List",
         metadata: nil,
@@ -1690,7 +1690,7 @@ purchasers.each do |purchaser_id|
 
       # Create Reveal-Seller-Details Event
       ClickEvent.create!(
-        purchaser_id: purchaser_id,
+        buyer_id: buyer_id,
         ad_id: ad_id,
         event_type: "Reveal-Seller-Details",
         metadata: nil,
@@ -1700,7 +1700,7 @@ purchasers.each do |purchaser_id|
 
       # Create WishList entry ONLY IF it doesn't already exist
       WishList.find_or_create_by!(
-        purchaser_id: purchaser_id,
+        buyer_id: buyer_id,
         ad_id: ad_id
       ) do |wishlist|
         wishlist.created_at = created_at_time
@@ -1721,7 +1721,7 @@ Ad.all.each do |ad|
 
     Review.create!(
       ad_id: ad.id,
-      purchaser_id: buyer.id,
+      buyer_id: buyer.id,
       rating: rating,
       review: review_text
     )
@@ -1761,8 +1761,8 @@ puts "Starts seeding for the Conversations"
 require 'faker'
 
 admin = Admin.find_by(email: 'admin@example.com')
-purchasers = Buyer.all
-vendors = Seller.all
+buyers = Buyer.all
+sellers = Seller.all
 ads = Ad.all  # Assuming ads exist
 
 raise 'Admin not found' unless admin
@@ -1784,32 +1784,32 @@ def create_messages(conversation, sender, receiver)
 end
 
 # Create admin ↔ buyer conversations
-purchasers.each do |buyer|
-  convo = Conversation.find_or_create_by!(admin_id: admin.id, purchaser_id: buyer.id)
+buyers.each do |buyer|
+  convo = Conversation.find_or_create_by!(admin_id: admin.id, buyer_id: buyer.id)
   create_messages(convo, admin, buyer)
 end
 
 # Create admin ↔ seller conversations
-vendors.each do |seller|
-  convo = Conversation.find_or_create_by!(admin_id: admin.id, vendor_id: seller.id)
+sellers.each do |seller|
+  convo = Conversation.find_or_create_by!(admin_id: admin.id, seller_id: seller.id)
   create_messages(convo, admin, seller)
 end
 
 # Create buyer ↔ seller ↔ ad conversations
 # Each buyer can message only once per ad
-purchasers.first(5).each do |buyer|
+buyers.first(5).each do |buyer|
   ads.sample(10).each do |ad|
     next if ad.seller.nil?
 
     seller = ad.seller
 
     # Skip if a conversation already exists for this buyer and ad
-    existing_convo = Conversation.find_by(purchaser_id: buyer.id, ad_id: ad.id)
+    existing_convo = Conversation.find_by(buyer_id: buyer.id, ad_id: ad.id)
     next if existing_convo.present?
 
     convo = Conversation.create!(
-      purchaser_id: buyer.id,
-      vendor_id: seller.id,
+      buyer_id: buyer.id,
+      seller_id: seller.id,
       ad_id: ad.id
     )
 

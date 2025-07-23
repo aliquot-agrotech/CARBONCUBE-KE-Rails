@@ -2,7 +2,7 @@ class Seller::TiersController < ApplicationController
   before_action :authenticate_seller
 
   def update_tier
-    Rails.logger.info "🛠 VENDOR ID CHECK: @current_seller.id = #{@current_seller&.id}"
+    Rails.logger.info "🛠 SELLER ID CHECK: @current_seller.id = #{@current_seller&.id}"
 
     unless @current_seller
       return render json: { error: 'Seller not found or not authenticated' }, status: :unauthorized

@@ -2,10 +2,10 @@
 
 one:
   admin_id: 1
-  purchaser_id: 1
-  vendor_id: 1
+  buyer_id: 1
+  seller_id: 1
 
 two:
   admin_id: 1
-  purchaser_id: 1
-  vendor_id: 1
+  buyer_id: 1
+  seller_id: 1

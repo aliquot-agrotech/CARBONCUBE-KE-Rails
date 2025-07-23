@@ -6,10 +6,10 @@ class Admin::OrdersController < ApplicationController
   def index
     if params[:search_query].present?
       @orders = Order.joins(:buyer)
-                    .where("vendors.phone_number = :query OR buyers.phone_number = :query OR orders.id = :query", query: params[:search_query])
-                    .includes(:buyer, order_items: { ad: :vendor })
+                    .where("sellers.phone_number = :query OR buyers.phone_number = :query OR orders.id = :query", query: params[:search_query])
+                    .includes(:buyer, order_items: { ad: :seller })
     else
-      @orders = Order.includes(:buyer, order_items: { ad: :vendor }).all
+      @orders = Order.includes(:buyer, order_items: { ad: :seller }).all
     end
   
     render json: @orders.as_json(
@@ -18,7 +18,7 @@ class Admin::OrdersController < ApplicationController
         order_items: {
           include: {
             ad: {
-              include: { vendor: { only: [:fullname] } }
+              include: { seller: { only: [:fullname] } }
             }
           }
         }
@@ -34,7 +34,7 @@ class Admin::OrdersController < ApplicationController
         order_items: {
           include: {
             ad: {
-              include: { vendor: { only: [:fullname] } }
+              include: { seller: { only: [:fullname] } }
             }
           }
         }
@@ -52,7 +52,7 @@ class Admin::OrdersController < ApplicationController
           order_items: {
             include: {
               ad: {
-                include: { vendor: { only: [:fullname] } }
+                include: { seller: { only: [:fullname] } }
               }
             }
           }

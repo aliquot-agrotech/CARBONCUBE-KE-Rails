@@ -6,10 +6,10 @@ class Admin::BuyForMeOrdersController < ApplicationController
   def index
     if params[:search_query].present?
       @buy_for_me_orders = BuyForMeOrder.joins(:buyer)
-                    .where("vendors.phone_number = :query OR buyers.phone_number = :query OR buy_for_me_orders.id = :query", query: params[:search_query])
-                    .includes(:buyer, buy_for_me_order_items: { ad: :vendor })
+                    .where("sellers.phone_number = :query OR buyers.phone_number = :query OR buy_for_me_orders.id = :query", query: params[:search_query])
+                    .includes(:buyer, buy_for_me_order_items: { ad: :seller })
     else
-      @buy_for_me_orders = BuyForMeOrder.includes(:buyer, buy_for_me_order_items: { ad: :vendor }).all
+      @buy_for_me_orders = BuyForMeOrder.includes(:buyer, buy_for_me_order_items: { ad: :seller }).all
     end
   
     render json: @buy_for_me_orders.as_json(
@@ -18,7 +18,7 @@ class Admin::BuyForMeOrdersController < ApplicationController
         buy_for_me_order_items: {
           include: {
             ad: {
-              include: { vendor: { only: [:fullname] } }
+              include: { seller: { only: [:fullname] } }
             }
           }
         }
@@ -34,7 +34,7 @@ class Admin::BuyForMeOrdersController < ApplicationController
         buy_for_me_order_items: {
           include: {
             ad: {
-              include: { vendor: { only: [:fullname] } }
+              include: { seller: { only: [:fullname] } }
             }
           }
         }
@@ -52,7 +52,7 @@ class Admin::BuyForMeOrdersController < ApplicationController
           buy_for_me_order_items: {
             include: {
               ad: {
-                include: { vendor: { only: [:fullname] } }
+                include: { seller: { only: [:fullname] } }
               }
             }
           }

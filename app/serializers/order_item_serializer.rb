@@ -14,6 +14,6 @@ class OrderItemSerializer < ActiveModel::Serializer
   end
 
   def seller_name
-    object.ad&.seller&.fullname || 'Unknown Vendor'
+    object.ad&.seller&.fullname || 'Unknown Seller'
   end
 end

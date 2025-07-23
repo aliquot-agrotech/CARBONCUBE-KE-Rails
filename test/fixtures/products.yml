@@ -1,7 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  vendor: one
+  seller: one
   category: one
   name: MyString
   description: MyText
@@ -12,7 +12,7 @@ one:
   stock: 1
 
 two:
-  vendor: two
+  seller: two
   category: two
   name: MyString
   description: MyText

@@ -1,7 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  vendor: one
+  seller: one
   title: MyString
   description: MyText
   discount_percentage: 9.99
@@ -9,7 +9,7 @@ one:
   end_date: 2024-06-28 12:39:45
 
 two:
-  vendor: two
+  seller: two
   title: MyString
   description: MyText
   discount_percentage: 9.99

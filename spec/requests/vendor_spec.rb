@@ -1,10 +1,10 @@
-# spec/requests/vendor_spec.rb
+# spec/requests/seller_spec.rb
 require 'rails_helper'
 
-RSpec.describe 'Vendor Management', type: :request do
-    let(:vendor_params) {
+RSpec.describe 'Seller Management', type: :request do
+    let(:seller_params) {
         {
-        vendor: {
+        seller: {
             full_name: "John Doe",
             phone_number: "1234567890",
             email: "john.doe@example.com",
@@ -35,15 +35,15 @@ RSpec.describe 'Vendor Management', type: :request do
         }
     }
 
-    describe 'Vendor Signup and Login' do
-        it 'signs up a vendor' do
-            post '/vendor/signup', params: vendor_params
+    describe 'Seller Signup and Login' do
+        it 'signs up a seller' do
+            post '/seller/signup', params: seller_params
             expect(response).to have_http_status(:created)
         end
 
-        it 'logs in a vendor' do
-            post '/vendor/signup', params: vendor_params
-            post '/vendor/login', params: { email: vendor_params[:vendor][:email], password: vendor_params[:vendor][:password] }
+        it 'logs in a seller' do
+            post '/seller/signup', params: seller_params
+            post '/seller/login', params: { email: seller_params[:seller][:email], password: seller_params[:seller][:password] }
             expect(response).to have_http_status(:ok)
             @jwt_token = JSON.parse(response.body)['token']
         end
@@ -51,21 +51,21 @@ RSpec.describe 'Vendor Management', type: :request do
 
     describe 'Product Management' do
         before do
-            post '/vendor/signup', params: vendor_params
-            post '/vendor/login', params: { email: vendor_params[:vendor][:email], password: vendor_params[:vendor][:password] }
+            post '/seller/signup', params: seller_params
+            post '/seller/login', params: { email: seller_params[:seller][:email], password: seller_params[:seller][:password] }
             @jwt_token = JSON.parse(response.body)['token']
         end
 
         it 'creates a product' do
-            post '/vendor/products', headers: { Authorization: "Bearer #{@jwt_token}" }, params: product_params
+            post '/seller/products', headers: { Authorization: "Bearer #{@jwt_token}" }, params: product_params
             expect(response).to have_http_status(:created)
             expect(JSON.parse(response.body)['title']).to eq('New Product')
         end
 
         it 'updates a product' do
-            post '/vendor/products', headers: { Authorization: "Bearer #{@jwt_token}" }, params: product_params
+            post '/seller/products', headers: { Authorization: "Bearer #{@jwt_token}" }, params: product_params
             product_id = JSON.parse(response.body)['id']
-            put "/vendor/products/#{product_id}", headers: { Authorization: "Bearer #{@jwt_token}" }, params: {
+            put "/seller/products/#{product_id}", headers: { Authorization: "Bearer #{@jwt_token}" }, params: {
                 product: {
                 title: "Updated Product",
                 description: "This is an updated product"
@@ -76,27 +76,27 @@ RSpec.describe 'Vendor Management', type: :request do
         end
 
         it 'deletes a product' do
-            post '/vendor/products', headers: { Authorization: "Bearer #{@jwt_token}" }, params: product_params
+            post '/seller/products', headers: { Authorization: "Bearer #{@jwt_token}" }, params: product_params
             product_id = JSON.parse(response.body)['id']
-            delete "/vendor/products/#{product_id}", headers: { Authorization: "Bearer #{@jwt_token}" }
+            delete "/seller/products/#{product_id}", headers: { Authorization: "Bearer #{@jwt_token}" }
             expect(response).to have_http_status(:no_content)
         end
     end
 
     describe 'Order Status and Analytics' do
         before do
-            post '/vendor/signup', params: vendor_params
-            post '/vendor/login', params: { email: vendor_params[:vendor][:email], password: vendor_params[:vendor][:password] }
+            post '/seller/signup', params: seller_params
+            post '/seller/login', params: { email: seller_params[:seller][:email], password: seller_params[:seller][:password] }
             @jwt_token = JSON.parse(response.body)['token']
         end
 
         it 'updates order status' do
-            patch '/vendor/orders/22', headers: { Authorization: "Bearer #{@jwt_token}" }, params: { status: "transiting" }
+            patch '/seller/orders/22', headers: { Authorization: "Bearer #{@jwt_token}" }, params: { status: "transiting" }
             expect(response).to have_http_status(:ok)
         end
 
         it 'views reviews and analytics' do
-            get '/vendor/analytics', headers: { Authorization: "Bearer #{@jwt_token}" }
+            get '/seller/analytics', headers: { Authorization: "Bearer #{@jwt_token}" }
             expect(response).to have_http_status(:ok)
         end
     end
