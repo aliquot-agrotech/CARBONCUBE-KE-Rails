@@ -31,7 +31,7 @@ class Seller < ApplicationRecord
   validates :email, presence: true, uniqueness: { case_sensitive: false }
   validates :enterprise_name, presence: true
   validates :location, presence: true
-  validates :business_registration_number, presence: true
+  validates :business_registration_number, length: { minimum: 1 }, allow_blank: true
   validates :age_group, presence: true
   # validates :tier, inclusion: { in: %w[Free Basic Standard Premium] }
 

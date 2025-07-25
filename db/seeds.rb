@@ -118,6 +118,14 @@ Admin.find_or_create_by(email: 'admin@example.com') do |admin|
   admin.password = '@admin#password123'
 end
 
+
+# Seed sales user data
+SalesUser.find_or_create_by(email: 'sales@example.com') do |sales|
+  sales.fullname = 'kimani'
+  sales.password = '@kimani123'
+end
+
+
 puts "Starts seeding Sellers, Riders and Buyers"
 
 # Seed Tiers

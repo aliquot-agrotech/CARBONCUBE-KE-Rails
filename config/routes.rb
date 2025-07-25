@@ -47,7 +47,7 @@ Rails.application.routes.draw do
   resources :email_otps, only: [:create] do
     collection do
       post :verify
-    end
+    end 
   end
 
   # Route for seller ads viewing
@@ -73,6 +73,7 @@ Rails.application.routes.draw do
       get ':buyer_id/profile', to: 'profiles#show'
       get ':buyer_id/orders', to: 'orders#index_for_buyer'
     end
+    
 
     namespace :rider do
       get ':rider_id/profile', to: 'profiles#show'
@@ -254,6 +255,13 @@ Rails.application.routes.draw do
 
     get 'identify', to: 'buyers#identify'
   end
+
+
+#for sales
+    namespace :sales do
+      resources :analytics, only: [:index]  # Dashboard data
+    end
+
 
   #==========================================Rider namespace for buyer-specific functionality=========================================#
   namespace :rider do

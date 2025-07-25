@@ -45,6 +45,7 @@ class AuthenticationController < ApplicationController
       Buyer.find_by(email: identifier) ||
       Seller.find_by(email: identifier) ||
       Admin.find_by(email: identifier) ||
+      SalesUser.find_by(email: identifier) ||
       Rider.find_by(email: identifier)
     elsif identifier.match?(/\A\d{10}\z/)
       # Assume phone number if it’s 10 digits
@@ -60,6 +61,7 @@ class AuthenticationController < ApplicationController
     when Buyer then 'buyer'
     when Seller then 'seller'
     when Admin then 'admin'
+    when SalesUser then 'sales'
     when Rider then 'rider'
     else 'unknown'
     end
