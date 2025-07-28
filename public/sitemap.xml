@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://carboncube-ke.com/</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Health Check (if public) -->
+  <url>
+    <loc>https://carboncube-ke.com/up</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.1</priority>
+  </url>
+
+  <!-- Public Ad Listings -->
+  <url>
+    <loc>https://carboncube-ke.com/ads</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Individual Ad Pages (examples - you'll need to generate these dynamically) -->
+  <!-- These would be generated from your actual ad IDs -->
+  <url>
+    <loc>https://carboncube-ke.com/ads/1</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Seller Profile Pages (examples - generate from actual seller IDs) -->
+  <url>
+    <loc>https://carboncube-ke.com/sellers/1/ads</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Public Data Endpoints (if these should be indexed) -->
+  <url>
+    <loc>https://carboncube-ke.com/banners</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/counties</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/age_groups</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/sectors</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/educations</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/employments</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/incomes</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/tiers</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/document_types</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Buyer Interface Public Pages -->
+  <url>
+    <loc>https://carboncube-ke.com/buyer/ads</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/buyer/ads/search</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/buyer/categories</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/buyer/subcategories</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Seller Interface Public Pages -->
+  <url>
+    <loc>https://carboncube-ke.com/seller/categories</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/seller/subcategories</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Sample Dynamic Routes (You'll need to generate these programmatically) -->
+  <!-- Counties with Sub-counties -->
+  <url>
+    <loc>https://carboncube-ke.com/counties/1/sub_counties</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/counties/47/sub_counties</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- Ad Reviews (examples) -->
+  <url>
+    <loc>https://carboncube-ke.com/ads/1/reviews</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Related Ads (examples) -->
+  <url>
+    <loc>https://carboncube-ke.com/buyer/ads/1/related</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://carboncube-ke.com/buyer/ads/1/seller</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Admin CMS Pages (if public) -->
+  <!-- Note: Most admin routes should NOT be in sitemap as they're private -->
+  <!-- Only include if you have public CMS content -->
+
+  <!-- Sales Analytics (if public) -->
+  <!-- <url>
+    <loc>https://carboncube-ke.com/sales/analytics</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.3</priority>
+  </url> -->
+
+</urlset>

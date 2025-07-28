@@ -104,6 +104,9 @@ gem 'whenever', require: false
 # Cloudinary for image hosting
 gem 'cloudinary'
 
+# Use the sitemap generator for SEO
+gem 'sitemap_generator'
+
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
