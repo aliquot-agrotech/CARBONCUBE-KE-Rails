@@ -126,6 +126,16 @@ SalesUser.find_or_create_by(email: 'sales@example.com') do |sales|
 end
 
 
+SalesUser.find_or_create_by(email: 'dennis@carboncube.com') do |sales|
+  sales.fullname = 'Dennis Kiplangat'
+  sales.password = '@dennis231'
+end
+
+SalesUser.find_or_create_by(email: 'timothy@carboncube.com') do |sales|
+  sales.fullname = 'Timothy Mwangi'
+  sales.password = '@timothy123'
+end
+
 puts "Starts seeding Sellers, Riders and Buyers"
 
 # Seed Tiers

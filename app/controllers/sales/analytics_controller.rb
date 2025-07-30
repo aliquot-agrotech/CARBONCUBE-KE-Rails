@@ -9,6 +9,11 @@ class Sales::AnalyticsController < ApplicationController
     @total_reviews = Review.count
     total_ads_wish_listed = WishList.count
 
+
+    paid_seller_tiers_count = SellerTier.where(tier_id: [2, 3, 4]).count
+
+    unpaid_seller_tiers = SellerTier.where(tier_id: 1).count
+
     
 
     render json: {
@@ -17,7 +22,8 @@ class Sales::AnalyticsController < ApplicationController
       total_ads: @total_ads,
       total_reviews: @total_reviews,
       total_ads_wish_listed: total_ads_wish_listed ,
-
+      subscription_countdowns:paid_seller_tiers_count,
+      without_subscription: unpaid_seller_tiers
     }
   end
 
