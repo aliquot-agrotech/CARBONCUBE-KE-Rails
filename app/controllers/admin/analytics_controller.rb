@@ -2,8 +2,9 @@ class Admin::AnalyticsController < ApplicationController
   before_action :authenticate_admin
 
   def index
-    @total_sellers = Seller.count
-    @total_buyers = Buyer.count
+    @total_sellers = Seller.where(deleted:false).count
+    @total_buyers = Buyer.where(deleted:false).count
+    
     @total_ads = Ad.count
     @total_reviews = Review.count
 

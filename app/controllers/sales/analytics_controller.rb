@@ -3,8 +3,8 @@ class Sales::AnalyticsController < ApplicationController
   before_action :authenticate_sales_user
 
   def index
-    @total_sellers = Seller.count
-    @total_buyers = Buyer.count
+    @total_sellers = Seller.where(deleted:false).count
+    @total_buyers = Buyer.where(deleted:false).count
     @total_ads = Ad.count
     @total_reviews = Review.count
     total_ads_wish_listed = WishList.count

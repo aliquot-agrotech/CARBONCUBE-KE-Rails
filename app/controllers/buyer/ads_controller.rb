@@ -43,9 +43,14 @@ class Buyer::AdsController < ApplicationController
       query_words = query.split(/\s+/)
       query_words.each do |word|
         ads = ads.where(
-          'ads.title ILIKE :word OR ads.description ILIKE :word OR categories.name ILIKE :word OR subcategories.name ILIKE :word',
-          word: "%#{word}%"
-        )
+        'ads.title ILIKE :word
+          OR ads.description ILIKE :word
+          OR categories.name ILIKE :word
+          OR subcategories.name ILIKE :word
+          OR sellers.enterprise_name ILIKE :word',
+       word: "%#{word}%"
+)
+
       end
     end
 
@@ -87,22 +92,19 @@ class Buyer::AdsController < ApplicationController
     render json: ads, each_serializer: AdSerializer
   end
 
+  
   # GET /buyer/ads/:id/related
   def related
     ad = Ad.find(params[:id])
-    
-    # Find ads from the same subcategory
-    related_ads = Ad.where(subcategory: ad.subcategory)
 
-    # Find ads that share words in the title
-    title_words = ad.title.split(' ')
-    related_by_title = Ad.where('title ILIKE ANY (array[?])', title_words.map { |word| "%#{word}%" })
+    # Fetch ads that share either the same category or subcategory
+    related_ads = Ad.where.not(id: ad.id)
+                    .where('category_id = ? OR subcategory_id = ?', ad.category_id, ad.subcategory_id)
+                    .distinct
 
-    # Combine results, excluding the original ad
-    related_ads = related_ads.or(related_by_title).where.not(id: ad.id).distinct
-
-    render json: related_ads
+    render json: related_ads, each_serializer: AdSerializer
   end
+
 
   # GET /buyer/ads/:id/seller
   def seller
