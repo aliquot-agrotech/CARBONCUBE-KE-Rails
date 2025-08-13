@@ -4,9 +4,6 @@ class Buyer::AdsController < ApplicationController
 
   # GET /buyer/ads
   def index
-    per_page = params[:per_page]&.to_i || 500  # ✅ Default to fetching all ads if not specified
-    page = params[:page].to_i.positive? ? params[:page].to_i : 1
-
     @ads = Ad.active.joins(:seller)
             .where(sellers: { blocked: false })
             .where(flagged: false)
@@ -14,13 +11,14 @@ class Buyer::AdsController < ApplicationController
     filter_by_category if params[:category_id].present?
     filter_by_subcategory if params[:subcategory_id].present?
 
-    @ads = @ads.limit(per_page).offset((page - 1) * per_page)
-
-    # ✅ Group ads by subcategory for frontend
     grouped_ads = @ads.group_by(&:subcategory_id)
 
-    render json: grouped_ads, each_serializer: AdSerializer
+    # Take only 4 ads per subcategory
+    limited_grouped_ads = grouped_ads.transform_values { |ads| ads.first(4) }
+
+    render json: limited_grouped_ads, each_serializer: AdSerializer
   end
+
 
   # GET /buyer/ads/:id
   def show
